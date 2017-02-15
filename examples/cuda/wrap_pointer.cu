@@ -8,7 +8,7 @@ int main(void)
 
     // obtain raw pointer to device memory
     int * raw_ptr;
-    cudaMalloc((void **) &raw_ptr, N * sizeof(int));
+    hipMalloc((void **) &raw_ptr, N * sizeof(int));
 
     // wrap raw pointer with a device_ptr 
     thrust::device_ptr<int> dev_ptr = thrust::device_pointer_cast(raw_ptr);
@@ -20,7 +20,7 @@ int main(void)
     dev_ptr[0] = 1;
 
     // free memory
-    cudaFree(raw_ptr);
+    hipFree(raw_ptr);
 
     return 0;
 }

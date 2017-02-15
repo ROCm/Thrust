@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <thrust/device_vector.h>
 #include <thrust/reduce.h>
 #include <thrust/system/cuda/execution_policy.h>
@@ -21,7 +22,7 @@
 // C++11-capable language and library constructs.
 
 template<typename Iterator, typename T, typename BinaryOperation, typename Pointer>
-__global__ void reduce_kernel(Iterator first, Iterator last, T init, BinaryOperation binary_op, Pointer result)
+__global__ void reduce_kernel(hipLaunchParm lp, Iterator first, Iterator last, T init, BinaryOperation binary_op, Pointer result)
 {
   *result = thrust::reduce(thrust::cuda::par, first, last, init, binary_op);
 }
@@ -35,19 +36,19 @@ int main()
   // method 1: call thrust::reduce from an asynchronous CUDA kernel launch
 
   // create a CUDA stream 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   // launch a CUDA kernel with only 1 thread on our stream
-  reduce_kernel<<<1,1,0,s>>>(data.begin(), data.end(), 0, thrust::plus<int>(), result.data());
+  hipLaunchKernel(HIP_KERNEL_NAME(reduce_kernel), dim3(1), dim3(1), 0, s, data.begin(), data.end(), 0, thrust::plus<int>(), result.data());
 
   // wait for the stream to finish
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   // our result should be ready
   assert(result[0] == n);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 
   // reset the result
   result[0] = 0;

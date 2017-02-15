@@ -18,15 +18,15 @@
 
 // A simple timer class
 
-#ifdef __CUDACC__
+#ifdef __HIPCC__
 
 // use CUDA's high-resolution timers when possible
-#include <cuda_runtime_api.h>
+#include <hip/hip_runtime_api.h>
 #include <thrust/system/cuda/error.h>
 #include <thrust/system_error.h>
 #include <string>
 
-void cuda_safe_call(cudaError_t error, const std::string& message = "")
+void cuda_safe_call(hipError_t error, const std::string& message = "")
 {
   if(error)
     throw thrust::system_error(error, thrust::cuda_category(), message);
@@ -34,34 +34,34 @@ void cuda_safe_call(cudaError_t error, const std::string& message = "")
 
 struct timer
 {
-  cudaEvent_t start;
-  cudaEvent_t end;
+  hipEvent_t start;
+  hipEvent_t end;
 
   timer(void)
   {
-    cuda_safe_call(cudaEventCreate(&start));
-    cuda_safe_call(cudaEventCreate(&end));
+    cuda_safe_call(hipEventCreate(&start));
+    cuda_safe_call(hipEventCreate(&end));
     restart();
   }
 
   ~timer(void)
   {
-    cuda_safe_call(cudaEventDestroy(start));
-    cuda_safe_call(cudaEventDestroy(end));
+    cuda_safe_call(hipEventDestroy(start));
+    cuda_safe_call(hipEventDestroy(end));
   }
 
   void restart(void)
   {
-    cuda_safe_call(cudaEventRecord(start, 0));
+    cuda_safe_call(hipEventRecord(start, 0));
   }
 
   double elapsed(void)
   {
-    cuda_safe_call(cudaEventRecord(end, 0));
-    cuda_safe_call(cudaEventSynchronize(end));
+    cuda_safe_call(hipEventRecord(end, 0));
+    cuda_safe_call(hipEventSynchronize(end));
 
     float ms_elapsed;
-    cuda_safe_call(cudaEventElapsedTime(&ms_elapsed, start, end));
+    cuda_safe_call(hipEventElapsedTime(&ms_elapsed, start, end));
     return ms_elapsed / 1e3;
   }
 

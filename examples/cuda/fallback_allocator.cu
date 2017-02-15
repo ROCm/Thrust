@@ -7,8 +7,8 @@
 #include <new> // for std::bad_alloc
 #include <iostream>
 
-// This example demonstrates how to implement a fallback for cudaMalloc
-// with a custom allocator. When cudaMalloc fails to allocate device memory
+// This example demonstrates how to implement a fallback for hipMalloc
+// with a custom allocator. When hipMalloc fails to allocate device memory
 // the fallback_allocator attempts to allocate pinned host memory and
 // then map the host buffer into the device address space. The
 // fallback_allocator enables the GPU to process data sets that are larger
@@ -22,38 +22,38 @@ class fallback_allocator
     // just allocate bytes
     typedef char value_type;
 
-    // allocate's job to is allocate host memory as a functional fallback when cudaMalloc fails
+    // allocate's job to is allocate host memory as a functional fallback when hipMalloc fails
     char *allocate(std::ptrdiff_t n)
     {
       char *result = 0;
 
       // attempt to allocate device memory
-      if(cudaMalloc(&result, n) == cudaSuccess)
+      if(hipMalloc(&result, n) == hipSuccess)
       {
         std::cout << "  allocated " << n << " bytes of device memory" << std::endl;
       }
       else
       {
         // reset the last CUDA error
-        cudaGetLastError();
+        hipGetLastError();
 
         // attempt to allocate pinned host memory
         void *h_ptr = 0;
-        if(cudaMallocHost(&h_ptr, n) == cudaSuccess)
+        if(hipHostMalloc(&h_ptr, n) == hipSuccess)
         {
           // attempt to map host pointer into device memory space
-          if(cudaHostGetDevicePointer(&result, h_ptr, 0) == cudaSuccess)
+          if(hipHostGetDevicePointer(&result, h_ptr, 0) == hipSuccess)
           {
             std::cout << "  allocated " << n << " bytes of pinned host memory (fallback successful)" << std::endl;
           }
           else
           {
             // reset the last CUDA error
-            cudaGetLastError();
+            hipGetLastError();
 
             // attempt to deallocate buffer
             std::cout << "  failed to map host memory into device address space (fallback failed)" << std::endl;
-            cudaFreeHost(h_ptr);
+            hipHostFree(h_ptr);
 
             throw std::bad_alloc();
           }
@@ -61,7 +61,7 @@ class fallback_allocator
         else
         {
           // reset the last CUDA error
-          cudaGetLastError();
+          hipGetLastError();
 
           std::cout << "  failed to allocate " << n << " bytes of memory (fallback failed)" << std::endl;
 
@@ -78,18 +78,18 @@ class fallback_allocator
       void *raw_ptr = thrust::raw_pointer_cast(ptr);
 
       // determine where memory resides
-      cudaPointerAttributes	attributes;
+      hipPointerAttribute_t	attributes;
 
-      if(cudaPointerGetAttributes(&attributes, raw_ptr) == cudaSuccess)
+      if(hipPointerGetAttributes(&attributes, raw_ptr) == hipSuccess)
       {
         // free the memory in the appropriate way
-        if(attributes.memoryType == cudaMemoryTypeHost)
+        if(attributes.memoryType == hipMemoryTypeHost)
         {
-          cudaFreeHost(raw_ptr);
+          hipHostFree(raw_ptr);
         }
         else
         {
-          cudaFree(raw_ptr);
+          hipFree(raw_ptr);
         }
       }
     }
@@ -100,9 +100,9 @@ int main(void)
 {
   // check whether device supports mapped host memory
   int device;
-  cudaGetDevice(&device);
-  cudaDeviceProp properties;
-  cudaGetDeviceProperties(&properties, device);
+  hipGetDevice(&device);
+  hipDeviceProp_t properties;
+  hipGetDeviceProperties(&properties, device);
 
   fallback_allocator alloc;
 

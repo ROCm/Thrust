@@ -81,9 +81,9 @@ struct pong
 
 int main()
 {
-  cudaStream_t s1, s2;
-  cudaStreamCreate(&s1);
-  cudaStreamCreate(&s2);
+  hipStream_t s1, s2;
+  hipStreamCreate(&s1);
+  hipStreamCreate(&s2);
 
   thrust::device_vector<int> ball(1);
 
@@ -104,11 +104,11 @@ int main()
                    pong());
 
   // Wait for all algorithms executed on the streams to terminate.
-  cudaStreamSynchronize(s1);
-  cudaStreamSynchronize(s2);
+  hipStreamSynchronize(s1);
+  hipStreamSynchronize(s2);
 
-  cudaStreamDestroy(s1);
-  cudaStreamDestroy(s2);
+  hipStreamDestroy(s1);
+  hipStreamDestroy(s2);
 
   return 0;
 }

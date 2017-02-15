@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <thrust/device_vector.h>
 #include <thrust/for_each.h>
 #include <thrust/iterator/counting_iterator.h>
@@ -195,7 +196,7 @@ void saxpy(float A, View1 X, View2 Y, View3 Z)
 
 template<class View1, class View2, class View3>
 __global__
-void saxpy_kernel(float A, View1 X, View2 Y, View3 Z)
+void saxpy_kernel(hipLaunchParm lp, float A, View1 X, View2 Y, View3 Z)
 {
   saxpy(A, X, Y, Z);
 }
@@ -223,7 +224,7 @@ int main(int argc, char* argv[])
   thrust::device_vector<float> Y(y, y + 4);
   thrust::device_vector<float> Z(z, z + 4);
 
-  saxpy_kernel<<<1, 1>>>(
+  hipLaunchKernel(HIP_KERNEL_NAME(saxpy_kernel), dim3(1), dim3(1), 0, 0, 
       2.0, 
 
       // make a range view of a pair of transform_iterators
@@ -235,7 +236,7 @@ int main(int argc, char* argv[])
 
       // range view of naked pointers
       make_range_view(Z.data().get(), 4));
-  assert(cudaSuccess == cudaDeviceSynchronize());
+  assert(hipSuccess == hipDeviceSynchronize());
 
   // print values from original device_vector<float> Z 
   // to ensure that range view was mapped to this vector

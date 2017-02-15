@@ -15,7 +15,7 @@ int main(void)
     int * raw_ptr = thrust::raw_pointer_cast(dev_ptr);
 
     // use raw_ptr in CUDA API functions
-    cudaMemset(raw_ptr, 0, N * sizeof(int));
+    hipMemset(raw_ptr, 0, N * sizeof(int));
 
     // free memory
     thrust::device_free(dev_ptr);
