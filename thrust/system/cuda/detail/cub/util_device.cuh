@@ -135,7 +135,7 @@ CUB_RUNTIME_FUNCTION __forceinline__ hipError_t PtxVersion(int &ptx_version)
 #ifndef CUB_RUNTIME_ENABLED
 
     // CUDA API calls not supported from this device
-    return hipErrorInvalidConfiguration;
+    return cudaErrorInvalidConfiguration;
 
 #elif (CUB_PTX_ARCH > 0)
 
@@ -167,7 +167,7 @@ CUB_RUNTIME_FUNCTION __forceinline__ hipError_t SmVersion(int &sm_version, int d
 #ifndef CUB_RUNTIME_ENABLED
 
     // CUDA API calls not supported from this device
-    return hipErrorInvalidConfiguration;
+    return cudaErrorInvalidConfiguration;
 
 #else
 
@@ -219,7 +219,7 @@ hipError_t MaxSmOccupancy(
 #ifndef CUB_RUNTIME_ENABLED
 
     // CUDA API calls not supported from this device
-    return CubDebug(hipErrorInvalidConfiguration);
+    return CubDebug(cudaErrorInvalidConfiguration);
 
 #else
 
@@ -340,7 +340,7 @@ hipError_t MaxSmOccupancy(
 #ifndef CUB_RUNTIME_ENABLED
 
     // CUDA API calls not supported from this device
-    return CubDebug(hipErrorInvalidConfiguration);
+    return CubDebug(cudaErrorInvalidConfiguration);
 
 #else
 

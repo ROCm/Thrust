@@ -62,7 +62,7 @@ enum errc_t
   launch_timeout                     = cudaErrorLaunchTimeout,
   launch_out_of_resources            = cudaErrorLaunchOutOfResources,
   invalid_device_function            = cudaErrorInvalidDeviceFunction,
-  invalid_configuration              = hipErrorInvalidConfiguration,
+  invalid_configuration              = cudaErrorInvalidConfiguration,
   invalid_device                     = hipErrorInvalidDevice,
   invalid_value                      = hipErrorInvalidValue,
   invalid_pitch_value                = cudaErrorInvalidPitchValue,
