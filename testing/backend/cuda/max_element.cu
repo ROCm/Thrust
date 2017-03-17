@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/extrema.h>
 #include <thrust/execution_policy.h>
@@ -32,13 +33,13 @@ void TestMaxElementDevice(ExecutionPolicy exec)
   
   typename thrust::host_vector<int>::iterator   h_max = thrust::max_element(h_data.begin(), h_data.end());
 
-  max_element_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
   ASSERT_EQUAL(h_max - h_data.begin(), (iter_type)d_result[0] - d_data.begin());
 
   
   typename thrust::host_vector<int>::iterator   h_min = thrust::max_element(h_data.begin(), h_data.end(), thrust::greater<int>());
 
-  max_element_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
   ASSERT_EQUAL(h_min - h_data.begin(), (iter_type)d_result[0] - d_data.begin());
 }
 
@@ -70,8 +71,8 @@ void TestMaxElementCudaStreams()
   data[4] = 5;
   data[5] = 1;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL( *thrust::max_element(thrust::cuda::par.on(s), data.begin(), data.end()), 5);
   ASSERT_EQUAL( thrust::max_element(thrust::cuda::par.on(s), data.begin(), data.end()) - data.begin(), 1);
@@ -79,7 +80,7 @@ void TestMaxElementCudaStreams()
   ASSERT_EQUAL( *thrust::max_element(thrust::cuda::par.on(s), data.begin(), data.end(), thrust::greater<T>()), 1);
   ASSERT_EQUAL( thrust::max_element(thrust::cuda::par.on(s), data.begin(), data.end(), thrust::greater<T>()) - data.begin(), 2);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestMaxElementCudaStreams);
 

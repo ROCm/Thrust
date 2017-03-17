@@ -219,7 +219,7 @@ OutputIterator inclusive_scan(execution_policy<DerivedPolicy> &exec,
 
   Size n = last - first;
 
-  hipStream_t s = stream(thrust::detail::derived_cast(exec));
+  cudaStream_t s = stream(thrust::detail::derived_cast(exec));
   
   const Size threshold_of_parallelism = 20000;
 
@@ -307,7 +307,7 @@ OutputIterator exclusive_scan(execution_policy<DerivedPolicy> &exec,
 
   Size n = last - first;
 
-  hipStream_t s = stream(thrust::detail::derived_cast(exec));
+  cudaStream_t s = stream(thrust::detail::derived_cast(exec));
   
   const Size threshold_of_parallelism = 20000;
 

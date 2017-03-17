@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/partition.h>
 #include <thrust/functional.h>
@@ -30,7 +31,7 @@ void TestPartitionPointDevice(ExecutionPolicy exec)
   iterator ref = thrust::stable_partition(v.begin(), v.end(), is_even<int>());
 
   thrust::device_vector<iterator> result(1);
-  partition_point_kernel<<<1,1>>>(exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(partition_point_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(ref - v.begin(), (iterator)result[0] - v.begin());
 }
@@ -64,8 +65,8 @@ void TestPartitionPointCudaStreams()
   Iterator last = v.begin() + 4;
   Iterator ref = first + 3;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL_QUIET(ref, thrust::partition_point(thrust::cuda::par.on(s), first, last, thrust::identity<T>()));
 
@@ -73,7 +74,7 @@ void TestPartitionPointCudaStreams()
   ref = last;
   ASSERT_EQUAL_QUIET(ref, thrust::partition_point(thrust::cuda::par.on(s), first, last, thrust::identity<T>()));
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestPartitionPointCudaStreams);
 

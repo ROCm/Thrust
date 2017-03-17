@@ -31,13 +31,6 @@
  * Random-access iterator types
  */
 
-/* cuda Textures are not yet supported by HIP.   The workaround is to pass symbols directly to kernel
-   #ifdef USE_TEXTURES to remove calls to cudaCreateChannelDesc, cudaBindTexture.  
-   Replace this with calls to cudaMemcpy, pass parameters to the kernel.
-   Inside the kernel, replace calls tex1Dfetch with direct load accesses, referencing the new parameter.
-*/
-
-
 #pragma once
 
 #include <iterator>
@@ -92,8 +85,6 @@ struct IteratorTexRef
             TEXTURE_MULTIPLE = sizeof(T) / sizeof(TextureWord)
         };
 
-#ifdef USE_TEXTURES
-
         // Texture reference type
         typedef texture<TextureWord> TexRef;
 
@@ -118,15 +109,10 @@ struct IteratorTexRef
         {
             return CubDebug(hipUnbindTexture(ref));
         }
-#endif
 
         /// Fetch element
         template <typename Distance>
-#ifdef USE_TEXTURES 
         static __device__ __forceinline__ T Fetch(Distance tex_offset)
-#else
-	static __device__ __forceinline__ T Fetch(Distance tex_offse, void* d_in)
-#endif
         {
             DeviceWord temp[DEVICE_MULTIPLE];
             TextureWord *words = reinterpret_cast<TextureWord*>(temp);
@@ -134,11 +120,7 @@ struct IteratorTexRef
             #pragma unroll
             for (int i = 0; i < TEXTURE_MULTIPLE; ++i)
             {
-#ifdef USE_TEXTURES     
-           words[i] = tex1Dfetch(ref, (tex_offset * TEXTURE_MULTIPLE) + i);
-#else
-	   words[i] = d_in[(tex_offset * TEXTURE_MULTIPLE) + i];
-#endif
+                words[i] = tex1Dfetch(ref, (tex_offset * TEXTURE_MULTIPLE) + i);
             }
 
             return reinterpret_cast<T&>(temp);
@@ -260,7 +242,6 @@ public:
         tex_offset(0)
     {}
 
-#ifdef USE_TEXTURES
     /// Use this iterator to bind \p ptr with a texture reference
     hipError_t BindTexture(
         T               *ptr,                   ///< Native pointer to wrap that is aligned to hipDeviceProp_t::textureAlignment
@@ -277,7 +258,6 @@ public:
     {
         return TexId::UnbindTexture();
     }
-#endif
 
     /// Postfix increment
     __host__ __device__ __forceinline__ self_type operator++(int)
@@ -302,11 +282,7 @@ public:
         return ptr[tex_offset];
 #else
         // Use the texture reference
-#ifdef USE_TEXTURES
-	return TexId::Fetch(tex_offset);
-#else
-        return TexId::Fetch(tex_offset, ptr);
-#endif/*USE_TEXTURES*/
+        return TexId::Fetch(tex_offset);
 #endif
     }
 

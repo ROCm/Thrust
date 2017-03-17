@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
@@ -107,7 +108,7 @@ void TestReduceByKeyDevice(ExecutionPolicy exec)
   thrust::device_vector<T> output_keys(keys.size());
   thrust::device_vector<T> output_values(values.size());
   
-  reduce_by_key_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(reduce_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   5);
@@ -127,7 +128,7 @@ void TestReduceByKeyDevice(ExecutionPolicy exec)
   // test BinaryPredicate
   initialize_keys(keys);  initialize_values(values);
   
-  reduce_by_key_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_reduce<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(reduce_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_reduce<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   3);
@@ -143,7 +144,7 @@ void TestReduceByKeyDevice(ExecutionPolicy exec)
   // test BinaryFunction
   initialize_keys(keys);  initialize_values(values);
   
-  reduce_by_key_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), thrust::equal_to<T>(), thrust::plus<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(reduce_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), thrust::equal_to<T>(), thrust::plus<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   5);
@@ -192,8 +193,8 @@ void TestReduceByKeyCudaStreams()
   Vector output_keys(keys.size());
   Vector output_values(values.size());
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   new_last = thrust::reduce_by_key(thrust::cuda::par.on(s), keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin());
 
@@ -245,7 +246,7 @@ void TestReduceByKeyCudaStreams()
   ASSERT_EQUAL(output_values[3], 15);
   ASSERT_EQUAL(output_values[4], 15);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestReduceByKeyCudaStreams);
 

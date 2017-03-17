@@ -80,10 +80,10 @@ class fallback_allocator
       // determine where memory resides
       hipPointerAttribute_t	attributes;
 
-      if(hipPointerGetAttributes(&attributes, raw_ptr) == hipSuccess)
+      if(cudaPointerGetAttributes(&attributes, raw_ptr) == hipSuccess)
       {
         // free the memory in the appropriate way
-        if(attributes.memoryType == hipMemoryTypeHost)
+        if(attributes.memoryType == cudaMemoryTypeHost)
         {
           hipHostFree(raw_ptr);
         }

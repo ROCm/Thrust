@@ -46,41 +46,41 @@ namespace stable_radix_sort_detail
 // sort ascending
 template<typename Key>
 __host__ __device__
-hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
+cudaError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                   size_t &temp_storage_bytes,
                                   cub_::DoubleBuffer<Key> &d_keys,
                                   int num_items,
                                   thrust::less<Key> comp,
                                   int begin_bit = 0,
                                   int end_bit = sizeof(Key) * 8,
-                                  hipStream_t stream = 0,
+                                  cudaStream_t stream = 0,
                                   bool debug_synchronous = false)
 {
   struct workaround
   {
     __host__ 
-    static hipError_t host_path(void *d_temp_storage,
+    static cudaError_t host_path(void *d_temp_storage,
                                  size_t &temp_storage_bytes,
                                  cub_::DoubleBuffer<Key> &d_keys,
                                  int num_items,
                                  thrust::less<Key>,
                                  int begin_bit,
                                  int end_bit,
-                                 hipStream_t stream,
+                                 cudaStream_t stream,
                                  bool debug_synchronous)
     {
       return cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
-    static hipError_t device_path(void *d_temp_storage,
+    static cudaError_t device_path(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    int num_items,
                                    thrust::less<Key>,
                                    int begin_bit,
                                    int end_bit,
-                                   hipStream_t stream,
+                                   cudaStream_t stream,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
@@ -102,41 +102,41 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
 // sort descending
 template<typename Key>
 __host__ __device__
-hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
+cudaError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                   size_t &temp_storage_bytes,
                                   cub_::DoubleBuffer<Key> &d_keys,
                                   int num_items,
                                   thrust::greater<Key> comp,
                                   int begin_bit = 0,
                                   int end_bit = sizeof(Key) * 8,
-                                  hipStream_t stream = 0,
+                                  cudaStream_t stream = 0,
                                   bool debug_synchronous = false)
 {
   struct workaround
   {
     __host__ 
-    static hipError_t host_path(void *d_temp_storage,
+    static cudaError_t host_path(void *d_temp_storage,
                                  size_t &temp_storage_bytes,
                                  cub_::DoubleBuffer<Key> &d_keys,
                                  int num_items,
                                  thrust::greater<Key>,
                                  int begin_bit,
                                  int end_bit,
-                                 hipStream_t stream,
+                                 cudaStream_t stream,
                                  bool debug_synchronous)
     {
       return cub_::DeviceRadixSort::SortKeysDescending(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
-    static hipError_t device_path(void *d_temp_storage,
+    static cudaError_t device_path(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    int num_items,
                                    thrust::greater<Key>,
                                    int begin_bit,
                                    int end_bit,
-                                   hipStream_t stream,
+                                   cudaStream_t stream,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
@@ -160,7 +160,7 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
 //         3. the value of the "temp_storage_bytes" parameter for CUB's sort
 template<typename T, typename Compare>
 __host__ __device__
-thrust::tuple<size_t, size_t, size_t> compute_temporary_storage_requirements_for_radix_sort_n(size_t n, Compare comp, hipStream_t stream)
+thrust::tuple<size_t, size_t, size_t> compute_temporary_storage_requirements_for_radix_sort_n(size_t n, Compare comp, cudaStream_t stream)
 {
   cub_::DoubleBuffer<T> dummy;
 
@@ -187,7 +187,7 @@ void stable_radix_sort_n(execution_policy<DerivedPolicy> &exec, T* first, size_t
 {
   if(n > 1)
   {
-    hipStream_t s = stream(thrust::detail::derived_cast<DerivedPolicy>(exec));
+    cudaStream_t s = stream(thrust::detail::derived_cast<DerivedPolicy>(exec));
 
     // compute temporary storage requirements
     size_t num_temporary_storage_bytes = 0;
@@ -264,7 +264,7 @@ namespace stable_radix_sort_detail
 // sort ascending
 template<typename Key, typename Value>
 __host__ __device__
-hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
+cudaError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    cub_::DoubleBuffer<Value> &d_values,
@@ -272,13 +272,13 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    thrust::less<Key> comp,
                                    int begin_bit = 0,
                                    int end_bit = sizeof(Key) * 8,
-                                   hipStream_t stream = 0,
+                                   cudaStream_t stream = 0,
                                    bool debug_synchronous = false)
 {
   struct workaround
   {
     __host__ 
-    static hipError_t host_path(void *d_temp_storage,
+    static cudaError_t host_path(void *d_temp_storage,
                                  size_t &temp_storage_bytes,
                                  cub_::DoubleBuffer<Key> &d_keys,
                                  cub_::DoubleBuffer<Value> &d_values,
@@ -286,14 +286,14 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                  thrust::less<Key>,
                                  int begin_bit,
                                  int end_bit,
-                                 hipStream_t stream,
+                                 cudaStream_t stream,
                                  bool debug_synchronous)
     {
       return cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
-    static hipError_t device_path(void *d_temp_storage,
+    static cudaError_t device_path(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    cub_::DoubleBuffer<Value> &d_values,
@@ -301,7 +301,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    thrust::less<Key>,
                                    int begin_bit,
                                    int end_bit,
-                                   hipStream_t stream,
+                                   cudaStream_t stream,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
@@ -323,7 +323,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
 // sort descending
 template<typename Key, typename Value>
 __host__ __device__
-hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
+cudaError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    cub_::DoubleBuffer<Value> &d_values,
@@ -331,13 +331,13 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    thrust::greater<Key> comp,
                                    int begin_bit = 0,
                                    int end_bit = sizeof(Key) * 8,
-                                   hipStream_t stream = 0,
+                                   cudaStream_t stream = 0,
                                    bool debug_synchronous = false)
 {
   struct workaround
   {
     __host__ 
-    static hipError_t host_path(void *d_temp_storage,
+    static cudaError_t host_path(void *d_temp_storage,
                                  size_t &temp_storage_bytes,
                                  cub_::DoubleBuffer<Key> &d_keys,
                                  cub_::DoubleBuffer<Value> &d_values,
@@ -345,14 +345,14 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                  thrust::greater<Key>,
                                  int begin_bit,
                                  int end_bit,
-                                 hipStream_t stream,
+                                 cudaStream_t stream,
                                  bool debug_synchronous)
     {
       return cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
-    static hipError_t device_path(void *d_temp_storage,
+    static cudaError_t device_path(void *d_temp_storage,
                                    size_t &temp_storage_bytes,
                                    cub_::DoubleBuffer<Key> &d_keys,
                                    cub_::DoubleBuffer<Value> &d_values,
@@ -360,7 +360,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    thrust::greater<Key>,
                                    int begin_bit,
                                    int end_bit,
-                                   hipStream_t stream,
+                                   cudaStream_t stream,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
@@ -385,7 +385,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
 //         4. the value of the "temp_storage_bytes" parameter for CUB's sort
 template<typename Key, typename Value, typename Compare>
 __host__ __device__
-thrust::tuple<size_t, size_t, size_t, size_t> compute_temporary_storage_requirements_for_radix_sort_by_key_n(size_t n, Compare comp, hipStream_t stream)
+thrust::tuple<size_t, size_t, size_t, size_t> compute_temporary_storage_requirements_for_radix_sort_by_key_n(size_t n, Compare comp, cudaStream_t stream)
 {
   cub_::DoubleBuffer<Key> dummy_keys;
   cub_::DoubleBuffer<Value> dummy_values;
@@ -429,7 +429,7 @@ void stable_radix_sort_by_key_n(execution_policy<DerivedPolicy> &exec,
 {
   if(n > 1)
   {
-    hipStream_t s = stream(thrust::detail::derived_cast<DerivedPolicy>(exec));
+    cudaStream_t s = stream(thrust::detail::derived_cast<DerivedPolicy>(exec));
 
     // compute temporary storage requirements
     size_t num_temporary_storage_bytes = 0;

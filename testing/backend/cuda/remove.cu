@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/remove.h>
 #include <thrust/execution_policy.h>
@@ -80,7 +81,7 @@ void TestRemoveDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> d_result(1);
   
   size_t h_size = thrust::remove(h_data.begin(), h_data.end(), 0) - h_data.begin();
-  remove_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), 0, d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), 0, d_result.begin());
   size_t d_size = (iterator)d_result[0] - d_data.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -117,7 +118,7 @@ void TestRemoveIfDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> d_result(1);
   
   size_t h_size = thrust::remove_if(h_data.begin(), h_data.end(), is_true<int>()) - h_data.begin();
-  remove_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), is_true<int>(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), is_true<int>(), d_result.begin());
   size_t d_size = (iterator)d_result[0] - d_data.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -158,7 +159,7 @@ void TestRemoveIfStencilDevice(ExecutionPolicy exec)
   
   size_t h_size = thrust::remove_if(h_data.begin(), h_data.end(), h_stencil.begin(), is_true<int>()) - h_data.begin();
 
-  remove_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_stencil.begin(), is_true<int>(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), is_true<int>(), d_result.begin());
   size_t d_size = (iterator)d_result[0] - d_data.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -199,7 +200,7 @@ void TestRemoveCopyDevice(ExecutionPolicy exec)
   
   size_t h_size = thrust::remove_copy(h_data.begin(), h_data.end(), h_result.begin(), 0) - h_result.begin();
 
-  remove_copy_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), 0, d_new_end.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_copy_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), 0, d_new_end.begin());
   size_t d_size = (iterator)d_new_end[0] - d_result.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -240,7 +241,7 @@ void TestRemoveCopyIfDevice(ExecutionPolicy exec)
   
   size_t h_size = thrust::remove_copy_if(h_data.begin(), h_data.end(), h_result.begin(), is_true<int>()) - h_result.begin();
 
-  remove_copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), is_true<int>(), d_new_end.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_true<int>(), d_new_end.begin());
   size_t d_size = (iterator)d_new_end[0] - d_result.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -284,7 +285,7 @@ void TestRemoveCopyIfStencilDevice(ExecutionPolicy exec)
   
   size_t h_size = thrust::remove_copy_if(h_data.begin(), h_data.end(), h_stencil.begin(), h_result.begin(), is_true<int>()) - h_result.begin();
 
-  remove_copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_stencil.begin(), d_result.begin(), is_true<int>(), d_new_end.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(remove_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), d_result.begin(), is_true<int>(), d_new_end.begin());
   size_t d_size = (iterator)d_new_end[0] - d_result.begin();
   
   ASSERT_EQUAL(h_size, d_size);
@@ -322,8 +323,8 @@ void TestRemoveCudaStreams()
   data[3] =  3; 
   data[4] =  2; 
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove(thrust::cuda::par.on(s),
                                         data.begin(), 
@@ -336,7 +337,7 @@ void TestRemoveCudaStreams()
   ASSERT_EQUAL(data[1], 1);
   ASSERT_EQUAL(data[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveCudaStreams);
 
@@ -355,8 +356,8 @@ void TestRemoveCopyCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove_copy(thrust::cuda::par.on(s),
                                              data.begin(), 
@@ -370,7 +371,7 @@ void TestRemoveCopyCudaStreams()
   ASSERT_EQUAL(result[1], 1);
   ASSERT_EQUAL(result[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveCopyCudaStreams);
 
@@ -387,8 +388,8 @@ void TestRemoveIfCudaStreams()
   data[3] =  3; 
   data[4] =  2; 
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove_if(thrust::cuda::par.on(s),
                                            data.begin(), 
@@ -401,7 +402,7 @@ void TestRemoveIfCudaStreams()
   ASSERT_EQUAL(data[1], 1);
   ASSERT_EQUAL(data[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveIfCudaStreams);
 
@@ -425,8 +426,8 @@ void TestRemoveIfStencilCudaStreams()
   stencil[3] = 0;
   stencil[4] = 1;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove_if(thrust::cuda::par.on(s),
                                            data.begin(), 
@@ -440,7 +441,7 @@ void TestRemoveIfStencilCudaStreams()
   ASSERT_EQUAL(data[1], 1);
   ASSERT_EQUAL(data[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveIfStencilCudaStreams);
 
@@ -459,8 +460,8 @@ void TestRemoveCopyIfCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove_copy_if(thrust::cuda::par.on(s),
                                                 data.begin(), 
@@ -474,7 +475,7 @@ void TestRemoveCopyIfCudaStreams()
   ASSERT_EQUAL(result[1], 1);
   ASSERT_EQUAL(result[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveCopyIfCudaStreams);
 
@@ -500,8 +501,8 @@ void TestRemoveCopyIfStencilCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::remove_copy_if(thrust::cuda::par.on(s),
                                                 data.begin(), 
@@ -516,7 +517,7 @@ void TestRemoveCopyIfStencilCudaStreams()
   ASSERT_EQUAL(result[1], 1);
   ASSERT_EQUAL(result[2], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestRemoveCopyIfStencilCudaStreams);
 

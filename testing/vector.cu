@@ -595,7 +595,7 @@ void TestVectorResizing(void)
     catch(std::bad_alloc e)
     {
       // reset the CUDA error
-      cudaGetLastError();
+      hipGetLastError();
     } // end catch
 #endif // defined(__CUDACC__) && CUDA_VERSION==3000
 

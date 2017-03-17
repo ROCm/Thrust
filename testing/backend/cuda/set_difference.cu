@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/set_operations.h>
 #include <thrust/execution_policy.h>
@@ -29,7 +30,7 @@ void TestSetDifferenceDevice(ExecutionPolicy exec)
 
   thrust::device_vector<Iterator> end_vec(1);
 
-  set_difference_kernel<<<1,1>>>(exec, a.begin(), a.end(), b.begin(), b.end(), result.begin(), end_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(set_difference_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), b.end(), result.begin(), end_vec.begin());
 
   Iterator end = end_vec.front();
 
@@ -67,16 +68,16 @@ void TestSetDifferenceCudaStreams()
 
   Vector result(2);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Iterator end = thrust::set_difference(thrust::cuda::par.on(s), a.begin(), a.end(), b.begin(), b.end(), result.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL_QUIET(result.end(), end);
   ASSERT_EQUAL(ref, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSetDifferenceCudaStreams);
 

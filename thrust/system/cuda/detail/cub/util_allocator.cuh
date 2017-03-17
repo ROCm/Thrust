@@ -319,7 +319,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
 
         // Lock
@@ -353,7 +353,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
 
         *d_ptr                          = NULL;
@@ -490,7 +490,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
         return DeviceAllocate(INVALID_DEVICE_ORDINAL, d_ptr, bytes, active_stream);
     #endif // CUB_PTX_ARCH
@@ -510,7 +510,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
 
         bool locked                     = false;
@@ -607,7 +607,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
         return DeviceFree(INVALID_DEVICE_ORDINAL, d_ptr);
     #endif // CUB_PTX_ARCH
@@ -621,7 +621,7 @@ struct CachingDeviceAllocator
     {
     #if (CUB_PTX_ARCH > 0)
         // Caching functionality only defined on host
-        return CubDebug(hipErrorInvalidConfiguration);
+        return CubDebug(cudaErrorInvalidConfiguration);
     #else
 
         hipError_t error         = hipSuccess;

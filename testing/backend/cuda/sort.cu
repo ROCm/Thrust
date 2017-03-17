@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/sort.h>
 #include <thrust/functional.h>
@@ -35,7 +36,7 @@ void TestComparisonSortDevice(ExecutionPolicy exec, const size_t n, Compare comp
   thrust::device_vector<T> d_data = h_data;
   
   thrust::device_vector<bool> is_supported(1);
-  sort_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), comp, is_supported.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(sort_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), comp, is_supported.begin());
 
   if(is_supported[0])
   {
@@ -124,15 +125,15 @@ void TestSortCudaStreams()
   keys[8] = 5;
   keys[9] = 6;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::sort(thrust::cuda::par.on(s), keys.begin(), keys.end());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(true, thrust::is_sorted(keys.begin(), keys.end()));
                       
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSortCudaStreams);
 
@@ -152,15 +153,15 @@ void TestComparisonSortCudaStreams()
   keys[8] = 5;
   keys[9] = 6;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::sort(thrust::cuda::par.on(s), keys.begin(), keys.end(), my_less<int>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(true, thrust::is_sorted(keys.begin(), keys.end(), my_less<int>()));
                       
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestComparisonSortCudaStreams);
 

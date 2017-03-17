@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/set_operations.h>
 #include <thrust/sort.h>
@@ -50,7 +51,7 @@ void TestSetDifferenceByKeyDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iter_pair> end_vec(1);
 
-  set_difference_by_key_kernel<<<1,1>>>(exec,
+  hipLaunchKernel(HIP_KERNEL_NAME(set_difference_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
                                         a_key.begin(), a_key.end(),
                                         b_key.begin(), b_key.end(),
                                         a_val.begin(),
@@ -102,8 +103,8 @@ void TestSetDifferenceByKeyCudaStreams()
 
   Vector result_key(2), result_val(2);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::pair<Iterator,Iterator> end =
     thrust::set_difference_by_key(thrust::cuda::par.on(s),
@@ -113,14 +114,14 @@ void TestSetDifferenceByKeyCudaStreams()
                                   b_val.begin(),
                                   result_key.begin(),
                                   result_val.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL_QUIET(result_key.end(), end.first);
   ASSERT_EQUAL_QUIET(result_val.end(), end.second);
   ASSERT_EQUAL(ref_key, result_key);
   ASSERT_EQUAL(ref_val, result_val);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSetDifferenceByKeyCudaStreams);
 

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/tabulate.h>
 #include <thrust/functional.h>
@@ -21,7 +22,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   
   Vector v(5);
 
-  tabulate_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>());
+  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>());
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -29,7 +30,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 3);
   ASSERT_EQUAL(v[4], 4);
 
-  tabulate_kernel<<<1,1>>>(exec, v.begin(), v.end(), -_1);
+  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), -_1);
 
   ASSERT_EQUAL(v[0],  0);
   ASSERT_EQUAL(v[1], -1);
@@ -37,7 +38,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], -3);
   ASSERT_EQUAL(v[4], -4);
   
-  tabulate_kernel<<<1,1>>>(exec, v.begin(), v.end(), _1 * _1 * _1);
+  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), _1 * _1 * _1);
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -66,11 +67,11 @@ void TestTabulateCudaStreams()
   
   Vector v(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::tabulate(thrust::cuda::par.on(s), v.begin(), v.end(), thrust::identity<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -79,7 +80,7 @@ void TestTabulateCudaStreams()
   ASSERT_EQUAL(v[4], 4);
 
   thrust::tabulate(thrust::cuda::par.on(s), v.begin(), v.end(), -_1);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0],  0);
   ASSERT_EQUAL(v[1], -1);
@@ -88,7 +89,7 @@ void TestTabulateCudaStreams()
   ASSERT_EQUAL(v[4], -4);
   
   thrust::tabulate(thrust::cuda::par.on(s), v.begin(), v.end(), _1 * _1 * _1);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -96,7 +97,7 @@ void TestTabulateCudaStreams()
   ASSERT_EQUAL(v[3], 27);
   ASSERT_EQUAL(v[4], 64);
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 }
 DECLARE_UNITTEST(TestTabulateCudaStreams);
 

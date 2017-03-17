@@ -103,7 +103,7 @@ OutputType tuned_reduce(execution_policy<DerivedPolicy> &exec,
 
   if(n <= 0) return init;
 
-  hipStream_t s = stream(thrust::detail::derived_cast(exec));
+  cudaStream_t s = stream(thrust::detail::derived_cast(exec));
 
   const size_type groupsize = 128;
   const size_type grainsize = 7;
@@ -152,7 +152,7 @@ OutputType general_reduce(execution_policy<DerivedPolicy> &exec,
 
   if(n <= 0) return init;
 
-  hipStream_t s = stream(thrust::detail::derived_cast(exec));
+  cudaStream_t s = stream(thrust::detail::derived_cast(exec));
 
   typedef thrust::detail::temporary_array<OutputType,DerivedPolicy> temporary_array;
 

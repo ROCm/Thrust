@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/gather.h>
 #include <thrust/execution_policy.h>
@@ -33,7 +34,7 @@ void TestGatherDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::gather(h_map.begin(), h_map.end(), h_source.begin(), h_output.begin());
-  gather_kernel<<<1,1>>>(exec, d_map.begin(), d_map.end(), d_source.begin(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(gather_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_source.begin(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -63,11 +64,11 @@ void TestGatherCudaStreams()
   src[0] = 0; src[1] = 1; src[2] = 2; src[3] = 3; src[4] = 4; src[5] = 5; src[6] = 6; src[7] = 7;
   dst[0] = 0; dst[1] = 0; dst[2] = 0; dst[3] = 0; dst[4] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::gather(thrust::cuda::par.on(s), map.begin(), map.end(), src.begin(), dst.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(dst[0], 6);
   ASSERT_EQUAL(dst[1], 2);
@@ -75,7 +76,7 @@ void TestGatherCudaStreams()
   ASSERT_EQUAL(dst[3], 7);
   ASSERT_EQUAL(dst[4], 2);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestGatherCudaStreams);
 
@@ -129,7 +130,7 @@ void TestGatherIfDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::gather_if(h_map.begin(), h_map.end(), h_stencil.begin(), h_source.begin(), h_output.begin(), is_even_gather_if<unsigned int>());
-  gather_if_kernel<<<1,1>>>(exec, d_map.begin(), d_map.end(), d_stencil.begin(), d_source.begin(), d_output.begin(), is_even_gather_if<unsigned int>());
+  hipLaunchKernel(HIP_KERNEL_NAME(gather_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_stencil.begin(), d_source.begin(), d_output.begin(), is_even_gather_if<unsigned int>());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -160,11 +161,11 @@ void TestGatherIfCudaStreams(void)
   src[0] = 0; src[1] = 1; src[2] = 2; src[3] = 3; src[4] = 4; src[5] = 5; src[6] = 6; src[7] = 7;
   dst[0] = 0; dst[1] = 0; dst[2] = 0; dst[3] = 0; dst[4] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::gather_if(thrust::cuda::par.on(s), map.begin(), map.end(), flg.begin(), src.begin(), dst.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(dst[0], 0);
   ASSERT_EQUAL(dst[1], 2);
@@ -172,7 +173,7 @@ void TestGatherIfCudaStreams(void)
   ASSERT_EQUAL(dst[3], 7);
   ASSERT_EQUAL(dst[4], 0);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestGatherIfCudaStreams);
 

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/merge.h>
 #include <thrust/functional.h>
@@ -53,7 +54,7 @@ void TestMergeDevice(ExecutionPolicy exec)
                           h_result.begin());
     h_result.resize(h_end - h_result.begin());
 
-    merge_kernel<<<1,1>>>(exec,
+    hipLaunchKernel(HIP_KERNEL_NAME(merge_kernel), dim3(1), dim3(1), 0, 0, exec,
                           d_a.begin(), d_a.end(),
                           d_b.begin(), d_b.begin() + size,
                           d_result.begin(),
@@ -100,8 +101,8 @@ void TestMergeCudaStreams()
 
   Vector result(7);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Iterator end = thrust::merge(thrust::cuda::par.on(s),
                                a.begin(), a.end(),
@@ -111,7 +112,7 @@ void TestMergeCudaStreams()
   ASSERT_EQUAL_QUIET(result.end(), end);
   ASSERT_EQUAL(ref, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestMergeCudaStreams);
 

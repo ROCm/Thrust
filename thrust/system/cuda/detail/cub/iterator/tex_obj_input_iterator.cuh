@@ -157,7 +157,6 @@ public:
         tex_obj(0)
     {}
 
-#ifdef USE_TEXTURES
     /// Use this iterator to bind \p ptr with a texture reference
     hipError_t BindTexture(
         T               *ptr,               ///< Native pointer to wrap that is aligned to hipDeviceProp_t::textureAlignment
@@ -185,7 +184,6 @@ public:
     {
         return cudaDestroyTextureObject(tex_obj);
     }
-#endif
 
     /// Postfix increment
     __host__ __device__ __forceinline__ self_type operator++(int)
@@ -215,14 +213,9 @@ public:
         #pragma unroll
         for (int i = 0; i < TEXTURE_MULTIPLE; ++i)
         {
-#ifdef USE_TEXTURES
             words[i] = tex1Dfetch<TextureWord>(
                 tex_obj,
                 (tex_offset * TEXTURE_MULTIPLE) + i);
-#else
-	words[i] = ptr[(tex_offset * TEXTURE_MULTIPLE) + i]
-#endif
-
         }
 
         // Load from words

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/transform_reduce.h>
 #include <thrust/execution_policy.h>
@@ -24,7 +25,7 @@ void TestTransformReduceDevice(ExecutionPolicy exec)
 
   thrust::device_vector<T> result(1);
 
-  transform_reduce_kernel<<<1,1>>>(exec, data.begin(), data.end(), thrust::negate<T>(), init, thrust::plus<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(transform_reduce_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), thrust::negate<T>(), init, thrust::plus<T>(), result.begin());
   
   ASSERT_EQUAL(8, (T)result[0]);
 }
@@ -54,15 +55,15 @@ void TestTransformReduceCudaStreams()
   
   T init = 10;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   T result = thrust::transform_reduce(thrust::cuda::par.on(s), data.begin(), data.end(), thrust::negate<T>(), init, thrust::plus<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(8, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestTransformReduceCudaStreams);
 

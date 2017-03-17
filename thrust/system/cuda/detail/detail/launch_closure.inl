@@ -1,4 +1,3 @@
-#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -96,7 +95,7 @@ template<typename Closure,
     if(num_blocks > 0)
     {
 #ifndef __CUDA_ARCH__
-      hipLaunchKernel(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
+      kernel<<<(unsigned int) num_blocks, (unsigned int) block_size, (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec))>>>(f);
 #else
       // XXX we can't pass parameters with constructors to kernels launched through the triple chevrons in __device__ code
       //     use cudaLaunchDevice directly
@@ -139,7 +138,7 @@ template<typename Closure>
       thrust::detail::temporary_array<Closure,DerivedPolicy> closure_storage(exec, host_tag, &f, &f + 1);
 
       // launch
-      hipLaunchKernel(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), (&closure_storage[0]).get());
+      kernel<<<(unsigned int) num_blocks, (unsigned int) block_size, (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec))>>>((&closure_storage[0]).get());
       synchronize_if_enabled("launch_closure_by_pointer");
     }
 #endif // __BULK_HAS_CUDART__
