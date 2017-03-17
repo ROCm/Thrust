@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 
 #include <thrust/device_vector.h>
@@ -24,7 +25,7 @@ template <typename Iterator1, typename Iterator2>
 void simple_copy(Iterator1 first1, Iterator1 last1, Iterator2 first2)
 {
 #if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
-    simple_copy_on_device<<<1,1>>>(first1, last1, first2);
+    hipLaunchKernel(HIP_KERNEL_NAME(simple_copy_on_device), dim3(1), dim3(1), 0, 0, first1, last1, first2);
 #else
     simple_copy_on_device(first1, last1, first2);
 #endif

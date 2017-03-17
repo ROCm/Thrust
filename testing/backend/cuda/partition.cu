@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/partition.h>
 #include <thrust/count.h>
@@ -35,7 +36,7 @@ void TestPartitionDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iterator> result(1);
   
-  partition_kernel<<<1,1>>>(exec, data.begin(), data.end(), is_even<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin());
   
   thrust::device_vector<T> ref(5);
   ref[0] = 2;
@@ -93,7 +94,7 @@ void TestPartitionStencilDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iterator> result(1);
   
-  partition_kernel<<<1,1>>>(exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin());
   
   thrust::device_vector<T> ref(5);
   ref[0] = 1;
@@ -148,7 +149,7 @@ void TestPartitionCopyDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
   
-  partition_copy_kernel<<<1,1>>>(exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
   
   thrust::device_vector<T> true_ref(2);
   true_ref[0] =  2;
@@ -216,7 +217,7 @@ void TestPartitionCopyStencilDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
 
-  partition_copy_kernel<<<1,1>>>(exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
 
   pair_type ends = iterators[0];
   
@@ -279,7 +280,7 @@ void TestStablePartitionDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> result(1);
   thrust::device_vector<bool> is_supported(1);
   
-  stable_partition_kernel<<<1,1>>>(exec, data.begin(), data.end(), is_even<T>(), result.begin(), is_supported.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin(), is_supported.begin());
   
   if(is_supported[0])
   {
@@ -346,7 +347,7 @@ void TestStablePartitionStencilDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> result(1);
   thrust::device_vector<bool> is_supported(1);
   
-  stable_partition_kernel<<<1,1>>>(exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin(), is_supported.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin(), is_supported.begin());
   
   if(is_supported[0])
   {
@@ -404,7 +405,7 @@ void TestStablePartitionCopyDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
   
-  stable_partition_copy_kernel<<<1,1>>>(exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
   
   thrust::device_vector<T> true_ref(2);
   true_ref[0] =  2;
@@ -472,7 +473,7 @@ void TestStablePartitionCopyStencilDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
 
-  stable_partition_copy_kernel<<<1,1>>>(exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
 
   pair_type ends = iterators[0];
   
@@ -519,8 +520,8 @@ void TestPartitionCudaStreams()
   data[3] = 1; 
   data[4] = 2; 
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   Iterator iter = thrust::partition(thrust::cuda::par.on(s), data.begin(), data.end(), is_even<T>());
   
@@ -534,7 +535,7 @@ void TestPartitionCudaStreams()
   ASSERT_EQUAL(iter - data.begin(), 2);
   ASSERT_EQUAL(data, ref);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestPartitionCudaStreams);
 

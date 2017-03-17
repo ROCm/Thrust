@@ -147,7 +147,6 @@ template <
     typename                Offset>                                 ///< Signed integer type for global offsets
 __launch_bounds__ (int(BlockRadixSortDownsweepPolicy::BLOCK_THREADS))
 __global__ void DeviceRadixSortDownsweepKernel(
-    hipLaunchParm 			lp,										///< HIP grid_launch_parm parameter
     Key                     *d_keys_in,                             ///< [in] Input keys ping buffer
     Key                     *d_keys_out,                            ///< [in] Output keys pong buffer
     Value                   *d_values_in,                           ///< [in] Input values ping buffer
@@ -535,7 +534,7 @@ struct DeviceRadixSortDispatch
 
         template <typename ScanPolicy, typename ScanKernelPtr>
         CUB_RUNTIME_FUNCTION __forceinline__ hipError_t InitScanPolicy(
-            int sm_version, int sm_count, ScanKernelPtr scan_kernel)
+            int, int, ScanKernelPtr)
         {
             block_threads               = ScanPolicy::BLOCK_THREADS;
             items_per_thread            = ScanPolicy::ITEMS_PER_THREAD;

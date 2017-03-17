@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/reverse.h>
 #include <thrust/execution_policy.h>
@@ -19,7 +20,7 @@ void TestReverseDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_data = h_data;
   
   thrust::reverse(h_data.begin(), h_data.end());
-  reverse_kernel<<<1,1>>>(exec, raw_pointer_cast(d_data.data()), raw_pointer_cast(d_data.data() + d_data.size()));
+  hipLaunchKernel(HIP_KERNEL_NAME(reverse_kernel), dim3(1), dim3(1), 0, 0, exec, raw_pointer_cast(d_data.data()), raw_pointer_cast(d_data.data() + d_data.size()));
   
   ASSERT_EQUAL(h_data, d_data);
 };
@@ -58,7 +59,7 @@ void TestReverseCopyDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_result(n);
 
   thrust::reverse_copy(h_data.begin(), h_data.end(), h_result.begin());
-  reverse_copy_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(reverse_copy_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
 
   ASSERT_EQUAL(h_result, d_result);
 };
@@ -88,12 +89,12 @@ void TestReverseCudaStreams()
   data[3] = 4;
   data[4] = 5;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::reverse(thrust::cuda::par.on(s), data.begin(), data.end());
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   Vector ref(5);
   ref[0] = 5;
@@ -104,7 +105,7 @@ void TestReverseCudaStreams()
 
   ASSERT_EQUAL(ref, data);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestReverseCudaStreams);
 
@@ -121,12 +122,12 @@ void TestReverseCopyCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::reverse_copy(thrust::cuda::par.on(s), data.begin(), data.end(), result.begin());
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   Vector ref(5);
   ref[0] = 5;
@@ -137,7 +138,7 @@ void TestReverseCopyCudaStreams()
 
   ASSERT_EQUAL(ref, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestReverseCopyCudaStreams);
 

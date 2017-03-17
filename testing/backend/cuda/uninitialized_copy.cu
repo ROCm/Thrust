@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/uninitialized_copy.h>
 #include <thrust/execution_policy.h>
@@ -21,7 +22,7 @@ void TestUninitializedCopyDevice(ExecutionPolicy exec)
   
   // copy to Vector
   Vector v2(5);
-  uninitialized_copy_kernel<<<1,1>>>(exec, v1.begin(), v1.end(), v2.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_copy_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
   ASSERT_EQUAL(v2[2], 2);
@@ -54,11 +55,11 @@ void TestUninitializedCopyCudaStreams()
   // copy to Vector
   Vector v2(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::uninitialized_copy(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
@@ -66,7 +67,7 @@ void TestUninitializedCopyCudaStreams()
   ASSERT_EQUAL(v2[3], 3);
   ASSERT_EQUAL(v2[4], 4);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUninitializedCopyCudaStreams);
 
@@ -89,7 +90,7 @@ void TestUninitializedCopyNDevice(ExecutionPolicy exec)
   
   // copy to Vector
   Vector v2(5);
-  uninitialized_copy_n_kernel<<<1,1>>>(exec, v1.begin(), v1.size(), v2.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_copy_n_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.size(), v2.begin());
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
   ASSERT_EQUAL(v2[2], 2);
@@ -122,11 +123,11 @@ void TestUninitializedCopyNCudaStreams()
   // copy to Vector
   Vector v2(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::uninitialized_copy_n(thrust::cuda::par.on(s), v1.begin(), v1.size(), v2.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
@@ -134,7 +135,7 @@ void TestUninitializedCopyNCudaStreams()
   ASSERT_EQUAL(v2[3], 3);
   ASSERT_EQUAL(v2[4], 4);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUninitializedCopyNCudaStreams);
 

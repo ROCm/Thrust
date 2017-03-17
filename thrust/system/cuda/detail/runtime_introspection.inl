@@ -39,11 +39,11 @@ __host__ __device__
 inline void uncached_device_properties(device_properties_t &p, int device_id)
 {
 #ifndef __CUDA_ARCH__
-  hipDeviceProp_t properties;
+  cudaDeviceProp properties;
   
-  hipError_t error = hipGetDeviceProperties(&properties, device_id);
+  cudaError_t error = cudaGetDeviceProperties(&properties, device_id);
   
-  throw_on_error(error, "hipGetDeviceProperties in get_device_properties");
+  throw_on_error(error, "cudaGetDeviceProperties in get_device_properties");
 
   // be careful about how this is initialized!
   device_properties_t temp = {
@@ -64,19 +64,19 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
 
   p = temp;
 #elif (__CUDA_ARCH__ >= 350)
-  hipError_t error = hipDeviceGetAttribute(&p.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[1],              hipDeviceAttributeMaxGridDimY,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[2],              hipDeviceAttributeMaxGridDimZ,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxThreadsPerBlock,          hipDeviceAttributeMaxThreadsPerBlock,          device_id);
-  error = hipDeviceGetAttribute(&p.maxThreadsPerMultiProcessor, hipDeviceAttributeMaxThreadsPerMultiProcessor, device_id);
-  error = hipDeviceGetAttribute(&p.minor,                       hipDeviceAttributeComputeCapabilityMinor,      device_id);
-  error = hipDeviceGetAttribute(&p.multiProcessorCount,         hipDeviceAttributeMultiprocessorCount,         device_id);
-  error = hipDeviceGetAttribute(&p.regsPerBlock,                hipDeviceAttributeMaxRegistersPerBlock,        device_id);
+  cudaError_t error = cudaDeviceGetAttribute(&p.major,           cudaDevAttrComputeCapabilityMajor,      device_id);
+  error = cudaDeviceGetAttribute(&p.maxGridSize[0],              cudaDevAttrMaxGridDimX,                 device_id);
+  error = cudaDeviceGetAttribute(&p.maxGridSize[1],              cudaDevAttrMaxGridDimY,                 device_id);
+  error = cudaDeviceGetAttribute(&p.maxGridSize[2],              cudaDevAttrMaxGridDimZ,                 device_id);
+  error = cudaDeviceGetAttribute(&p.maxThreadsPerBlock,          cudaDevAttrMaxThreadsPerBlock,          device_id);
+  error = cudaDeviceGetAttribute(&p.maxThreadsPerMultiProcessor, cudaDevAttrMaxThreadsPerMultiProcessor, device_id);
+  error = cudaDeviceGetAttribute(&p.minor,                       cudaDevAttrComputeCapabilityMinor,      device_id);
+  error = cudaDeviceGetAttribute(&p.multiProcessorCount,         cudaDevAttrMultiProcessorCount,         device_id);
+  error = cudaDeviceGetAttribute(&p.regsPerBlock,                cudaDevAttrMaxRegistersPerBlock,        device_id);
   int temp;
-  error = hipDeviceGetAttribute(&temp,                          hipDeviceAttributeMaxSharedMemoryPerBlock,     device_id);
+  error = cudaDeviceGetAttribute(&temp,                          cudaDevAttrMaxSharedMemoryPerBlock,     device_id);
   p.sharedMemPerBlock = temp;
-  error = hipDeviceGetAttribute(&p.warpSize,                    hipDeviceAttributeWarpSize,                    device_id);
+  error = cudaDeviceGetAttribute(&p.warpSize,                    cudaDevAttrWarpSize,                    device_id);
 
   throw_on_error(error, "cudaDeviceGetProperty in get_device_properties");
 #else
@@ -136,13 +136,13 @@ int current_device()
   int result = -1;
 
 #if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 350
-  hipError_t error = hipGetDevice(&result);
+  cudaError_t error = cudaGetDevice(&result);
 
-  throw_on_error(error, "hipGetDevice in current_device");
+  throw_on_error(error, "cudaGetDevice in current_device");
 
   if(result < 0)
   {
-    throw_on_error(hipErrorNoDevice, "hipGetDevice in current_device");
+    throw_on_error(cudaErrorNoDevice, "cudaGetDevice in current_device");
   }
 #else
   // dunno how to safely error here

@@ -33,15 +33,10 @@ namespace detail
 __host__ __device__
 inline hipStream_t legacy_stream()
 {
-#if defined(__NVCC__)
-   #if (CUDA_VERSION < 7000)
-       return 0;
-   #else
-       return cudaStreamLegacy;
-   #endif
+#if (CUDA_VERSION < 7000)
+  return 0;
 #else
-    // For HIP/ROCM this is equivalent to null stream. (HIP/ROCm does not support per-thread default stream).
-    return 0; 
+  return cudaStreamLegacy;
 #endif
 }
 

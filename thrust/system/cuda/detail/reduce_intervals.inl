@@ -1,4 +1,3 @@
-#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -97,7 +96,7 @@ struct commutative_reduce_intervals_closure
     }
     else
     {
-      // compute reduction with all hipBlockDim_x threads
+      // compute reduction with all blockDim.x threads
       OutputType sum = *input;
 
       i     += context.block_dimension();

@@ -32,15 +32,15 @@ namespace detail
 inline __host__ __device__
 void synchronize(const char *message)
 {
-  throw_on_error(hipDeviceSynchronize(), message);
+  throw_on_error(cudaDeviceSynchronize(), message);
 } // end synchronize()
 
 
 inline __host__ __device__
-void synchronize(hipStream_t stream, const char *message)
+void synchronize(cudaStream_t stream, const char *message)
 {
 #if !defined(__CUDA_ARCH__)
-  throw_on_error(hipStreamSynchronize(stream), message);
+  throw_on_error(cudaStreamSynchronize(stream), message);
 #else
   synchronize(message);
 #endif

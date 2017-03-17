@@ -31,15 +31,15 @@ namespace detail
 
 template<typename ExecutionGroup, typename Closure>
 __host__ __device__
-future<void> async_in_stream(ExecutionGroup g, Closure c, hipStream_t s, hipEvent_t before_event)
+future<void> async_in_stream(ExecutionGroup g, Closure c, cudaStream_t s, cudaEvent_t before_event)
 {
 #if __BULK_HAS_CUDART__
   if(before_event != 0)
   {
-    bulk::detail::throw_on_error(hipStreamWaitEvent(s, before_event, 0), "hipStreamWaitEvent in async_in_stream");
+    bulk::detail::throw_on_error(cudaStreamWaitEvent(s, before_event, 0), "cudaStreamWaitEvent in async_in_stream");
   }
 #else
-  bulk::detail::terminate_with_message("async_in_stream(): hipStreamWaitEvent requires CUDART");
+  bulk::detail::terminate_with_message("async_in_stream(): cudaStreamWaitEvent requires CUDART");
 #endif
 
   bulk::detail::cuda_launcher<ExecutionGroup, Closure> launcher;
@@ -51,26 +51,26 @@ future<void> async_in_stream(ExecutionGroup g, Closure c, hipStream_t s, hipEven
 
 template<typename ExecutionGroup, typename Closure>
 __host__ __device__
-future<void> async(ExecutionGroup g, Closure c, hipEvent_t before_event)
+future<void> async(ExecutionGroup g, Closure c, cudaEvent_t before_event)
 {
-  hipStream_t s;
+  cudaStream_t s;
 
-  // XXX hipStreamCreate is __host__-only
+  // XXX cudaStreamCreate is __host__-only
   //     figure out a way to support this that does not require creating a new stream
 #if (__BULK_HAS_CUDART__ && !defined(__CUDA_ARCH__))
-  bulk::detail::throw_on_error(hipStreamCreate(&s), "hipStreamCreate in bulk::detail::async");
+  bulk::detail::throw_on_error(cudaStreamCreate(&s), "cudaStreamCreate in bulk::detail::async");
 #else
   s = 0;
-  bulk::detail::terminate_with_message("bulk::async(): hipStreamCreate() is unsupported in __device__ code.");
+  bulk::detail::terminate_with_message("bulk::async(): cudaStreamCreate() is unsupported in __device__ code.");
 #endif
 
 #if __BULK_HAS_CUDART__
   if(before_event != 0)
   {
-    bulk::detail::throw_on_error(hipStreamWaitEvent(s, before_event, 0), "hipStreamWaitEvent in bulk::detail::async");
+    bulk::detail::throw_on_error(cudaStreamWaitEvent(s, before_event, 0), "cudaStreamWaitEvent in bulk::detail::async");
   }
 #else
-  bulk::detail::terminate_with_message("async_in_stream(): hipStreamWaitEvent requires CUDART");
+  bulk::detail::terminate_with_message("async_in_stream(): cudaStreamWaitEvent requires CUDART");
 #endif
 
   bulk::detail::cuda_launcher<ExecutionGroup, Closure> launcher;

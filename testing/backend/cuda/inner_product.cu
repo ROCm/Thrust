@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/inner_product.h>
 #include <thrust/execution_policy.h>
@@ -27,7 +28,7 @@ void TestInnerProductDevice(ExecutionPolicy exec)
   int init = 13;
   
   int expected = thrust::inner_product(h_v1.begin(), h_v1.end(), h_v2.begin(), init);
-  inner_product_kernel<<<1,1>>>(exec, d_v1.begin(), d_v1.end(), d_v2.begin(), init, result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(inner_product_kernel), dim3(1), dim3(1), 0, 0, exec, d_v1.begin(), d_v1.end(), d_v2.begin(), init, result.begin());
   
   ASSERT_EQUAL(expected, result[0]);
 }
@@ -54,14 +55,14 @@ void TestInnerProductCudaStreams()
   v1[0] =  1; v1[1] = -2; v1[2] =  3;
   v2[0] = -4; v2[1] =  5; v2[2] =  6;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   int init = 3;
   int result = thrust::inner_product(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin(), init);
   ASSERT_EQUAL(result, 7);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestInnerProductCudaStreams);
 

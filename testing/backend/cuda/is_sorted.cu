@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/sort.h>
 #include <thrust/execution_policy.h>
@@ -23,12 +24,12 @@ void TestIsSortedDevice(ExecutionPolicy exec)
   v[0] = 1;
   v[1] = 0;
 
-  is_sorted_kernel<<<1,1>>>(exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
   thrust::sort(v.begin(), v.end());
 
-  is_sorted_kernel<<<1,1>>>(exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 }
 
@@ -51,8 +52,8 @@ void TestIsSortedCudaStreams()
   thrust::device_vector<int> v(4);
   v[0] = 0; v[1] = 5; v[2] = 8; v[3] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   ASSERT_EQUAL(thrust::is_sorted(thrust::cuda::par.on(s), v.begin(), v.begin() + 0), true);
   ASSERT_EQUAL(thrust::is_sorted(thrust::cuda::par.on(s), v.begin(), v.begin() + 1), true);
@@ -75,7 +76,7 @@ void TestIsSortedCudaStreams()
   
   ASSERT_EQUAL(thrust::is_sorted(thrust::cuda::par.on(s), v.begin(), v.end()), false);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestIsSortedCudaStreams);
 

@@ -49,8 +49,7 @@
 #include "../util_debug.cuh"
 #include "../util_namespace.cuh"
 
-// This iterator is compatible with CUDA 5.5 and newer
-#if (defined(__NVCC__) && (CUDA_VERSION >= 5050 || defined(DOXYGEN_ACTIVE))) || defined(__HCC__) 
+#if (CUDA_VERSION >= 5050) || defined(DOXYGEN_ACTIVE)  // This iterator is compatible with CUDA 5.5 and newer
 
 #if (THRUST_VERSION >= 100700)    // This iterator is compatible with Thrust API 1.7 and newer
     #include <thrust/iterator/iterator_facade.h>
@@ -392,7 +391,4 @@ public:
 }               // CUB namespace
 CUB_NS_POSTFIX  // Optional outer namespace(s)
 
-#ifdef __NVCC__ 
-#endif
 #endif // CUDA_VERSION
-

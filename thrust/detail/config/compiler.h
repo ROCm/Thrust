@@ -25,7 +25,7 @@
 #include <cuda.h>
 
 // Thrust supports CUDA >= 3.0
-#if (defined(__NVCC__) && CUDA_VERSION < 3000)
+#if CUDA_VERSION < 3000
 #error "CUDA v3.0 or newer is required"
 #endif // CUDA_VERSION
 
