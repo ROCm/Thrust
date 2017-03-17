@@ -36,22 +36,22 @@ inline device_properties_t device_properties_uncached(int device_id)
 {
   device_properties_t prop = {0,{0,0,0},0,0,0,0,0,0,0};
 
-  hipError_t error = hipErrorNoDevice;
+  cudaError_t error = cudaErrorNoDevice;
 
 #if __BULK_HAS_CUDART__
-  error = hipDeviceGetAttribute(&prop.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
-  error = hipDeviceGetAttribute(&prop.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
-  error = hipDeviceGetAttribute(&prop.maxGridSize[1],              hipDeviceAttributeMaxGridDimY,                 device_id);
-  error = hipDeviceGetAttribute(&prop.maxGridSize[2],              hipDeviceAttributeMaxGridDimZ,                 device_id);
-  error = hipDeviceGetAttribute(&prop.maxThreadsPerBlock,          hipDeviceAttributeMaxThreadsPerBlock,          device_id);
-  error = hipDeviceGetAttribute(&prop.maxThreadsPerMultiProcessor, hipDeviceAttributeMaxThreadsPerMultiProcessor, device_id);
-  error = hipDeviceGetAttribute(&prop.minor,                       hipDeviceAttributeComputeCapabilityMinor,      device_id);
-  error = hipDeviceGetAttribute(&prop.multiProcessorCount,         hipDeviceAttributeMultiprocessorCount,         device_id);
-  error = hipDeviceGetAttribute(&prop.regsPerBlock,                hipDeviceAttributeMaxRegistersPerBlock,        device_id);
+  error = cudaDeviceGetAttribute(&prop.major,           cudaDevAttrComputeCapabilityMajor,      device_id);
+  error = cudaDeviceGetAttribute(&prop.maxGridSize[0],              cudaDevAttrMaxGridDimX,                 device_id);
+  error = cudaDeviceGetAttribute(&prop.maxGridSize[1],              cudaDevAttrMaxGridDimY,                 device_id);
+  error = cudaDeviceGetAttribute(&prop.maxGridSize[2],              cudaDevAttrMaxGridDimZ,                 device_id);
+  error = cudaDeviceGetAttribute(&prop.maxThreadsPerBlock,          cudaDevAttrMaxThreadsPerBlock,          device_id);
+  error = cudaDeviceGetAttribute(&prop.maxThreadsPerMultiProcessor, cudaDevAttrMaxThreadsPerMultiProcessor, device_id);
+  error = cudaDeviceGetAttribute(&prop.minor,                       cudaDevAttrComputeCapabilityMinor,      device_id);
+  error = cudaDeviceGetAttribute(&prop.multiProcessorCount,         cudaDevAttrMultiProcessorCount,         device_id);
+  error = cudaDeviceGetAttribute(&prop.regsPerBlock,                cudaDevAttrMaxRegistersPerBlock,        device_id);
   int temp;
-  error = hipDeviceGetAttribute(&temp,                             hipDeviceAttributeMaxSharedMemoryPerBlock,     device_id);
+  error = cudaDeviceGetAttribute(&temp,                             cudaDevAttrMaxSharedMemoryPerBlock,     device_id);
   prop.sharedMemPerBlock = temp;
-  error = hipDeviceGetAttribute(&prop.hipWarpSize,                    hipDeviceAttributeWarpSize,                    device_id);
+  error = cudaDeviceGetAttribute(&prop.warpSize,                    cudaDevAttrWarpSize,                    device_id);
 #else
   (void) device_id; // Suppress unused parameter warnings
 #endif
@@ -108,12 +108,12 @@ inline int current_device()
   int result = -1;
 
 #if __BULK_HAS_CUDART__
-  bulk::detail::throw_on_error(hipGetDevice(&result), "current_device(): after hipGetDevice");
+  bulk::detail::throw_on_error(cudaGetDevice(&result), "current_device(): after cudaGetDevice");
 #endif
 
   if(result < 0)
   {
-    bulk::detail::throw_on_error(hipErrorNoDevice, "current_device(): after hipGetDevice"); 
+    bulk::detail::throw_on_error(cudaErrorNoDevice, "current_device(): after cudaGetDevice"); 
   }
 
   return result;
@@ -153,7 +153,7 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
   return result;
 #else
   return function_attributes_t();
-#endif // __HIPCC__
+#endif // __CUDACC__
 }
 
 __host__ __device__

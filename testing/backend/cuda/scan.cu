@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <cstdio>
 #include <unittest/unittest.h>
 #include <thrust/scan.h>
@@ -38,29 +39,29 @@ void TestScanDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::inclusive_scan(h_input.begin(), h_input.end(), h_output.begin());
-  inclusive_scan_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan(h_input.begin(), h_input.end(), h_output.begin());
-  exclusive_scan_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan(h_input.begin(), h_input.end(), h_output.begin(), (T) 11);
-  exclusive_scan_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_output.begin(), (T) 11);
+  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), (T) 11);
   ASSERT_EQUAL(d_output, h_output);
   
   // in-place scans
   h_output = h_input;
   d_output = d_input;
   thrust::inclusive_scan(h_output.begin(), h_output.end(), h_output.begin());
-  inclusive_scan_kernel<<<1,1>>>(exec, d_output.begin(), d_output.end(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   h_output = h_input;
   d_output = d_input;
   
   thrust::exclusive_scan(h_output.begin(), h_output.end(), h_output.begin());
-  exclusive_scan_kernel<<<1,1>>>(exec, d_output.begin(), d_output.end(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
   
   ASSERT_EQUAL(d_output, h_output);
 }
@@ -103,12 +104,12 @@ void TestScanCudaStreams()
 
   Vector input_copy(input);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   // inclusive scan
   iter = thrust::inclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 1; result[1] = 4; result[2] = 2; result[3] = 6; result[4] = 1;
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -117,7 +118,7 @@ void TestScanCudaStreams()
   
   // exclusive scan
   iter = thrust::exclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin(), 0);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 0; result[1] = 1; result[2] = 4; result[3] = 2; result[4] = 6;
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -126,7 +127,7 @@ void TestScanCudaStreams()
   
   // exclusive scan with init
   iter = thrust::exclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin(), 3);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 3; result[1] = 4; result[2] = 7; result[3] = 5; result[4] = 9;
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -135,7 +136,7 @@ void TestScanCudaStreams()
   
   // inclusive scan with op
   iter = thrust::inclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin(), thrust::plus<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 1; result[1] = 4; result[2] = 2; result[3] = 6; result[4] = 1;
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -144,7 +145,7 @@ void TestScanCudaStreams()
 
   // exclusive scan with init and op
   iter = thrust::exclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin(), 3, thrust::plus<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 3; result[1] = 4; result[2] = 7; result[3] = 5; result[4] = 9;
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -154,7 +155,7 @@ void TestScanCudaStreams()
   // inplace inclusive scan
   input = input_copy;
   iter = thrust::inclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), input.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 1; result[1] = 4; result[2] = 2; result[3] = 6; result[4] = 1;
   ASSERT_EQUAL(iter - input.begin(), input.size());
@@ -163,7 +164,7 @@ void TestScanCudaStreams()
   // inplace exclusive scan with init
   input = input_copy;
   iter = thrust::exclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), input.begin(), 3);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 3; result[1] = 4; result[2] = 7; result[3] = 5; result[4] = 9;
   ASSERT_EQUAL(iter - input.begin(), input.size());
@@ -172,13 +173,13 @@ void TestScanCudaStreams()
   // inplace exclusive scan with implicit init=0
   input = input_copy;
   iter = thrust::exclusive_scan(thrust::cuda::par.on(s), input.begin(), input.end(), input.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   result[0] = 0; result[1] = 1; result[2] = 4; result[3] = 2; result[4] = 6;
   ASSERT_EQUAL(iter - input.begin(), input.size());
   ASSERT_EQUAL(input, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestScanCudaStreams);
 

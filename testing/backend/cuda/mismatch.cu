@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/mismatch.h>
 #include <thrust/execution_policy.h>
@@ -27,20 +28,20 @@ void TestMismatchDevice(ExecutionPolicy exec)
 
   thrust::device_vector<pair_type> d_result(1);
   
-  mismatch_kernel<<<1,1>>>(exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
 
   ASSERT_EQUAL(2, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(2, ((pair_type)d_result[0]).second - b.begin());
   
   b[2] = 3;
   
-  mismatch_kernel<<<1,1>>>(exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
   ASSERT_EQUAL(3, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(3, ((pair_type)d_result[0]).second - b.begin());
   
   b[3] = 4;
   
-  mismatch_kernel<<<1,1>>>(exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
   ASSERT_EQUAL(4, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(4, ((pair_type)d_result[0]).second - b.begin());
 }
@@ -70,8 +71,8 @@ void TestMismatchCudaStreams()
   a[2] = 3; b[2] = 4;
   a[3] = 4; b[3] = 3;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL(thrust::mismatch(thrust::cuda::par.on(s), a.begin(), a.end(), b.begin()).first  - a.begin(), 2);
   ASSERT_EQUAL(thrust::mismatch(thrust::cuda::par.on(s), a.begin(), a.end(), b.begin()).second - b.begin(), 2);
@@ -86,7 +87,7 @@ void TestMismatchCudaStreams()
   ASSERT_EQUAL(thrust::mismatch(thrust::cuda::par.on(s), a.begin(), a.end(), b.begin()).first  - a.begin(), 4);
   ASSERT_EQUAL(thrust::mismatch(thrust::cuda::par.on(s), a.begin(), a.end(), b.begin()).second - b.begin(), 4);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestMismatchCudaStreams);
 

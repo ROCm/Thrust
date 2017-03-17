@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/sort.h>
 #include <thrust/execution_policy.h>
@@ -25,12 +26,12 @@ void TestIsSortedUntilDevice(ExecutionPolicy exec)
   v[0] = 1;
   v[1] = 0;
   
-  is_sorted_until_kernel<<<1,1>>>(exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_until_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL_QUIET(v.begin() + 1, (iter_type)result[0]);
   
   thrust::sort(v.begin(), v.end());
   
-  is_sorted_until_kernel<<<1,1>>>(exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_until_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL_QUIET(v.end(), (iter_type)result[0]);
 }
 
@@ -56,8 +57,8 @@ void TestIsSortedUntilCudaStreams()
   typedef Vector::value_type T;
   typedef Vector::iterator Iterator;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector v(4);
   v[0] = 0; v[1] = 5; v[2] = 8; v[3] = 0;
@@ -105,7 +106,7 @@ void TestIsSortedUntilCudaStreams()
   ref = v.begin() + 4;
   ASSERT_EQUAL_QUIET(ref, thrust::is_sorted_until(thrust::cuda::par.on(s), first, last, thrust::greater<T>()));
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestIsSortedUntilCudaStreams);
 

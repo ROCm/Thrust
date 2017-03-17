@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/adjacent_difference.h>
 #include <thrust/execution_policy.h>
@@ -27,18 +28,18 @@ void TestAdjacentDifferenceDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_output.begin());
-  adjacent_difference_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
   
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_output.begin(), thrust::plus<T>());
-  adjacent_difference_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_output.begin(), thrust::plus<T>());
+  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), thrust::plus<T>());
   
   ASSERT_EQUAL(h_output, d_output);
   
   // in-place operation
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_input.begin(), thrust::plus<T>());
-  adjacent_difference_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_input.begin(), thrust::plus<T>());
+  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_input.begin(), thrust::plus<T>());
   
   ASSERT_EQUAL(h_input, h_output); //computed previously
   ASSERT_EQUAL(d_input, d_output); //computed previously
@@ -63,8 +64,8 @@ DECLARE_VARIABLE_UNITTEST(TestAdjacentDifferenceDeviceDevice);
 
 void TestAdjacentDifferenceCudaStreams()
 {
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::device_vector<int> input(3);
   thrust::device_vector<int> output(3);
@@ -72,13 +73,13 @@ void TestAdjacentDifferenceCudaStreams()
   
   thrust::adjacent_difference(thrust::cuda::par.on(s), input.begin(), input.end(), output.begin());
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(output[0], 1);
   ASSERT_EQUAL(output[1], 3);
   ASSERT_EQUAL(output[2], 2);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestAdjacentDifferenceCudaStreams);
 

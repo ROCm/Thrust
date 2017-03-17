@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/swap.h>
 #include <thrust/execution_policy.h>
@@ -22,7 +23,7 @@ void TestSwapRangesDevice(ExecutionPolicy exec)
   Vector v2(5);
   v2[0] = 5; v2[1] = 6; v2[2] = 7; v2[3] = 8; v2[4] = 9;
 
-  swap_ranges_kernel<<<1,1>>>(exec, v1.begin(), v1.end(), v2.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(swap_ranges_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
 
   ASSERT_EQUAL(v1[0], 5);
   ASSERT_EQUAL(v1[1], 6);
@@ -59,11 +60,11 @@ void TestSwapRangesCudaStreams()
   Vector v2(5);
   v2[0] = 5; v2[1] = 6; v2[2] = 7; v2[3] = 8; v2[4] = 9;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::swap_ranges(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v1[0], 5);
   ASSERT_EQUAL(v1[1], 6);
@@ -77,7 +78,7 @@ void TestSwapRangesCudaStreams()
   ASSERT_EQUAL(v2[3], 3);
   ASSERT_EQUAL(v2[4], 4);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSwapRangesCudaStreams);
 

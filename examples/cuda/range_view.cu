@@ -196,7 +196,7 @@ void saxpy(float A, View1 X, View2 Y, View3 Z)
 
 template<class View1, class View2, class View3>
 __global__
-void saxpy_kernel(hipLaunchParm lp, float A, View1 X, View2 Y, View3 Z)
+void saxpy_kernel(hipLaunchParm lp,float A, View1 X, View2 Y, View3 Z)
 {
   saxpy(A, X, Y, Z);
 }

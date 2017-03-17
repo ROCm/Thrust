@@ -1,6 +1,6 @@
 #include <unittest/unittest.h>
 
-#if defined(__CUDACC__)
+#if defined(__HIPCC__)
 
 #include <thrust/system/cuda/detail/runtime_introspection.h>
 #include <thrust/system/cuda/detail/cuda_launch_config.h>
@@ -240,5 +240,5 @@ void TestUnknownDeviceRobustness(void)
 }
 DECLARE_UNITTEST(TestUnknownDeviceRobustness);
 
-#endif // defined(__CUDACC__)
+#endif // defined(__HIPCC__)
 

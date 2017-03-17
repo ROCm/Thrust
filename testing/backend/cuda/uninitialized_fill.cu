@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/uninitialized_fill.h>
 #include <thrust/execution_policy.h>
@@ -22,7 +23,7 @@ void TestUninitializedFillDevice(ExecutionPolicy exec)
   
   T exemplar(7);
   
-  uninitialized_fill_kernel<<<1,1>>>(exec, v.begin() + 1, v.begin() + 4, exemplar);
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 4, exemplar);
   
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], exemplar);
@@ -32,7 +33,7 @@ void TestUninitializedFillDevice(ExecutionPolicy exec)
   
   exemplar = 8;
   
-  uninitialized_fill_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 3, exemplar);
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 3, exemplar);
   
   ASSERT_EQUAL(v[0], exemplar);
   ASSERT_EQUAL(v[1], exemplar);
@@ -42,7 +43,7 @@ void TestUninitializedFillDevice(ExecutionPolicy exec)
   
   exemplar = 9;
   
-  uninitialized_fill_kernel<<<1,1>>>(exec, v.begin() + 2, v.end(), exemplar);
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 2, v.end(), exemplar);
   
   ASSERT_EQUAL(v[0], 8);
   ASSERT_EQUAL(v[1], 8);
@@ -52,7 +53,7 @@ void TestUninitializedFillDevice(ExecutionPolicy exec)
   
   exemplar = 1;
   
-  uninitialized_fill_kernel<<<1,1>>>(exec, v.begin(), v.end(), exemplar);
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), exemplar);
   
   ASSERT_EQUAL(v[0], exemplar);
   ASSERT_EQUAL(v[1], exemplar);
@@ -86,11 +87,11 @@ void TestUninitializedFillCudaStreams()
   
   T exemplar(7);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::uninitialized_fill(thrust::cuda::par.on(s), v.begin(), v.end(), exemplar);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(v[0], exemplar);
   ASSERT_EQUAL(v[1], exemplar);
@@ -98,7 +99,7 @@ void TestUninitializedFillCudaStreams()
   ASSERT_EQUAL(v[3], exemplar);
   ASSERT_EQUAL(v[4], exemplar);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUninitializedFillCudaStreams);
 
@@ -124,7 +125,7 @@ void TestUninitializedFillNDevice(ExecutionPolicy exec)
 
   thrust::device_vector<Vector::iterator> iter_vec(1);
   
-  uninitialized_fill_n_kernel<<<1,1>>>(exec, v.begin() + 1, 3, exemplar, iter_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, 3, exemplar, iter_vec.begin());
   Vector::iterator iter = iter_vec[0];
   
   ASSERT_EQUAL(v[0], 0);
@@ -136,7 +137,7 @@ void TestUninitializedFillNDevice(ExecutionPolicy exec)
   
   exemplar = 8;
   
-  uninitialized_fill_n_kernel<<<1,1>>>(exec, v.begin() + 0, 3, exemplar, iter_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, 3, exemplar, iter_vec.begin());
   iter = iter_vec[0];
   
   ASSERT_EQUAL(v[0], exemplar);
@@ -148,7 +149,7 @@ void TestUninitializedFillNDevice(ExecutionPolicy exec)
   
   exemplar = 9;
   
-  uninitialized_fill_n_kernel<<<1,1>>>(exec, v.begin() + 2, 3, exemplar, iter_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 2, 3, exemplar, iter_vec.begin());
   iter = iter_vec[0];
   
   ASSERT_EQUAL(v[0], 8);
@@ -160,7 +161,7 @@ void TestUninitializedFillNDevice(ExecutionPolicy exec)
   
   exemplar = 1;
   
-  uninitialized_fill_n_kernel<<<1,1>>>(exec, v.begin(), v.size(), exemplar, iter_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.size(), exemplar, iter_vec.begin());
   iter = iter_vec[0];
   
   ASSERT_EQUAL(v[0], exemplar);
@@ -196,11 +197,11 @@ void TestUninitializedFillNCudaStreams()
   
   T exemplar(7);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::uninitialized_fill_n(thrust::cuda::par.on(s), v.begin(), v.size(), exemplar);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(v[0], exemplar);
   ASSERT_EQUAL(v[1], exemplar);
@@ -208,7 +209,7 @@ void TestUninitializedFillNCudaStreams()
   ASSERT_EQUAL(v[3], exemplar);
   ASSERT_EQUAL(v[4], exemplar);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUninitializedFillNCudaStreams);
 

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/scatter.h>
 #include <thrust/execution_policy.h>
@@ -33,7 +34,7 @@ void TestScatterDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_output(output_size, 0);
   
   thrust::scatter(h_input.begin(), h_input.end(), h_map.begin(), h_output.begin());
-  scatter_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_map.begin(), d_output.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(scatter_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -88,7 +89,7 @@ void TestScatterIfDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_output(output_size, 0);
   
   thrust::scatter_if(h_input.begin(), h_input.end(), h_map.begin(), h_map.begin(), h_output.begin(), is_even_scatter_if<unsigned int>());
-  scatter_if_kernel<<<1,1>>>(exec, d_input.begin(), d_input.end(), d_map.begin(), d_map.begin(), d_output.begin(), is_even_scatter_if<unsigned int>());
+  hipLaunchKernel(HIP_KERNEL_NAME(scatter_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_map.begin(), d_output.begin(), is_even_scatter_if<unsigned int>());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -120,12 +121,12 @@ void TestScatterCudaStreams()
   src[0] = 0; src[1] = 1; src[2] = 2; src[3] = 3; src[4] = 4;
   dst[0] = 0; dst[1] = 0; dst[2] = 0; dst[3] = 0; dst[4] = 0; dst[5] = 0; dst[6] = 0; dst[7] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::scatter(thrust::cuda::par.on(s), src.begin(), src.end(), map.begin(), dst.begin());
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(dst[0], 0);
   ASSERT_EQUAL(dst[1], 2);
@@ -136,7 +137,7 @@ void TestScatterCudaStreams()
   ASSERT_EQUAL(dst[6], 0);
   ASSERT_EQUAL(dst[7], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestScatterCudaStreams);
 
@@ -155,11 +156,11 @@ void TestScatterIfCudaStreams()
   src[0] = 0; src[1] = 1; src[2] = 2; src[3] = 3; src[4] = 4;
   dst[0] = 0; dst[1] = 0; dst[2] = 0; dst[3] = 0; dst[4] = 0; dst[5] = 0; dst[6] = 0; dst[7] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::scatter_if(thrust::cuda::par.on(s), src.begin(), src.end(), map.begin(), flg.begin(), dst.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(dst[0], 0);
   ASSERT_EQUAL(dst[1], 0);
@@ -170,7 +171,7 @@ void TestScatterIfCudaStreams()
   ASSERT_EQUAL(dst[6], 0);
   ASSERT_EQUAL(dst[7], 3);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestScatterIfCudaStreams);
 

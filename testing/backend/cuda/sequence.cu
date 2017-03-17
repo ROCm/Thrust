@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/sequence.h>
 #include <thrust/execution_policy.h>
@@ -32,7 +33,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
 {
   thrust::device_vector<int> v(5);
   
-  sequence_kernel<<<1,1>>>(exec, v.begin(), v.end());
+  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end());
   
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -40,7 +41,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 3);
   ASSERT_EQUAL(v[4], 4);
   
-  sequence_kernel<<<1,1>>>(exec, v.begin(), v.end(), 10);
+  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10);
   
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 11);
@@ -48,7 +49,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 13);
   ASSERT_EQUAL(v[4], 14);
   
-  sequence_kernel<<<1,1>>>(exec, v.begin(), v.end(), 10, 2);
+  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10, 2);
   
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 12);
@@ -75,11 +76,11 @@ void TestSequenceCudaStreams()
   
   Vector v(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::sequence(thrust::cuda::par.on(s), v.begin(), v.end());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -88,7 +89,7 @@ void TestSequenceCudaStreams()
   ASSERT_EQUAL(v[4], 4);
 
   thrust::sequence(thrust::cuda::par.on(s), v.begin(), v.end(), 10);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 11);
@@ -97,7 +98,7 @@ void TestSequenceCudaStreams()
   ASSERT_EQUAL(v[4], 14);
   
   thrust::sequence(thrust::cuda::par.on(s), v.begin(), v.end(), 10, 2);
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 12);
@@ -105,7 +106,7 @@ void TestSequenceCudaStreams()
   ASSERT_EQUAL(v[3], 16);
   ASSERT_EQUAL(v[4], 18);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSequenceCudaStreams);
 

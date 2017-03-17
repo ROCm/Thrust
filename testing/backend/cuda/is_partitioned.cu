@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/partition.h>
 #include <thrust/functional.h>
@@ -34,13 +35,13 @@ void TestIsPartitionedDevice(ExecutionPolicy exec)
   v[0] = 1;
   v[1] = 0;
 
-  is_partitioned_kernel<<<1,1>>>(exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(false, result[0]);
 
   thrust::partition(v.begin(), v.end(), is_even<int>());
 
-  is_partitioned_kernel<<<1,1>>>(exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(true, result[0]);
 }
@@ -65,8 +66,8 @@ void TestIsPartitionedCudaStreams()
   thrust::device_vector<int> v(4);
   v[0] = 1; v[1] = 1; v[2] = 1; v[3] = 0;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   // empty partition
   ASSERT_EQUAL_QUIET(true, thrust::is_partitioned(thrust::cuda::par.on(s), v.begin(), v.begin(), thrust::identity<int>()));
@@ -88,7 +89,7 @@ void TestIsPartitionedCudaStreams()
   // not partitioned
   ASSERT_EQUAL_QUIET(false, thrust::is_partitioned(thrust::cuda::par.on(s), v.begin(), v.end(), thrust::identity<int>()));
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestIsPartitionedCudaStreams);
 

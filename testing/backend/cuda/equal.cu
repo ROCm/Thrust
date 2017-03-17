@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/equal.h>
 #include <thrust/functional.h>
@@ -28,11 +29,11 @@ void TestEqualDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<bool> d_result(1, false);
   
   //empty ranges
-  equal_kernel<<<1,1>>>(exec, d_data1.begin(), d_data1.begin(), d_data1.begin(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin(), d_data1.begin(), d_result.begin());
   ASSERT_EQUAL(d_result[0], true);
   
   //symmetric cases
-  equal_kernel<<<1,1>>>(exec, d_data1.begin(), d_data1.end(), d_data1.begin(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data1.begin(), d_result.begin());
   ASSERT_EQUAL(d_result[0], true);
   
   if(n > 0)
@@ -40,13 +41,13 @@ void TestEqualDevice(ExecutionPolicy exec, const size_t n)
     d_data1[0] = 0; d_data2[0] = 1;
     
     //different vectors
-    equal_kernel<<<1,1>>>(exec, d_data1.begin(), d_data1.end(), d_data2.begin(), d_result.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data2.begin(), d_result.begin());
     ASSERT_EQUAL(d_result[0], false);
     
     //different predicates
-    equal_kernel<<<1,1>>>(exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::less<T>(), d_result.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::less<T>(), d_result.begin());
     ASSERT_EQUAL(d_result[0], true);
-    equal_kernel<<<1,1>>>(exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::greater<T>(), d_result.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::greater<T>(), d_result.begin());
     ASSERT_EQUAL(d_result[0], false);
   }
 }
@@ -75,8 +76,8 @@ void TestEqualCudaStreams()
   v1[0] = 5; v1[1] = 2; v1[2] = 0; v1[3] = 0; v1[4] = 0;
   v2[0] = 5; v2[1] = 2; v2[2] = 0; v2[3] = 6; v2[4] = 1;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   ASSERT_EQUAL(thrust::equal(thrust::cuda::par.on(s), v1.begin(), v1.end(), v1.begin()), true);
   ASSERT_EQUAL(thrust::equal(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin()), false);
@@ -90,7 +91,7 @@ void TestEqualCudaStreams()
   ASSERT_EQUAL(thrust::equal(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin(), thrust::less_equal<int>()), true);
   ASSERT_EQUAL(thrust::equal(thrust::cuda::par.on(s), v1.begin(), v1.end(), v2.begin(), thrust::greater<int>()),    false);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestEqualCudaStreams);
 

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/extrema.h>
 
@@ -44,7 +45,7 @@ void TestMinMaxElementDevice(ExecutionPolicy exec)
   d_min = thrust::minmax_element(d_data.begin(), d_data.end()).first;
   d_max = thrust::minmax_element(d_data.begin(), d_data.end()).second;
 
-  minmax_element_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
   d_min = ((pair_type)d_result[0]).first;
   d_max = ((pair_type)d_result[0]).second;
   
@@ -54,7 +55,7 @@ void TestMinMaxElementDevice(ExecutionPolicy exec)
   h_max = thrust::minmax_element(h_data.begin(), h_data.end(), thrust::greater<int>()).first;
   h_min = thrust::minmax_element(h_data.begin(), h_data.end(), thrust::greater<int>()).second;
 
-  minmax_element_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
   d_max = ((pair_type)d_result[0]).first;
   d_min = ((pair_type)d_result[0]).second;
   
@@ -89,15 +90,15 @@ void TestMinMaxElementCudaStreams()
   data[4] = 5;
   data[5] = 1;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL( *thrust::minmax_element(thrust::cuda::par.on(s), data.begin(), data.end()).first,  1);
   ASSERT_EQUAL( *thrust::minmax_element(thrust::cuda::par.on(s), data.begin(), data.end()).second, 5);
   ASSERT_EQUAL(  thrust::minmax_element(thrust::cuda::par.on(s), data.begin(), data.end()).first  - data.begin(), 2);
   ASSERT_EQUAL(  thrust::minmax_element(thrust::cuda::par.on(s), data.begin(), data.end()).second - data.begin(), 1);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestMinMaxElementCudaStreams);
 

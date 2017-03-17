@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/set_operations.h>
 #include <thrust/execution_policy.h>
@@ -32,7 +33,7 @@ void TestSetUnionDevice(ExecutionPolicy exec)
   Vector result(5);
   thrust::device_vector<Iterator> end_vec(1);
 
-  set_union_kernel<<<1,1>>>(exec,
+  hipLaunchKernel(HIP_KERNEL_NAME(set_union_kernel), dim3(1), dim3(1), 0, 0, exec,
                             a.begin(), a.end(),
                             b.begin(), b.end(),
                             result.begin(),
@@ -73,19 +74,19 @@ void TestSetUnionCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Iterator end = thrust::set_union(thrust::cuda::par.on(s),
                                    a.begin(), a.end(),
                                    b.begin(), b.end(),
                                    result.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL_QUIET(result.end(), end);
   ASSERT_EQUAL(ref, result);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestSetUnionCudaStreams);
 
