@@ -51,7 +51,7 @@ inline device_properties_t device_properties_uncached(int device_id)
   int temp;
   error = cudaDeviceGetAttribute(&temp,                             cudaDevAttrMaxSharedMemoryPerBlock,     device_id);
   prop.sharedMemPerBlock = temp;
-  error = cudaDeviceGetAttribute(&prop.warpSize,                    cudaDevAttrWarpSize,                    device_id);
+  error = hipDeviceGetAttribute(&prop.hipWarpSize,                    hipDeviceAttributeWarpSize,                    device_id);
 #else
   (void) device_id; // Suppress unused parameter warnings
 #endif

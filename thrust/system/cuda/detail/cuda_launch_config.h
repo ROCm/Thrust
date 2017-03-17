@@ -271,7 +271,7 @@ size_t max_active_blocks_per_multiprocessor(const device_properties_t    &proper
   //////////////////////////////////////////
   const int regAllocationUnit = reg_allocation_unit(properties, attributes.numRegs);
   const size_t warpAllocationMultiple = warp_allocation_multiple(properties);
-  const size_t numWarps = util::round_i(util::divide_ri(CTA_SIZE, properties.warpSize), warpAllocationMultiple);
+  const size_t numWarps = util::round_i(util::divide_ri(CTA_SIZE, properties.hipWarpSize), warpAllocationMultiple);
 
   // Calc limit
   size_t ctaLimitRegs;
@@ -279,14 +279,14 @@ size_t max_active_blocks_per_multiprocessor(const device_properties_t    &proper
   {
     // GPUs of compute capability 1.x allocate registers to CTAs
     // Number of regs per block is regs per thread times number of warps times warp size, rounded up to allocation unit
-    const size_t regsPerCTA = util::round_i(attributes.numRegs * properties.warpSize * numWarps, regAllocationUnit);
+    const size_t regsPerCTA = util::round_i(attributes.numRegs * properties.hipWarpSize * numWarps, regAllocationUnit);
     ctaLimitRegs = regsPerCTA > 0 ? properties.regsPerBlock / regsPerCTA : maxBlocksPerSM;
   }
   else
   {
     // GPUs of compute capability 2.x and higher allocate registers to warps
     // Number of regs per warp is regs per thread times times warp size, rounded up to allocation unit
-    const size_t regsPerWarp = util::round_i(attributes.numRegs * properties.warpSize, regAllocationUnit);
+    const size_t regsPerWarp = util::round_i(attributes.numRegs * properties.hipWarpSize, regAllocationUnit);
     const size_t numSides = num_sides_per_multiprocessor(properties);
     const size_t numRegsPerSide = properties.regsPerBlock / numSides;
     ctaLimitRegs = regsPerWarp > 0 ? ((numRegsPerSide / regsPerWarp) * numSides) / numWarps : maxBlocksPerSM;
@@ -310,7 +310,7 @@ std::size_t block_size_with_maximum_potential_occupancy(const function_attribute
 {
   size_t max_occupancy      = properties.maxThreadsPerMultiProcessor;
   size_t largest_blocksize  = cuda_launch_config_detail::util::min_(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
-  size_t granularity        = properties.warpSize;
+  size_t granularity        = properties.hipWarpSize;
   size_t max_blocksize      = 0;
   size_t highest_occupancy  = 0;
 
@@ -363,7 +363,7 @@ size_t max_blocksize_subject_to_smem_usage(const device_properties_t   &properti
                                            UnaryFunction blocksize_to_dynamic_smem_usage)
 {
   size_t largest_blocksize = (thrust::min)(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
-  size_t granularity = properties.warpSize;
+  size_t granularity = properties.hipWarpSize;
   
   for(int blocksize = largest_blocksize; blocksize > 0; blocksize -= granularity)
   {
