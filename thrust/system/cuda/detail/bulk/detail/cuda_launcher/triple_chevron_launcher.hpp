@@ -61,7 +61,7 @@ template<unsigned int block_size, typename Function, bool by_value = (sizeof(Fun
 template<unsigned int block_size, typename Function>
 __global__
 __bulk_launch_bounds__(block_size, 0)
-void launch_by_value(hipLaunchParm lp, Function f)
+void launch_by_value(Function f)
 {
   f();
 }

@@ -65,7 +65,8 @@ OutputIterator copy_device_to_device(execution_policy<DerivedPolicy> &exec,
     thrust::detail::temporary_array<OutputType, thrust::host_system_tag> temp2(temp_exec, temp1.begin(), temp1.end());
 
     // copy temp2 to device
-    result = thrust::system::cuda::detail::copy_cross_system(temp2.begin(), temp2.end(), result);
+    cross_system<thrust::host_system_tag, DerivedPolicy> systems(temp_exec, exec);
+    result = thrust::system::cuda::detail::copy_cross_system(systems, temp2.begin(), temp2.end(), result);
 
     return result;
 #endif // THRUST_DEVICE_COMPILER_NVCC
