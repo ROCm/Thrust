@@ -465,8 +465,8 @@ bool UnitTestDriver::run_tests(const ArgumentSet& args, const ArgumentMap& kwarg
 
 
 // driver_instance maps a DeviceSystem to a singleton UnitTestDriver
-template<typename DeviceSystem>
-UnitTestDriver &driver_instance(DeviceSystem tag)
+//template<typename DeviceSystem>
+UnitTestDriver &driver_instance(/*DeviceSystem tag*/)
 {
   static UnitTestDriver s_instance;
   return s_instance;
@@ -477,7 +477,7 @@ UnitTestDriver &driver_instance(DeviceSystem tag)
 // driver_instance in that function
 UnitTestDriver &UnitTestDriver::s_driver()
 {
-  return driver_instance(thrust::device_system_tag());
+  return driver_instance(/*thrust::device_system_tag()*/);
 }
 
 

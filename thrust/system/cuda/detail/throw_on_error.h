@@ -37,6 +37,14 @@ void throw_on_error(hipError_t error, const char *message)
   thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
 }
 
+inline __host__ __device__
+void throw_on_error(cudaError_t error, const char *message)
+{
+  thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
+}
+
+
+
 
 } // end detail
 } // end cuda
