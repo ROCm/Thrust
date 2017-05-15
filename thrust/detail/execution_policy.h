@@ -17,6 +17,7 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+#include <hip/hip_runtime.h>
 
 namespace thrust
 {

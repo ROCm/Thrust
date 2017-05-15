@@ -21,6 +21,7 @@
 #include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/terminate.hpp>
 #include <thrust/detail/swap.h>
+#include <hip/hip_runtime.h>
 #include <utility>
 #include <stdexcept>
 #include <iostream>

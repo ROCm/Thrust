@@ -1,3 +1,4 @@
+#include <hip/hip_runtime.h>
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -35,7 +36,9 @@ void throw_on_error(hipError_t e, const char *message)
   if(e)
   {
 #ifndef __CUDA_ARCH__
-    throw thrust::system_error(e, thrust::cuda_category(), message);
+
+    //throw thrust::system_error(e, thrust::cuda_category(), message);
+thrust::system_error(e, thrust::system::cuda_category(), message);
 #else
 #  if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
     printf("Error after %s: %s\n", message, hipGetErrorString(e));
@@ -47,7 +50,7 @@ void throw_on_error(hipError_t e, const char *message)
   } // end if
 } // end throw_on_error()
 
-
+#if 0
 inline __host__ __device__
 void throw_on_error(cudaError_t e, const char *message)
 {
@@ -66,7 +69,7 @@ void throw_on_error(cudaError_t e, const char *message)
   } // end if
 } // end throw_on_error()
 
-
+#endif
 } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
