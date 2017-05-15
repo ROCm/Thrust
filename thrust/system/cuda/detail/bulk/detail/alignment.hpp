@@ -65,7 +65,7 @@ template<typename T>
 template<std::size_t Align> struct aligned_type;
 
 // __align__ is CUDA-specific, so guard it
-#if defined(__HIPCC__)
+#if defined(__CUDACC__)
 
 // implementing aligned_type portably is tricky:
 

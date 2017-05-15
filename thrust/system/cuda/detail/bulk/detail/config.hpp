@@ -24,7 +24,7 @@
 #define BULK_NAMESPACE_SUFFIX
 #endif
 
-#if defined(__HIPCC__) && !(defined(__CUDA__) && defined(__clang__))
+#if defined(__CUDACC__) && !(defined(__CUDA__) && defined(__clang__))
 #  ifndef __bulk_exec_check_disable__
 #    define __bulk_exec_check_disable__ #pragma nv_exec_check_disable
 #  endif // __bulk_exec_check_disable__
@@ -39,7 +39,7 @@
 #endif
 
 
-#if defined(__HIPCC__)
+#if defined(__CUDACC__)
 #  if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__>= 350 && defined(__CUDACC_RDC__))
 #    define __BULK_HAS_CUDART__ 1
 #  else
@@ -49,13 +49,13 @@
 #  define __BULK_HAS_CUDART__ 0
 #endif
 
-#if defined(__HIPCC__)
+#if defined(__CUDACC__)
 #  if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200)
 #    define __BULK_HAS_PRINTF__ 1
 #  else
 #    define __BULK_HAS_PRINTF__ 0
 #  endif
 #else
-#  define __BULK_HAS_PRINTF__ 1
+#  define __BULK_HAS_PRINTF__ 0
 #endif
 

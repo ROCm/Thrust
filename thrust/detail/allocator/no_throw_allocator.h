@@ -45,6 +45,8 @@ template<typename BaseAllocator>
     void deallocate(typename super_t::pointer p, typename super_t::size_type n)
     {
 #ifndef __CUDA_ARCH__
+super_t::deallocate(p, n);
+#if 0      
       try
       {
         super_t::deallocate(p, n);
@@ -53,6 +55,7 @@ template<typename BaseAllocator>
       {
         // catch anything
       } // end catch
+#endif
 #else
       super_t::deallocate(p, n);
 #endif

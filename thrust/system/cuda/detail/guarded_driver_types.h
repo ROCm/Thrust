@@ -36,7 +36,8 @@
 #    define THRUST_DEVICE_NEEDS_RESTORATION
 #  endif
 #else // GNUC pre 4.5.0
-#  if !defined(__DRIVER_TYPES_H__)
+#if !defined(HIP_INCLUDE_HIP_HCC_DETAIL_DRIVER_TYPES_H)
+//#  if !defined(__DRIVER_TYPES_H__)
 #    ifdef __host__
 #      undef __host__
 #    endif

@@ -52,7 +52,8 @@ void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
 
   if(error)
   {
-    throw thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
+    //throw thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
+  thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
   } // end if
 #else
   result = thrust::raw_pointer_cast(thrust::malloc(thrust::seq, n));

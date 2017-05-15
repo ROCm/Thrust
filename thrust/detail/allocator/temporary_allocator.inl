@@ -46,7 +46,8 @@ __host__ __device__
     deallocate(result.first, cnt);
 
 #if !defined(__CUDA_ARCH__)
-    throw thrust::system::detail::bad_alloc("temporary_buffer::allocate: get_temporary_buffer failed");
+    //throw thrust::system::detail::bad_alloc("temporary_buffer::allocate: get_temporary_buffer failed");
+    thrust::system::detail::bad_alloc("temporary_buffer::allocate: get_temporary_buffer failed");
 #else
     thrust::system::cuda::detail::terminate_with_message("temporary_buffer::allocate: get_temporary_buffer failed");
 #endif

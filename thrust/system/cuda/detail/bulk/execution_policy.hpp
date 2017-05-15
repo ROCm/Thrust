@@ -19,6 +19,7 @@
 #include <thrust/system/cuda/detail/bulk/future.hpp>
 #include <thrust/detail/type_traits.h>
 #include <thrust/system/cuda/detail/bulk/detail/cuda_launcher/runtime_introspection.hpp>
+#include <hip/hip_runtime.h>
 #include <cstddef>
 
 

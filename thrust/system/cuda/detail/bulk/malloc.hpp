@@ -471,15 +471,13 @@ class singleton_on_chip_allocator
     singleton_unsafe_on_chip_allocator m_alloc;
 }; // end singleton_on_chip_allocator
 
-
 // put the object in an anonymous namespace so that non-CUDA compilers don't complain about multiple definitions
-namespace
-{
+//namespace
+//{
 
-__shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 
-} // end anon namespace
-
+//} // end anon namespace
 
 inline __device__ void init_on_chip_malloc(size_t max_data_segment_size)
 {
@@ -511,7 +509,6 @@ inline __device__ void unsafe_on_chip_free(void *ptr)
 {
   s_on_chip_allocator.get().unsafe_deallocate(ptr);
 } // end unsafe_on_chip_free()
-
 
 } // end detail
 
@@ -564,7 +561,6 @@ inline __device__ void shfree(void *ptr)
 #endif
 } // end shfree()
 
-
 inline __device__ void unsafe_shfree(void *ptr)
 {
 #if __CUDA_ARCH__ >= 200
@@ -580,7 +576,6 @@ inline __device__ void unsafe_shfree(void *ptr)
   bulk::detail::unsafe_on_chip_free(bulk::on_chip_cast(ptr));
 #endif
 } // end unsafe_shfree()
-
 
 template<typename ConcurrentGroup>
 __device__
@@ -614,7 +609,6 @@ inline void free(ConcurrentGroup &g, void *ptr)
 
   g.wait();
 } // end free()
-
 
 } // end namespace bulk
 BULK_NAMESPACE_SUFFIX
