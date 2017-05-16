@@ -24,7 +24,10 @@
 // if the compiler does not have push_macro & pop_macro, just undef __host__ & __device__ and hope for the best
 
 // can't tell exactly when push_macro & pop_macro were introduced to gcc; assume 4.5.0
-#if !defined(__HOST_DEFINES_H__)
+//#if !defined(__HOST_DEFINES_H__)
+/* In ROCm 1.5, host_defines.h has a macro HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H whereas in ROCm 1.4 the macro is defined as HOST_DEFINES_H. 
+While using ROCm 1.4 use the macros defined in ROCm 1.4 */
+#if ((defined(__HCC__) && !defined(HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H)) || (defined(__NVCC__) && !defined(__HOST_DEFINES_H__)))
 #  if !defined(__GNUC__) || ((10000 * __GNUC__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__) >= 40500) || defined(__clang__)
 #    ifdef __host__
 #      pragma push_macro("__host__")
@@ -33,7 +36,7 @@
 #    endif
 #    ifdef __device__
 #      pragma push_macro("__device__")
-#      undef __device__
+#     undef __device__
 #      define BULK_DEVICE_NEEDS_RESTORATION
 #    endif
 #  else // GNUC pre 4.5.0
@@ -41,7 +44,7 @@
 #      undef __host__
 #    endif
 #    ifdef __device__
-#      undef __device__
+#     undef __device__
 #    endif
 #  endif // has push/pop_macro
 #endif // __HOST_DEFINES_H__
