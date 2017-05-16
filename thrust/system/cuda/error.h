@@ -1,3 +1,4 @@
+#include <hip/hip_runtime.h>
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -41,7 +42,7 @@ namespace cuda
 
 // To construct an error_code after a CUDA Runtime error:
 //
-//   error_code(::hipGetLastError(), cuda_category())
+//   error_code(::cudaGetLastError(), cuda_category())
 
 // XXX N3000 prefers enum class errc { ... }
 namespace errc
@@ -49,68 +50,6 @@ namespace errc
 
 /*! \p errc_t enumerates the kinds of CUDA Runtime errors.
  */
-enum  	hipError_t { 
-  hipSuccess = 0, 
-  hipErrorOutOfMemory = 2, 
-  hipErrorNotInitialized = 3, 
-  hipErrorDeinitialized = 4, 
-  hipErrorProfilerDisabled = 5, 
-  hipErrorProfilerNotInitialized = 6, 
-  hipErrorProfilerAlreadyStarted = 7, 
-  hipErrorProfilerAlreadyStopped = 8, 
-  hipErrorInvalidImage = 200, 
-  hipErrorInvalidContext = 201, 
-  hipErrorContextAlreadyCurrent = 202, 
-  hipErrorMapFailed = 205, 
-  hipErrorUnmapFailed = 206, 
-  hipErrorArrayIsMapped = 207, 
-  hipErrorAlreadyMapped = 208, 
-  hipErrorNoBinaryForGpu = 209, 
-  hipErrorAlreadyAcquired = 210, 
-  hipErrorNotMapped = 211, 
-  hipErrorNotMappedAsArray = 212, 
-  hipErrorNotMappedAsPointer = 213, 
-  hipErrorECCNotCorrectable = 214, 
-  hipErrorUnsupportedLimit = 215, 
-  hipErrorContextAlreadyInUse = 216, 
-  hipErrorPeerAccessUnsupported = 217, 
-  hipErrorInvalidKernelFile = 218, 
-  hipErrorInvalidGraphicsContext = 219, 
-  hipErrorInvalidSource = 300, 
-  hipErrorFileNotFound = 301, 
-  hipErrorSharedObjectSymbolNotFound = 302, 
-  hipErrorSharedObjectInitFailed = 303, 
-  hipErrorOperatingSystem = 304, 
-  hipErrorInvalidHandle = 400, 
-  hipErrorNotFound = 500, 
-  hipErrorIllegalAddress = 700, 
-  hipErrorInvalidSymbol = 701, 
-  hipErrorMissingConfiguration = 1001, 
-  hipErrorMemoryAllocation = 1002, 
-  hipErrorInitializationError = 1003, 
-  hipErrorLaunchFailure = 1004, 
-  hipErrorPriorLaunchFailure = 1005, 
-  hipErrorLaunchTimeOut = 1006, 
-  hipErrorLaunchOutOfResources = 1007, 
-  hipErrorInvalidDeviceFunction = 1008, 
-  hipErrorInvalidConfiguration = 1009, 
-  hipErrorInvalidDevice = 1010, 
-  hipErrorInvalidValue = 1011, 
-  hipErrorInvalidDevicePointer = 1017, 
-  hipErrorInvalidMemcpyDirection = 1021, 
-  hipErrorUnknown = 1030, 
-  hipErrorInvalidResourceHandle = 1033, 
-  hipErrorNotReady = 1034, 
-  hipErrorNoDevice = 1038, 
-  hipErrorPeerAccessAlreadyEnabled = 1050, 
-  hipErrorPeerAccessNotEnabled = 1051, 
-  hipErrorRuntimeMemory = 1052, 
-  hipErrorRuntimeOther = 1053, 
-  hipErrorHostMemoryAlreadyRegistered = 1061, 
-  hipErrorHostMemoryNotRegistered = 1062, 
-  hipErrorMapBufferObjectFailed = 1071, 
-  hipErrorTbd 
-};
 enum errc_t
 {
   // from cuda/include/driver_types.h
@@ -127,40 +66,40 @@ enum errc_t
   invalid_configuration              = hipErrorInvalidConfiguration,
   invalid_device                     = hipErrorInvalidDevice,
   invalid_value                      = hipErrorInvalidValue,
-  invalid_pitch_value                = cudaErrorInvalidPitchValue,
+  invalid_pitch_value                = hipErrorTbd,
   invalid_symbol                     = hipErrorInvalidSymbol,
   map_buffer_object_failed           = hipErrorMapBufferObjectFailed,
-  unmap_buffer_object_failed         = cudaErrorUnmapBufferObjectFailed,
-  invalid_host_pointer               = cudaErrorInvalidHostPointer,
-  
+  unmap_buffer_object_failed         = hipErrorTbd,
+  invalid_host_pointer               = hipErrorTbd,
   invalid_device_pointer             = hipErrorInvalidDevicePointer,
-  
-  invalid_texture                    = cudaErrorInvalidTexture,
-  invalid_texture_binding            = cudaErrorInvalidTextureBinding,
-  invalid_channel_descriptor         = cudaErrorInvalidChannelDescriptor,
+  invalid_texture                    = hipErrorTbd,
+  invalid_texture_binding            = hipErrorTbd,
+  invalid_channel_descriptor         = hipErrorTbd,
   invalid_memcpy_direction           = hipErrorInvalidMemcpyDirection,
-  address_of_constant_error          = cudaErrorAddressOfConstant,
-  texture_fetch_failed               = cudaErrorTextureFetchFailed,
-  texture_not_bound                  = cudaErrorTextureNotBound,
-  synchronization_error              = cudaErrorSynchronizationError,
-  invalid_filter_setting             = cudaErrorInvalidFilterSetting,
-  invalid_norm_setting               = cudaErrorInvalidNormSetting,
-  mixed_device_execution             = cudaErrorMixedDeviceExecution,
-  cuda_runtime_unloading             = cudaErrorCudartUnloading,
+  address_of_constant_error          = hipErrorTbd,
+  texture_fetch_failed               = hipErrorTbd,
+  texture_not_bound                  = hipErrorTbd,
+  synchronization_error              = hipErrorTbd,
+  invalid_filter_setting             = hipErrorTbd,
+  invalid_norm_setting               = hipErrorTbd,
+  mixed_device_execution             = hipErrorTbd,
+  cuda_runtime_unloading             = hipErrorTbd,
   unknown                            = hipErrorUnknown,
-  not_yet_implemented                = cudaErrorNotYetImplemented,
-  memory_value_too_large             = cudaErrorMemoryValueTooLarge,
+  not_yet_implemented                = hipErrorTbd,
+  memory_value_too_large             = hipErrorTbd,
   invalid_resource_handle            = hipErrorInvalidResourceHandle,
   not_ready                          = hipErrorNotReady,
-  insufficient_driver                = cudaErrorInsufficientDriver,
-  set_on_active_process_error        = cudaErrorSetOnActiveProcess,
+  insufficient_driver                = hipErrorTbd,
+  set_on_active_process_error        = hipErrorSetOnActiveProcess,
   no_device                          = hipErrorNoDevice,
-  ecc_uncorrectable                  = cudaErrorECCUncorrectable,
+  ecc_uncorrectable                  = hipErrorTbd,
 
-#if (defined(__NVCC__) && defined(CUDART_VERSION) && (CUDART_VERSION >= 4020)) || defined(__HCC__) 
-  shared_object_symbol_not_found     = hipErrorSharedObjectSymbolNotFound,
-  shared_object_init_failed          = hipErrorSharedObjectInitFailed,
-  unsupported_limit                  = hipErrorUnsupportedLimit,
+
+
+#if CUDART_VERSION >= 4020
+  shared_object_symbol_not_found     = cudaErrorSharedObjectSymbolNotFound,
+  shared_object_init_failed          = cudaErrorSharedObjectInitFailed,
+  unsupported_limit                  = cudaErrorUnsupportedLimit,
   duplicate_variable_name            = cudaErrorDuplicateVariableName,
   duplicate_texture_name             = cudaErrorDuplicateTextureName,
   duplicate_surface_name             = cudaErrorDuplicateSurfaceName,
@@ -171,16 +110,16 @@ enum errc_t
   peer_access_already_enabled        = hipErrorPeerAccessAlreadyEnabled,
   peer_access_not_enabled            = hipErrorPeerAccessNotEnabled,
   device_already_in_use              = cudaErrorDeviceAlreadyInUse,
-  profiler_disabled                  = hipErrorProfilerDisabled,
+  profiler_disabled                  = cudaErrorProfilerDisabled,
   assert_triggered                   = cudaErrorAssert,
   too_many_peers                     = cudaErrorTooManyPeers,
-  host_memory_already_registered     = hipErrorHostMemoryAlreadyRegistered ,
+  host_memory_already_registered     = hipErrorHostMemoryAlreadyRegistered,
   host_memory_not_registered         = hipErrorHostMemoryNotRegistered,
-  operating_system_error             = hipErrorOperatingSystem,
+  operating_system_error             = cudaErrorOperatingSystem,
 #endif
 
-#if (defined(__NVCC__) && defined(CUDART_VERSION) && (CUDART_VERSION >= 5000)) || defined(__HCC__) 
-  peer_access_unsupported            = hipErrorPeerAccessUnsupported,
+#if CUDART_VERSION >= 5000
+  peer_access_unsupported            = cudaErrorPeerAccessUnsupported,
   launch_max_depth_exceeded          = cudaErrorLaunchMaxDepthExceeded,
   launch_file_scoped_texture_used    = cudaErrorLaunchFileScopedTex,
   launch_file_scoped_surface_used    = cudaErrorLaunchFileScopedSurf,
@@ -189,11 +128,8 @@ enum errc_t
   attempted_operation_not_supported  = cudaErrorNotSupported,
 #endif
 
-
-
-  startup_failure                    = cudaErrorStartupFailure
+//  startup_failure                    = hipErrorStartupFailure
 }; // end errc_t
-
 
 } // end namespace errc
 
