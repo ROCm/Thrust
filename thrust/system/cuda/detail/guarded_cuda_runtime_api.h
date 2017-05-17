@@ -24,7 +24,7 @@
 
 // we only try to do this stuff if cuda/include/host_defines.h has been included
 //#if !defined(__HOST_DEFINES_H__)
-#if !defined(HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H)
+#if ((defined(__HCC__) && !defined(HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H)) || (defined(__NVCC__) && !defined(__HOST_DEFINES_H__)))
 #ifdef __host__
 #undef __host__
 #endif // __host__

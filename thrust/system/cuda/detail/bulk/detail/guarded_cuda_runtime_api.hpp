@@ -25,7 +25,7 @@
 
 // can't tell exactly when push_macro & pop_macro were introduced to gcc; assume 4.5.0
 //#if !defined(__HOST_DEFINES_H__)
-#if !defined(HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H)
+#if ((defined(__HCC__) && !defined(HIP_INCLUDE_HIP_HCC_DETAIL_HOST_DEFINES_H)) || (defined(__NVCC__) && !defined(__HOST_DEFINES_H__)))
 #  if !defined(__GNUC__) || ((10000 * __GNUC__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__) >= 40500) || defined(__clang__)
 #    ifdef __host__
 #      pragma push_macro("__host__")

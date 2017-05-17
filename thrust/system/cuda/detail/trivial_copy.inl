@@ -175,8 +175,10 @@ void trivial_copy_n(execution_policy<DerivedPolicy> &exec,
   // we need to have hipMemcpyAsync figure out the directionality of the copy dynamically
   // using hipMemcpyDefault
 
+#if __BULK_HAS_CUDART__
   hipMemcpyKind kind = trivial_copy_detail::cuda_memcpy_kind(thrust::detail::derived_cast(exec), thrust::detail::derived_cast(exec));
   trivial_copy_detail::checked_cudaMemcpyAsync(dst, src, n * sizeof(T), kind, stream(thrust::detail::derived_cast(exec)));
+#endif
 #else
   thrust::transform(exec, first, first + n, result, thrust::identity<T>());
 #endif
