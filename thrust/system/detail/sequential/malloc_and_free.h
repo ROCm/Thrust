@@ -36,7 +36,7 @@ inline __host__ __device__
 void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
 {
 #if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200)
-  return std::malloc(n);
+  //return std::malloc(n); //need to recheck the change
 #else
   return 0;
 #endif
