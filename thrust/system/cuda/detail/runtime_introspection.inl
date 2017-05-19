@@ -39,8 +39,9 @@ __host__ __device__
 inline void uncached_device_properties(device_properties_t &p, int device_id)
 {
 #ifndef __CUDA_ARCH__
+#if __BULK_HAS_CUDART__
   hipDeviceProp_t properties;
-  
+
   hipError_t error = hipGetDeviceProperties(&properties, device_id);
   
   throw_on_error(error, "hipGetDeviceProperties in get_device_properties");
@@ -63,6 +64,7 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   };
 
   p = temp;
+#endif
 #elif (__CUDA_ARCH__ >= 350)
   hipError_t error = hipDeviceGetAttribute(&p.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
   error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
@@ -122,7 +124,9 @@ device_properties_t device_properties(int device_id)
 {
   device_properties_t result;
 #ifndef __CUDA_ARCH__
+#if __BULK_HAS_CUDART__
   runtime_introspection_detail::cached_device_properties(result, device_id);
+#endif
 #else
   runtime_introspection_detail::uncached_device_properties(result, device_id);
 #endif
@@ -136,6 +140,7 @@ int current_device()
   int result = -1;
 
 #if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 350
+  #if __BULK_HAS_CUDART__
   hipError_t error = hipGetDevice(&result);
 
   throw_on_error(error, "hipGetDevice in current_device");
@@ -144,8 +149,10 @@ int current_device()
   {
     throw_on_error(hipErrorNoDevice, "hipGetDevice in current_device");
   }
+#endif
 #else
   // dunno how to safely error here
+
 #endif
 
   return result;
@@ -164,6 +171,7 @@ __host__ __device__
 inline function_attributes_t function_attributes(KernelFunction kernel)
 {
 #if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 350)
+#ifdef __HIP_PLATFORM_NVCC__
   cudaFuncAttributes attributes;
 
   typedef void (*fun_ptr_type)();
@@ -180,6 +188,9 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
     attributes.ptxVersion,
     attributes.sharedSizeBytes
   };
+#else
+function_attributes_t result = {0};
+#endif
 #else
   function_attributes_t result = {0};
 #endif

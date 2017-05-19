@@ -20,7 +20,8 @@
 
 #pragma once
 
-#ifdef __HIPCC__
+//#ifdef __HIPCC__
+#ifdef __CUDACC__
 
 #include <cuda.h>
 
@@ -63,7 +64,8 @@
 #endif // THRUST_HOST_COMPILER
 
 // figure out which device compiler we're using
-#if defined(__HIPCC__)
+//#if defined(__HIPCC__)
+#if defined(__CUDACC__)
 #define THRUST_DEVICE_COMPILER THRUST_DEVICE_COMPILER_NVCC
 #elif THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC
 #define THRUST_DEVICE_COMPILER THRUST_DEVICE_COMPILER_MSVC
