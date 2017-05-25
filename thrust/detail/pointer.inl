@@ -38,6 +38,17 @@ template<typename Element, typename Tag, typename Reference, typename Derived>
         : super_t(other)
 {} // end pointer::pointer
 
+//added for linking errors
+
+
+template<typename Element, typename Tag, typename Reference, typename Derived>
+  __host__ __device__
+  pointer<Element,Tag,Reference,Derived>
+    ::pointer(Element* ptr)
+      : super_t(ptr)
+{} // end pointer::pointer
+
+
 
 template<typename Element, typename Tag, typename Reference, typename Derived>
   template<typename OtherPointer>

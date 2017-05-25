@@ -89,6 +89,12 @@ template<typename T>
     template<typename OtherT>
     __host__ __device__
     explicit device_ptr(OtherT *ptr) : super_t(ptr) {}
+  
+     //added to verify linker errors. 
+     __host__ __device__
+    device_ptr(T* ptr) : super_t(ptr) {}
+
+    
 
     /*! \p device_ptr's copy constructor allows copying from another device_ptr with related type.
      *  \param other The \p device_ptr to copy from.
@@ -111,18 +117,22 @@ template<typename T>
 
 // declare these members for the purpose of Doxygenating them
 // they actually exist in a derived-from class
-#if 0
+
     /*! This method returns this \p device_ptr's raw pointer.
      *  \return This \p device_ptr's raw pointer.
      */
     __host__ __device__
-    T *get(void) const;
-#endif // end doxygen-only members
+   // T *get(void) const;
+T *get(void) const
+{
+ return NULL;
+}
+
 }; // end device_ptr
 
 // declare these methods for the purpose of Doxygenating them
 // they actually are defined for a derived-from class
-#if 0
+
 /*! Writes to an output stream the value of a \p device_ptr's raw pointer.
  *
  *  \param os The output stream.
@@ -132,7 +142,6 @@ template<typename T>
 template<typename T, typename charT, typename traits>
 std::basic_ostream<charT, traits> &
 operator<<(std::basic_ostream<charT, traits> &os, const device_ptr<T> &p);
-#endif
 
 /*! \}
  */

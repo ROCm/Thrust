@@ -150,6 +150,10 @@ template<typename Element, typename Tag, typename Reference, typename Derived>
     template<typename OtherElement>
     __host__ __device__
     explicit pointer(OtherElement *ptr);
+// added to check linker errors
+     __host__ __device__
+    explicit pointer(Element *ptr);
+
 
     // OtherPointer's element_type shall be convertible to Element
     // OtherPointer's system shall be convertible to Tag

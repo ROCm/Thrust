@@ -184,7 +184,12 @@ template<typename T>
     __host__ __device__
     explicit pointer(OtherT *ptr) : super_t(ptr) {}
 
-    /*! This constructor allows construction from another pointer-like object with related type.
+    //added to look into linking errors
+    __host__ __device__
+    explicit pointer(T *ptr) : super_t(ptr) {} 
+
+
+   /*! This constructor allows construction from another pointer-like object with related type.
      *
      *  \param other The \p OtherPointer to copy.
      *  \tparam OtherPointer The system tag associated with \p OtherPointer shall be convertible

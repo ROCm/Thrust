@@ -26,6 +26,7 @@
 #include <thrust/iterator/iterator_traits.h>
 #include <thrust/pair.h>
 
+
 namespace thrust
 {
 
