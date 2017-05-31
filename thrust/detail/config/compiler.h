@@ -90,7 +90,8 @@
 #endif // _OPENMP
 
 // disable specific MSVC warnings
-#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && !defined(__CUDA_ARCH__)
+//#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && !defined(__CUDA_ARCH__)
+#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && __HIP_DEVICE_COMPILE__ == 0
 #define __THRUST_DISABLE_MSVC_WARNING_BEGIN(x) \
 __pragma(warning(push)) \
 __pragma(warning(disable : x))

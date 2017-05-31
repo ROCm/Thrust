@@ -166,7 +166,8 @@ void trivial_copy_n(execution_policy<DerivedPolicy> &exec,
 {
   typedef typename thrust::iterator_value<RandomAccessIterator1>::type T;
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   void *dst = thrust::raw_pointer_cast(&*result);
   const void *src = thrust::raw_pointer_cast(&*first);
 

@@ -76,7 +76,8 @@ struct my_allocator_with_custom_destroy
   __host__ __device__
   void destroy(T *p)
   {
-#if !__CUDA_ARCH__
+//#if !__CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
     g_state = 13;
 #endif
   }

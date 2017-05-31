@@ -41,7 +41,8 @@ void synchronize(const char *message)
 inline __host__ __device__
 void synchronize(hipStream_t stream, const char *message)
 {
-#if !defined(__CUDA_ARCH__)
+//#if !defined(__CUDA_ARCH__)
+#if __HIP_DEVICE_COMPILE__ == 0
   #if __BULK_HAS_CUDART__
   throw_on_error(hipStreamSynchronize(stream), message);
   #endif
@@ -55,7 +56,8 @@ void synchronize_if_enabled(const char *message)
 {
 // XXX this could potentially be a runtime decision
 //     note we always have to synchronize in __device__ code
-#if __THRUST_SYNCHRONOUS || defined(__CUDA_ARCH__)
+//#if __THRUST_SYNCHRONOUS || defined(__CUDA_ARCH__)
+#if __THRUST_SYNCHRONOUS || __HIP_DEVICE_COMPILE__ 
   synchronize(message);
 #else
   // WAR "unused parameter" warning

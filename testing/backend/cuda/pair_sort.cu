@@ -8,12 +8,16 @@ template<typename ExecutionPolicy, typename Iterator1, typename Iterator2>
 __global__
 void stable_sort_kernel(ExecutionPolicy exec, Iterator1 first, Iterator1 last, Iterator2 is_supported)
 {
-#if (__CUDA_ARCH__ >= 200)
+//#if (__CUDA_ARCH__ >= 200) //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   *is_supported = true;
   thrust::stable_sort(exec, first, last);
-#else
+}
+//#else  //commented while converting the flags
+else {
   *is_supported = false;
-#endif
+}
+//#endif  //commented while converting the flags
 }
 
 

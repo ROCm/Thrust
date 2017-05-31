@@ -66,7 +66,8 @@ template<typename Derived>
 };
 
 
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
 static const __device__ tag seq;
 #else
 static const tag seq;

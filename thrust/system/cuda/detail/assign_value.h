@@ -56,7 +56,8 @@ inline __host__ __device__
     }
   };
 
-#ifndef __CUDA_ARCH__
+//ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   war_nvbugs_881631::host_path(exec,dst,src);
 #else
   war_nvbugs_881631::device_path(exec,dst,src);
@@ -92,7 +93,8 @@ inline __host__ __device__
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0 
   war_nvbugs_881631::host_path(exec,dst,src);
 #else
   war_nvbugs_881631::device_path(exec,dst,src);
@@ -134,7 +136,9 @@ inline __host__ __device__
     }
   };
 
-#if __CUDA_ARCH__
+//#if __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
+
   war_nvbugs_881631::device_path(systems,dst,src);
 #else
   war_nvbugs_881631::host_path(systems,dst,src);
@@ -180,7 +184,8 @@ inline __host__ __device__
     }
   };
 
-#if __CUDA_ARCH__
+//#if __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
   war_nvbugs_881631::device_path(systems,dst,src);
 #else
   war_nvbugs_881631::host_path(systems,dst,src);

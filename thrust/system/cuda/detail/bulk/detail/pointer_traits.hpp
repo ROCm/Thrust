@@ -32,19 +32,26 @@ inline __device__ unsigned int __isShared(const void *ptr)
 
   unsigned int ret;
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+#if __HIP_ARCH_HAS_FLOAT_ATOMIC_ADD__ 
   asm volatile ("{ \n\t"
                 "    .reg .pred p; \n\t"
                 "    isspacep.shared p, %1; \n\t"
                 "    selp.u32 %0, 1, 0, p;  \n\t"
 #  if (defined(_MSC_VER) && defined(_WIN64)) || defined(__LP64__)
                 "} \n\t" : "=r"(ret) : "l"(ptr));
-#  else
+
+#  else 
+
                 "} \n\t" : "=r"(ret) : "r"(ptr));
-#  endif
-#else
+
+
+#  endif 
+
+ #else //commented while converting the flags
   ret = 0;
-#endif
+#endif //commented while converting the flag
+
 
   return ret;
 } // end __isShared()
@@ -61,11 +68,13 @@ inline __device__ bool is_global(const void *ptr)
   // XXX WAR unused variable warning
   (void) ptr;
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+/*if __HIP_ARCH_HAS_FLOAT_ATOMIC_ADD__ 
   return __isGlobal(ptr);
-#else
+//#else //commented while converting the flag
+else*/ //commented as __isGlobal() is undefined 
   return false;
-#endif
+//#endif //commented while converting the flag
 } // end is_global()
 
 

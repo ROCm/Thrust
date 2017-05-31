@@ -95,7 +95,8 @@ template<typename Closure,
 
     if(num_blocks > 0)
     {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
       hipLaunchKernel(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
 #else
       // XXX we can't pass parameters with constructors to kernels launched through the triple chevrons in __device__ code
@@ -250,7 +251,8 @@ template<typename Closure>
 __host__ __device__
 function_attributes_t closure_attributes()
 {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return closure_attributes_detail::cached_closure_attributes<Closure>();
 #else
   return closure_attributes_detail::uncached_closure_attributes<Closure>();

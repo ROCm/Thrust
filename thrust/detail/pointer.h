@@ -149,7 +149,8 @@ template<typename Element, typename Tag, typename Reference, typename Derived>
     // XXX consider making the pointer implementation a template parameter which defaults to Element *
     template<typename OtherElement>
     __host__ __device__
-    explicit pointer(OtherElement *ptr);
+    explicit pointer(OtherElement *ptr); 
+
 // added to check linker errors
      __host__ __device__
     explicit pointer(Element *ptr);

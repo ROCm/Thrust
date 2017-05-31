@@ -51,7 +51,8 @@ struct seq_t : thrust::system::detail::sequential::execution_policy<seq_t>
 } // end detail
 
 
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
 static const __device__ detail::seq_t seq;
 #else
 static const detail::seq_t seq;

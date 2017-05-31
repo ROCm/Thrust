@@ -155,7 +155,8 @@ struct CopyConstructTest
   __host__ __device__
   CopyConstructTest(const CopyConstructTest &exemplar)
   {
-#if __CUDA_ARCH__
+//#if __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
     copy_constructed_on_device = true;
     copy_constructed_on_host   = false;
 #else

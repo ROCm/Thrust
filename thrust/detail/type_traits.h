@@ -532,7 +532,9 @@ template<typename T>
 
 struct largest_available_float
 {
-#if defined(__CUDA_ARCH__)
+//#if defined(__CUDA_ARCH__)
+#if __HIP_DEVICE_COMPILE__
+
 #  if (__CUDA_ARCH__ < 130)
   typedef float type;
 #  else

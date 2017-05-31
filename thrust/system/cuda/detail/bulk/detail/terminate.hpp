@@ -31,7 +31,8 @@ namespace detail
 __host__ __device__
 inline void terminate()
 {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
   asm("trap;");
 #else
   std::terminate();

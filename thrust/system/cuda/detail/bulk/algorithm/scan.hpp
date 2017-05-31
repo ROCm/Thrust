@@ -467,7 +467,8 @@ __device__ void inclusive_scan(bulk::concurrent_group<bulk::agent<grainsize>,gro
 {
   typedef detail::scan_detail::scan_buffer<groupsize,grainsize,RandomAccessIterator1,RandomAccessIterator2,BinaryFunction> buffer_type;
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck 
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   buffer_type *buffer = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
 
   if(bulk::is_on_chip(buffer))
@@ -480,10 +481,13 @@ __device__ void inclusive_scan(bulk::concurrent_group<bulk::agent<grainsize>,gro
   } // end else
 
   bulk::free(g, buffer);
-#else
+}
+//#else //commented while converting the flags
+else {
   __shared__ uninitialized<buffer_type> buffer;
   detail::scan_detail::scan_with_buffer<true>(g, first, last, result, init, binary_op, buffer.get());
-#endif // __CUDA_ARCH__
+}
+//#endif // __CUDA_ARCH__ //commented while converting the flag
 } // end inclusive_scan()
 
 
@@ -570,7 +574,8 @@ exclusive_scan(bulk::concurrent_group<agent<grainsize>,groupsize> &g,
 {
   typedef detail::scan_detail::scan_buffer<groupsize,grainsize,RandomAccessIterator1,RandomAccessIterator2,BinaryFunction> buffer_type;
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck 
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   buffer_type *buffer = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
 
   if(bulk::is_on_chip(buffer))
@@ -583,10 +588,13 @@ exclusive_scan(bulk::concurrent_group<agent<grainsize>,groupsize> &g,
   } // end else
 
   bulk::free(g, buffer);
-#else
+}
+//#else //commented while converting the flag
+else {
   __shared__ uninitialized<buffer_type> buffer;
   detail::scan_detail::scan_with_buffer<false>(g, first, last, result, init, binary_op, buffer.get());
-#endif
+}
+//#endif //commented while converting the flag
 
   return result + (last - first);
 } // end exclusive_scan()

@@ -38,7 +38,8 @@ namespace runtime_introspection_detail
 __host__ __device__
 inline void uncached_device_properties(device_properties_t &p, int device_id)
 {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
 #if __BULK_HAS_CUDART__
   hipDeviceProp_t properties;
 
@@ -65,7 +66,10 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
 
   p = temp;
 #endif
-#elif (__CUDA_ARCH__ >= 350)
+//#elif (__CUDA_ARCH__ >= 350) //need to recheck as it is not clear which flag to use
+#else
+if __HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ {
+
   hipError_t error = hipDeviceGetAttribute(&p.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
   error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
   error = hipDeviceGetAttribute(&p.maxGridSize[1],              hipDeviceAttributeMaxGridDimY,                 device_id);
@@ -81,9 +85,10 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   error = hipDeviceGetAttribute(&p.warpSize,                    hipDeviceAttributeWarpSize,                    device_id);
 
   throw_on_error(error, "cudaDeviceGetProperty in get_device_properties");
-#else
+}
+//#else //commented while converting the flag
   // dunno how we can safely error here.
-#endif
+#endif 
 } // end get_device_properties()
 
 
@@ -123,7 +128,8 @@ inline __host__ __device__
 device_properties_t device_properties(int device_id)
 {
   device_properties_t result;
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
 #if __BULK_HAS_CUDART__
   runtime_introspection_detail::cached_device_properties(result, device_id);
 #endif
@@ -139,7 +145,9 @@ int current_device()
 {
   int result = -1;
 
-#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 350
+//#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 350
+//Need to recheck as it is not clear which flag to use
+#if __HIP_DEVICE_COMPILE__ == 0 || (__HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ && __HIP_ARCH_HAS_DYNAMIC_PARALLEL__)
   #if __BULK_HAS_CUDART__
   hipError_t error = hipGetDevice(&result);
 
@@ -170,7 +178,9 @@ template<typename KernelFunction>
 __host__ __device__
 inline function_attributes_t function_attributes(KernelFunction kernel)
 {
-#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 350)
+//#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 350)
+//Need to recheck as it is not clear which flag to use
+#if __HIP_DEVICE_COMPILE__ == 0 || (__HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ && __HIP_ARCH_HAS_DYNAMIC_PARALLEL__)
 #ifdef __HIP_PLATFORM_NVCC__
   cudaFuncAttributes attributes;
 

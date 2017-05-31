@@ -35,7 +35,8 @@ void throw_on_error(hipError_t e, const char *message)
 {
   if(e)
   {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
 
     //throw thrust::system_error(e, thrust::cuda_category(), message);
 #if __BULK_HAS_CUDART__
@@ -58,7 +59,8 @@ void throw_on_error(cudaError_t e, const char *message)
 {
   if(e)
   {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
     throw thrust::system_error(e, thrust::cuda_category(), message);
 #else
 #  if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)

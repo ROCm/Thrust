@@ -14,7 +14,8 @@ struct Foo
   __host__ __device__
   ~Foo(void)
   {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
     // __device__ overload
     if(set_me_upon_destruction != 0)
       *set_me_upon_destruction = true;

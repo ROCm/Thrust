@@ -45,7 +45,8 @@ __host__ __device__
     // note that we pass cnt to deallocate, not a value derived from result.second
     deallocate(result.first, cnt);
 
-#if !defined(__CUDA_ARCH__)
+//#if !defined(__CUDA_ARCH__)
+#if __HIP_DEVICE_COMPILE__ == 0
     //throw thrust::system::detail::bad_alloc("temporary_buffer::allocate: get_temporary_buffer failed");
     thrust::system::detail::bad_alloc("temporary_buffer::allocate: get_temporary_buffer failed");
 #else

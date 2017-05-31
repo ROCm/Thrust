@@ -40,15 +40,14 @@ __host__ __device__
                     std::ptrdiff_t n,
                     T *result)
 {
-#ifndef __CUDA_ARCH__
+#ifndef __CUDA_ARCH_
+  
   std::memmove(result, first, n * sizeof(T));
   return result + n;
 #else
   return thrust::system::detail::sequential::general_copy_n(first, n, result);
 #endif
 } // end trivial_copy_n()
-
-
 } // end namespace sequential
 } // end namespace detail
 } // end namespace system

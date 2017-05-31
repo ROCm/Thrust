@@ -35,11 +35,14 @@ template<typename DerivedPolicy>
 inline __host__ __device__
 void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
 {
-#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200)
+//#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200) //Need to recheck
+#if (__HIP_DEVICE_COMPILE__ == 0) ||(__HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__)
+
   //return std::malloc(n); //need to recheck the change
+//#else //commented while converting the flag
 #else
   return 0;
-#endif
+#endif //commented while converting the flag
 } // end mallc()
 
 
@@ -47,9 +50,10 @@ template<typename DerivedPolicy, typename Pointer>
 inline __host__ __device__
 void free(sequential::execution_policy<DerivedPolicy> &, Pointer ptr)
 {
-#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200)
+//#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 200) //Need to recheck
+#if __HIP_DEVICE_COMPILE__ == 0 || __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__
   std::free(thrust::raw_pointer_cast(ptr));
-#endif
+#endif // commented while converting the flag
 } // end mallc()
 
 

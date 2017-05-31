@@ -353,7 +353,8 @@ template<typename T>
 __host__ __device__
 bool virtualize_smem(size_t num_elements_per_block)
 {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   size_t num_smem_bytes_required = num_elements_per_block * sizeof(T);
 
   thrust::system::cuda::detail::device_properties_t props = thrust::system::cuda::detail::device_properties();

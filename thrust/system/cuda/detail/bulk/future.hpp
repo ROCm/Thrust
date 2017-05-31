@@ -84,7 +84,8 @@ class future<void>
 
 #if __BULK_HAS_CUDART__
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
       // XXX need to capture the error as an exception and then throw it in .get()
       bulk::detail::throw_on_error(hipEventSynchronize(m_event), "hipEventSynchronize in future::wait");
 #else

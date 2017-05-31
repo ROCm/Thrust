@@ -236,7 +236,8 @@ class cuda_task<
     void operator()()
     {
       // guard use of CUDA built-ins from foreign compilers
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
       // instantiate a view of this grid
       grid_type this_grid =
         make_grid<grid_type>(
@@ -250,14 +251,16 @@ class cuda_task<
           0
       );
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_3DGRID__   {
       // initialize shared storage
       if(this_grid.this_exec.this_exec.index() == 0)
       {
         bulk::detail::init_on_chip_malloc(this_grid.this_exec.heap_size());
       }
       this_grid.this_exec.wait();
-#endif
+}
+//#endif //commented while converting the flag
 
       super_t::substitute_placeholders_and_execute(this_grid, super_t::c);
 #endif
@@ -294,7 +297,8 @@ class cuda_task<
     void operator()()
     {
       // guard use of CUDA built-ins from foreign compilers
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
       // instantiate a view of this block
       block_type this_block =
         make_block<block_type>(
@@ -304,14 +308,16 @@ class cuda_task<
           0
         );
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
       // initialize shared storage
       if(this_block.this_exec.index() == 0)
       {
         bulk::detail::init_on_chip_malloc(this_block.heap_size());
       }
       this_block.wait();
-#endif
+}
+// #endif //commented while converting the flag
 
       super_t::substitute_placeholders_and_execute(this_block, super_t::c);
 #endif
@@ -340,7 +346,8 @@ class cuda_task<parallel_group<agent<grainsize>,groupsize>,Closure>
     void operator()()
     {
       // guard use of CUDA built-ins from foreign compilers
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
       typedef int size_type;
 
       const size_type grid_size = hipGridDim_x * hipBlockDim_x;

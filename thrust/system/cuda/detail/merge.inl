@@ -95,7 +95,9 @@ struct merge_kernel
     // XXX this assumes that RandomAccessIterator2's value_type converts to RandomAccessIterator1's value_type
     typedef typename thrust::iterator_value<RandomAccessIterator1>::type value_type;
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200
+//need to recheck as it is not clear which flag to use.
+#if  __HIP_ARCH_HAS_SURFACE_FUNCS__  || __HIP_ARCH_HAS_FLOAT_ATOMIC_ADD__ 
     // merge through a stage
     value_type *stage = reinterpret_cast<value_type*>(bulk_::malloc(g, elements_per_group * sizeof(value_type)));
 
@@ -119,9 +121,12 @@ struct merge_kernel
     } // end else
 
     bulk_::free(g, stage);
+
 #else
+
     __shared__ bulk_::uninitialized_array<value_type, groupsize * grainsize> stage;
     staged_merge(g, first1, local_size1, first2, local_size2, stage.data(), result, comp);
+
 #endif
   } // end operator()
 }; // end merge_kernel

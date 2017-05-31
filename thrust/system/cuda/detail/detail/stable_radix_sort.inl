@@ -91,7 +91,8 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return workaround::host_path(d_temp_storage, temp_storage_bytes, d_keys, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
 #else
   return workaround::device_path(d_temp_storage, temp_storage_bytes, d_keys, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
@@ -147,7 +148,8 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return workaround::host_path(d_temp_storage, temp_storage_bytes, d_keys, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
 #else
   return workaround::device_path(d_temp_storage, temp_storage_bytes, d_keys, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
@@ -312,7 +314,8 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return workaround::host_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
 #else
   return workaround::device_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);

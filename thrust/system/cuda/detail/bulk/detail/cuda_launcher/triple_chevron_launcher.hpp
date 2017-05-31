@@ -124,7 +124,8 @@ class triple_chevron_launcher : protected triple_chevron_launcher_base<block_siz
         static void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
         {
 #if __BULK_HAS_CUDART__
-#  ifndef __CUDA_ARCH__
+//#  ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
           cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
           cudaSetupArgument(task, 0);
           bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");
@@ -177,7 +178,8 @@ class triple_chevron_launcher<block_size_,Function,false> : protected triple_che
           bulk::detail::parameter_ptr<task_type> parm = bulk::detail::make_parameter<task_type>(task);
 
 #if __BULK_HAS_CUDART__
-#  ifndef __CUDA_ARCH__
+//#  ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
           cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
           cudaSetupArgument(static_cast<const task_type*>(parm.get()), 0);
           bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");

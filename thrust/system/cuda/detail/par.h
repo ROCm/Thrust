@@ -58,7 +58,8 @@ struct par_t : thrust::system::cuda::detail::execution_policy<par_t>
 } // end detail
 
 
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
 static const __device__ detail::par_t par;
 #else
 static const detail::par_t par;

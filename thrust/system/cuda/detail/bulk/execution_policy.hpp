@@ -354,7 +354,8 @@ class concurrent_group
     void wait() const
     {
       // guard use of __syncthreads from foreign compilers
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
       __syncthreads();
 #endif
     }
@@ -410,7 +411,8 @@ class concurrent_group<ExecutionAgent,dynamic_group_size>
     void wait()
     {
       // guard use of __syncthreads from foreign compilers
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
       __syncthreads();
 #endif
     }
@@ -619,7 +621,8 @@ struct is_cursor<cursor<d> >
 } // end detail
 
 
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
 static const __device__ detail::cursor<0> root;
 #else
 static const detail::cursor<0> root;

@@ -50,7 +50,8 @@ void iter_swap(tag, Pointer1 a, Pointer2 b)
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return war_nvbugs_881631::host_path(a,b);
 #else
   return war_nvbugs_881631::device_path(a,b);

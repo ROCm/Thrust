@@ -436,11 +436,16 @@ class singleton_on_chip_allocator
         inline __device__
         bool try_lock()
         {
-#if __CUDA_ARCH__ >= 110
+//#if __CUDA_ARCH__ >= 110
+if __HIP_ARCH_HAS_GLOBAL_INT32_ATOMICS__ 
+
+
+
           return atomicCAS(&m_in_use, 0, 1) != 0;
-#else
+//#else 
+else
           return false;
-#endif
+//#endif
         } // end try_lock()
 
 
@@ -518,12 +523,15 @@ inline __device__ void *shmalloc(size_t num_bytes)
   // first try on_chip_malloc
   void *result = detail::on_chip_malloc(num_bytes);
   
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+
   if(!result)
   {
     result = std::malloc(num_bytes);
   } // end if
-#endif // __CUDA_ARCH__
+}
+//#endif // __CUDA_ARCH__ // commented while converting flag
 
   return result;
 } // end shmalloc()
@@ -534,12 +542,14 @@ inline __device__ void *unsafe_shmalloc(size_t num_bytes)
   // first try on_chip_malloc
   void *result = detail::unsafe_on_chip_malloc(num_bytes);
   
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   if(!result)
   {
     result = std::malloc(num_bytes);
   } // end if
-#endif // __CUDA_ARCH__
+}
+//#endif // __CUDA_ARCH__ //commented while converting flag
 
   return result;
 } // end unsafe_shmalloc()
@@ -547,7 +557,8 @@ inline __device__ void *unsafe_shmalloc(size_t num_bytes)
 
 inline __device__ void shfree(void *ptr)
 {
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Neeed to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   if(bulk::is_on_chip(ptr))
   {
     bulk::detail::on_chip_free(bulk::on_chip_cast(ptr));
@@ -556,14 +567,17 @@ inline __device__ void shfree(void *ptr)
   {
     std::free(ptr);
   } // end else
-#else
+}
+//#else //commented while converting the flag
+else
   bulk::detail::on_chip_free(bulk::on_chip_cast(ptr));
-#endif
+//#endif //commented while converting the flag
 } // end shfree()
 
 inline __device__ void unsafe_shfree(void *ptr)
 {
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   if(bulk::is_on_chip(ptr))
   {
     bulk::detail::unsafe_on_chip_free(bulk::on_chip_cast(ptr));
@@ -572,9 +586,11 @@ inline __device__ void unsafe_shfree(void *ptr)
   {
     std::free(ptr);
   } // end else
-#else
+}
+//#else //commented while converting thr flag
+else
   bulk::detail::unsafe_on_chip_free(bulk::on_chip_cast(ptr));
-#endif
+//#endif //commented while converting the flag
 } // end unsafe_shfree()
 
 template<typename ConcurrentGroup>

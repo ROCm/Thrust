@@ -66,7 +66,8 @@ inline __host__ __device__
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   return war_nvbugs_881631::host_path(exec, ptr);
 #else
   return war_nvbugs_881631::device_path(exec, ptr);

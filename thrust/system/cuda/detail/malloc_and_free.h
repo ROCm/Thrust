@@ -46,7 +46,8 @@ void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
 {
   void *result = 0;
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   // XXX use hipMalloc in __device__ code when it becomes available
   #if __BULK_HAS_CUDART__
   hipError_t error = hipMalloc(reinterpret_cast<void**>(&result), n);
@@ -69,7 +70,8 @@ template<typename DerivedPolicy, typename Pointer>
 __host__ __device__
 void free(execution_policy<DerivedPolicy> &, Pointer ptr)
 {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
   // XXX use hipFree in __device__ code when it becomes available
   #if __BULK_HAS_CUDART__
   throw_on_error(hipFree(thrust::raw_pointer_cast(ptr)), "hipFree in free");

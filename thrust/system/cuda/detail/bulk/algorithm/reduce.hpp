@@ -195,12 +195,17 @@ T reduce(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
     this_sum_defined = true;
   } // end for
 
-#if __CUDA_ARCH__ >= 200
-  T *buffer = reinterpret_cast<T*>(bulk::malloc(g, groupsize * sizeof(T)));
-#else
+//#if __CUDA_ARCH__ >= 200  //Need to recheck
+ T *buffer;
+
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__
+   buffer = reinterpret_cast<T*>(bulk::malloc(g, groupsize * sizeof(T)));
+//#else //commented while converting the flags
+else{
   __shared__ bulk::uninitialized_array<T,groupsize> buffer_impl;
-  T *buffer = buffer_impl.data();
-#endif
+  buffer = buffer_impl.data();
+}
+//#endif //commented while converting the flag
 
   if(this_sum_defined)
   {
@@ -212,9 +217,10 @@ T reduce(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
   // reduce across the group
   T result = bulk::detail::reduce_detail::destructive_reduce_n(g, buffer, thrust::min<size_type>(groupsize,n), init, binary_op);
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__
   bulk::free(g,buffer);
-#endif
+//#endif //commented while converting flags
 
   return result;
 } // end reduce

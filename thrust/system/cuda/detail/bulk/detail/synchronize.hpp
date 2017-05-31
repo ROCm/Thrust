@@ -46,7 +46,8 @@ void synchronize_if_enabled(const char* message = "")
 {
 // XXX we rely on __THRUST_SYNCHRONOUS here
 //     note we always have to synchronize in __device__ code
-#if __THRUST_SYNCHRONOUS || defined(__CUDA_ARCH__)
+//#if __THRUST_SYNCHRONOUS || defined(__CUDA_ARCH__)
+#if __THRUST_SYNCHRONOUS || __HIP_DEVICE_COMPILE__
   synchronize(message);
 #else
   // WAR "unused parameter" warning

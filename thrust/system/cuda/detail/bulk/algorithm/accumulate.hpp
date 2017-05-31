@@ -142,12 +142,16 @@ T accumulate(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
     T
   > buffer_type;
 
-#if __CUDA_ARCH__ >= 200
-  buffer_type *buffer = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
-#else
+//#if __CUDA_ARCH__ >= 200 //Need to recheck 
+buffer_type *buffer;
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__
+  /*buffer_type *  */ buffer = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
+//#else //commented while converting the flag
+else {
   __shared__ uninitialized<buffer_type> buffer_impl;
-  buffer_type *buffer = &buffer_impl.get();
-#endif
+  /*buffer_type * */buffer = &buffer_impl.get();
+}
+//#endif // commented while converting the flag
   
   for(; first < last; first += elements_per_group)
   {
@@ -186,9 +190,10 @@ T accumulate(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
     sum = accumulate_detail::destructive_accumulate_n(g, buffer->sums.data(), thrust::min<size_type>(groupsize,n), sum, binary_op);
   } // end for
 
-#if __CUDA_ARCH__ >= 200
+//#if __CUDA_ARCH__ >= 200 //Need to recheck 
+if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__
   bulk::free(g, buffer);
-#endif
+//#endif // commented while converting the flag
 
   return sum;
 } // end accumulate

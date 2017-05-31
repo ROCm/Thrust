@@ -94,7 +94,8 @@ inline device_properties_t device_properties_cached(int device_id)
 __host__ __device__
 inline device_properties_t device_properties(int device_id)
 {
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
  #if __BULK_HAS_CUDART__ 
  return device_properties_cached(device_id);
  #endif
