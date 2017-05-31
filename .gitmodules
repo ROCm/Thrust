@@ -1,0 +1,3 @@
+[submodule "cub-hip"]
+	path = cub-hip
+	url = https://github.com/ROCmSoftwarePlatform/cub-hip.git
