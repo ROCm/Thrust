@@ -67,8 +67,8 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   p = temp;
 #endif
 //#elif (__CUDA_ARCH__ >= 350) //need to recheck as it is not clear which flag to use
-#else
-if __HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ {
+//#else
+#elif __HIP_ARCH_HAS_SURFACE_FUNCS__ 
 
   hipError_t error = hipDeviceGetAttribute(&p.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
   error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
@@ -85,8 +85,8 @@ if __HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ {
   error = hipDeviceGetAttribute(&p.warpSize,                    hipDeviceAttributeWarpSize,                    device_id);
 
   throw_on_error(error, "cudaDeviceGetProperty in get_device_properties");
-}
-//#else //commented while converting the flag
+
+#else //commented while converting the flag
   // dunno how we can safely error here.
 #endif 
 } // end get_device_properties()

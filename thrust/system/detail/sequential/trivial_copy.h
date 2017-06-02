@@ -40,7 +40,10 @@ __host__ __device__
                     std::ptrdiff_t n,
                     T *result)
 {
-#ifndef __CUDA_ARCH_
+//#ifndef __CUDA_ARCH__
+
+#if __HIP_DEVICE_COMPILE__ == 0
+
   
   std::memmove(result, first, n * sizeof(T));
   return result + n;
