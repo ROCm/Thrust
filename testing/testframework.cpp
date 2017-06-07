@@ -166,9 +166,9 @@ struct TestResult
   std::string message;
   
   // XXX use a c++11 timer result when available
-  std::clock_t elapsed;
+  /*std::*/clock_t elapsed;
   
-  TestResult(const TestStatus status, std::clock_t elapsed, const UnitTest& u, const std::string& message = "")
+  TestResult(const TestStatus status, /*std::*/clock_t elapsed, const UnitTest& u, const std::string& message = "")
       : status(status), name(u.name), message(message), elapsed(elapsed)
   {}
   
@@ -295,7 +295,7 @@ bool UnitTestDriver::run_tests(std::vector<UnitTest *>& tests_to_run, const Argu
      try
      {
        // time the test
-       std::clock_t start = std::clock();
+       /*std::*/clock_t start = std::clock();
   
        // run the test
        test.run();
@@ -305,19 +305,19 @@ bool UnitTestDriver::run_tests(std::vector<UnitTest *>& tests_to_run, const Argu
      } 
      catch(unittest::UnitTestFailure& f)
      {
-       record_result(TestResult(Failure, std::numeric_limits<std::clock_t>::max(), test, f.message), test_results);
+       record_result(TestResult(Failure, std::numeric_limits</*std::*/clock_t>::max(), test, f.message), test_results);
      }
      catch(unittest::UnitTestKnownFailure& f)
      {
-       record_result(TestResult(KnownFailure, std::numeric_limits<std::clock_t>::max(), test, f.message), test_results);
+       record_result(TestResult(KnownFailure, std::numeric_limits</*std::*/clock_t>::max(), test, f.message), test_results);
      }
      catch(std::bad_alloc& e)
      {
-       record_result(TestResult(Error, std::numeric_limits<std::clock_t>::max(), test, e.what()), test_results);
+       record_result(TestResult(Error, std::numeric_limits</*std::*/clock_t>::max(), test, e.what()), test_results);
      }
      catch(unittest::UnitTestError& e)
      {
-       record_result(TestResult(Error, std::numeric_limits<std::clock_t>::max(), test, e.message), test_results);
+       record_result(TestResult(Error, std::numeric_limits</*std::*/clock_t>::max(), test, e.message), test_results);
      }
   
      // immediate report
