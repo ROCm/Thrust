@@ -2,6 +2,7 @@
 #include <thrust/sort.h>
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
+#include "hip/hip_runtime.h"
 
 
 template <typename T>

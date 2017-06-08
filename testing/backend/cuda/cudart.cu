@@ -1,13 +1,14 @@
 #include <unittest/unittest.h>
-#include <cuda_runtime_api.h>
+#include <hip/hip_runtime_api.h>
 #include <thrust/detail/util/align.h>
+#include "hip/hip_runtime.h"
 
 template<typename T>
 void TestCudaMallocResultAligned(const std::size_t n)
 {
   T *ptr = 0;
-  cudaMalloc(&ptr, n * sizeof(T));
-  cudaFree(ptr);
+  hipMalloc(&ptr, n * sizeof(T));
+  hipFree(ptr);
 
   ASSERT_EQUAL(true, thrust::detail::util::is_aligned(ptr));
 }

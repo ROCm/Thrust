@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/logical.h>
 #include <thrust/functional.h>
@@ -19,24 +20,24 @@ void TestAllOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  all_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
   v[1] = 0;
   
-  all_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
-  all_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  all_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  all_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  all_of_kernel<<<1,1>>>(exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 }
 
@@ -62,8 +63,8 @@ void TestAllOfCudaStreams()
   
   Vector v(3, 1);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   ASSERT_EQUAL(thrust::all_of(thrust::cuda::par.on(s), v.begin(), v.end(), thrust::identity<T>()), true);
   
@@ -76,7 +77,7 @@ void TestAllOfCudaStreams()
   ASSERT_EQUAL(thrust::all_of(thrust::cuda::par.on(s), v.begin() + 0, v.begin() + 2, thrust::identity<T>()), false);
   ASSERT_EQUAL(thrust::all_of(thrust::cuda::par.on(s), v.begin() + 1, v.begin() + 2, thrust::identity<T>()), false);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestAllOfCudaStreams);
 
@@ -97,24 +98,24 @@ void TestAnyOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  any_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
   v[1] = 0;
   
-  any_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
-  any_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  any_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  any_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  any_of_kernel<<<1,1>>>(exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 }
 
@@ -140,8 +141,8 @@ void TestAnyOfCudaStreams()
 
   Vector v(3, 1);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL(thrust::any_of(thrust::cuda::par.on(s), v.begin(), v.end(), thrust::identity<T>()), true);
 
@@ -154,7 +155,7 @@ void TestAnyOfCudaStreams()
   ASSERT_EQUAL(thrust::any_of(thrust::cuda::par.on(s), v.begin() + 0, v.begin() + 2, thrust::identity<T>()), true);
   ASSERT_EQUAL(thrust::any_of(thrust::cuda::par.on(s), v.begin() + 1, v.begin() + 2, thrust::identity<T>()), false);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestAnyOfCudaStreams);
 
@@ -175,24 +176,24 @@ void TestNoneOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  none_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
   v[1] = 0;
   
-  none_of_kernel<<<1,1>>>(exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
-  none_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  none_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  none_of_kernel<<<1,1>>>(exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  none_of_kernel<<<1,1>>>(exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 }
 
@@ -218,8 +219,8 @@ void TestNoneOfCudaStreams()
 
   Vector v(3, 1);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   ASSERT_EQUAL(thrust::none_of(thrust::cuda::par.on(s), v.begin(), v.end(), thrust::identity<T>()), false);
 
@@ -232,7 +233,7 @@ void TestNoneOfCudaStreams()
   ASSERT_EQUAL(thrust::none_of(thrust::cuda::par.on(s), v.begin() + 0, v.begin() + 2, thrust::identity<T>()), false);
   ASSERT_EQUAL(thrust::none_of(thrust::cuda::par.on(s), v.begin() + 1, v.begin() + 2, thrust::identity<T>()), true);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestNoneOfCudaStreams);
 

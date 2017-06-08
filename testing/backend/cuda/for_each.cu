@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/for_each.h>
 #include <thrust/execution_policy.h>
@@ -21,9 +22,9 @@ struct CopyFunctorWithManyRegisters
 void TestForEachLargeRegisterFootprint()
 {
   int current_device = -1;
-  cudaGetDevice(&current_device);
-  cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, current_device);
+  hipGetDevice(&current_device);
+  hipDeviceProp_t prop;
+  hipGetDeviceProperties(&prop, current_device);
 
   thrust::device_vector<int> data(NUM_REGISTERS, 12345);
 
@@ -37,9 +38,9 @@ DECLARE_UNITTEST(TestForEachLargeRegisterFootprint);
 void TestForEachNLargeRegisterFootprint()
 {
   int current_device = -1;
-  cudaGetDevice(&current_device);
-  cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, current_device);
+  hipGetDevice(&current_device);
+  hipDeviceProp_t prop;
+  hipGetDeviceProperties(&prop, current_device);
 
   thrust::device_vector<int> data(NUM_REGISTERS, 12345);
 
@@ -88,7 +89,7 @@ void TestForEachDeviceSeq(const size_t n)
   
   thrust::for_each(h_input.begin(), h_input.end(), h_f);
   
-  for_each_kernel<<<1,1>>>(thrust::seq, d_input.begin(), d_input.end(), d_f);
+  hipLaunchKernel(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.end(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -117,7 +118,7 @@ void TestForEachDeviceDevice(const size_t n)
   
   thrust::for_each(h_input.begin(), h_input.end(), h_f);
   
-  for_each_kernel<<<1,1>>>(thrust::device, d_input.begin(), d_input.end(), d_f);
+  hipLaunchKernel(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.end(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -154,7 +155,7 @@ void TestForEachNDeviceSeq(const size_t n)
   
   thrust::for_each_n(h_input.begin(), h_input.size(), h_f);
   
-  for_each_n_kernel<<<1,1>>>(thrust::seq, d_input.begin(), d_input.size(), d_f);
+  hipLaunchKernel(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.size(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -183,7 +184,7 @@ void TestForEachNDeviceDevice(const size_t n)
   
   thrust::for_each_n(h_input.begin(), h_input.size(), h_f);
   
-  for_each_n_kernel<<<1,1>>>(thrust::device, d_input.begin(), d_input.size(), d_f);
+  hipLaunchKernel(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.size(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -192,8 +193,8 @@ DECLARE_VARIABLE_UNITTEST(TestForEachNDeviceDevice);
 
 void TestForEachCudaStreams()
 {
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   thrust::device_vector<int> input(5);
   thrust::device_vector<int> output(7, 0);
@@ -205,7 +206,7 @@ void TestForEachCudaStreams()
   
   thrust::for_each(thrust::cuda::par.on(s), input.begin(), input.end(), f);
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(output[0], 0);
   ASSERT_EQUAL(output[1], 0);
@@ -215,7 +216,7 @@ void TestForEachCudaStreams()
   ASSERT_EQUAL(output[5], 0);
   ASSERT_EQUAL(output[6], 1);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestForEachCudaStreams);
 

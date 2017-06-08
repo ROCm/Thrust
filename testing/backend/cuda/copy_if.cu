@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/copy.h>
 #include <thrust/sequence.h>
@@ -47,7 +48,7 @@ void TestCopyIfDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), is_even<int>());
-    copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -62,7 +63,7 @@ void TestCopyIfDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), mod_3<int>());
-    copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -100,8 +101,8 @@ void TestCopyIfCudaStreams()
 
   Vector result(5);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::copy_if(thrust::cuda::par.on(s),
                                          data.begin(), 
@@ -114,7 +115,7 @@ void TestCopyIfCudaStreams()
   ASSERT_EQUAL(result[0], 2);
   ASSERT_EQUAL(result[1], 2);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestCopyIfCudaStreams);
 
@@ -152,7 +153,7 @@ void TestCopyIfStencilDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), is_even<int>());
-    copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -167,7 +168,7 @@ void TestCopyIfStencilDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), mod_3<int>());
-    copy_if_kernel<<<1,1>>>(exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
+    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -213,8 +214,8 @@ void TestCopyIfStencilCudaStreams()
   stencil[3] = 0;
   stencil[4] = 1;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   Vector::iterator end = thrust::copy_if(thrust::cuda::par.on(s),
                                          data.begin(), 
@@ -228,7 +229,7 @@ void TestCopyIfStencilCudaStreams()
   ASSERT_EQUAL(result[0], 2);
   ASSERT_EQUAL(result[1], 2);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestCopyIfStencilCudaStreams);
 

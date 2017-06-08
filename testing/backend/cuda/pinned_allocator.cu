@@ -2,6 +2,7 @@
 #include <thrust/system/cuda/experimental/pinned_allocator.h>
 #include <thrust/host_vector.h>
 #include <thrust/copy.h>
+#include "hip/hip_runtime.h"
 
 template <typename T>
 void TestPinnedAllocatorSimple(const size_t n)

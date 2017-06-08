@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/unique.h>
 #include <thrust/functional.h>
@@ -76,7 +77,7 @@ void TestUniqueByKeyDevice(ExecutionPolicy exec)
   // basic test
   initialize_keys(keys);  initialize_values(values);
   
-  unique_by_key_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - keys.begin(),   5);
@@ -96,7 +97,7 @@ void TestUniqueByKeyDevice(ExecutionPolicy exec)
   // test BinaryPredicate
   initialize_keys(keys);  initialize_values(values);
   
-  unique_by_key_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - keys.begin(),   3);
@@ -138,11 +139,11 @@ void TestUniqueByKeyCudaStreams()
   // basic test
   initialize_keys(keys);  initialize_values(values);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   new_last = thrust::unique_by_key(thrust::cuda::par.on(s), keys.begin(), keys.end(), values.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
   
   ASSERT_EQUAL(new_last.first  - keys.begin(),   5);
   ASSERT_EQUAL(new_last.second - values.begin(), 5);
@@ -173,7 +174,7 @@ void TestUniqueByKeyCudaStreams()
   ASSERT_EQUAL(values[1], 2);
   ASSERT_EQUAL(values[2], 7);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUniqueByKeyCudaStreams);
 
@@ -213,7 +214,7 @@ void TestUniqueCopyByKeyDevice(ExecutionPolicy exec)
   Vector output_keys(keys.size());
   Vector output_values(values.size());
 
-  unique_by_key_copy_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   5);
@@ -233,7 +234,7 @@ void TestUniqueCopyByKeyDevice(ExecutionPolicy exec)
   // test BinaryPredicate
   initialize_keys(keys);  initialize_values(values);
   
-  unique_by_key_copy_kernel<<<1,1>>>(exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   3);
@@ -279,11 +280,11 @@ void TestUniqueCopyByKeyCudaStreams()
   Vector output_keys(keys.size());
   Vector output_values(values.size());
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   new_last = thrust::unique_by_key_copy(thrust::cuda::par.on(s), keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   5);
   ASSERT_EQUAL(new_last.second - output_values.begin(), 5);
@@ -303,7 +304,7 @@ void TestUniqueCopyByKeyCudaStreams()
   initialize_keys(keys);  initialize_values(values);
   
   new_last = thrust::unique_by_key_copy(thrust::cuda::par.on(s), keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_unique<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   3);
   ASSERT_EQUAL(new_last.second - output_values.begin(), 3);
@@ -315,7 +316,7 @@ void TestUniqueCopyByKeyCudaStreams()
   ASSERT_EQUAL(output_values[1], 2);
   ASSERT_EQUAL(output_values[2], 7);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUniqueCopyByKeyCudaStreams);
 

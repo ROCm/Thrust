@@ -1,6 +1,6 @@
 #include <unittest/testframework.h>
 #include <thrust/system/cuda/memory.h>
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #include "testframework.h"
 
 __global__ void dummy_kernel() {}
@@ -10,27 +10,29 @@ bool binary_exists_for_current_device()
   // check against the dummy_kernel
   // if we're unable to get the attributes, then
   // we didn't compile a binary compatible with the current device
-  cudaFuncAttributes attr;
-  cudaError_t error = cudaFuncGetAttributes(&attr, dummy_kernel);
-  return error == cudaSuccess;
+ hipFuncAttributes attr; 
+// cudaFuncAttributes attr;
+  hipError_t error = hipFuncGetAttributes(&attr, dummy_kernel);
+//  hipError_t error = cudaFuncGetAttributes(&attr, dummy_kernel);
+  return error == hipSuccess;
 }
 
 void list_devices(void)
 {
   int deviceCount;
-  cudaGetDeviceCount(&deviceCount);
+  hipGetDeviceCount(&deviceCount);
   if(deviceCount == 0)
   {
     std::cout << "There is no device supporting CUDA" << std::endl;
   }
   
   int selected_device;
-  cudaGetDevice(&selected_device);
+  hipGetDevice(&selected_device);
   
   for (int dev = 0; dev < deviceCount; ++dev)
   {
-    cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, dev);
+    hipDeviceProp_t deviceProp;
+    hipGetDeviceProperties(&deviceProp, dev);
     
     if(dev == 0)
     {
@@ -72,7 +74,7 @@ std::vector<int> CUDATestDriver::target_devices(const ArgumentMap &kwargs)
   {
     // target all devices in the system
     int count = 0;
-    cudaGetDeviceCount(&count);
+    hipGetDeviceCount(&count);
     
     result.resize(count);
     // XXX iota is not available in c++03
@@ -90,13 +92,13 @@ std::vector<int> CUDATestDriver::target_devices(const ArgumentMap &kwargs)
 
 bool CUDATestDriver::check_cuda_error(bool concise)
 {
-  cudaError_t error = cudaGetLastError();
+  hipError_t error = hipGetLastError();
   if(error)
   {
     if(!concise)
     {
       std::cout << "[ERROR] CUDA Error detected before running tests: [";
-      std::cout << std::string(cudaGetErrorString(error));
+      std::cout << std::string(hipGetErrorString(error));
       std::cout << "]" << std::endl;
     }
   } 
@@ -106,18 +108,18 @@ bool CUDATestDriver::check_cuda_error(bool concise)
 
 bool CUDATestDriver::post_test_sanity_check(const UnitTest &test, bool concise)
 {
-  cudaError_t error = cudaGetLastError();
-  if(error && error != cudaErrorMemoryAllocation)
+  hipError_t error = hipGetLastError();
+  if(error && error != hipErrorMemoryAllocation)
   {
     if(!concise)
     {
       std::cout << "\t[ERROR] CUDA Error detected after running " << test.name << ": [";
-      std::cout << std::string(cudaGetErrorString(error));
+      std::cout << std::string(hipGetErrorString(error));
       std::cout << "]" << std::endl;
     }
   }
 
-  return error == cudaSuccess;
+  return error == hipSuccess;
 }
   
 bool CUDATestDriver::run_tests(const ArgumentSet &args, const ArgumentMap &kwargs)
@@ -150,7 +152,7 @@ bool CUDATestDriver::run_tests(const ArgumentSet &args, const ArgumentMap &kwarg
       ++device)
   {
     // set the device
-    cudaSetDevice(*device);
+    hipSetDevice(*device);
 
     // check if a binary exists for this device
     // if none exists, skip the device silently unless this is the only one we're targeting
@@ -162,8 +164,8 @@ bool CUDATestDriver::run_tests(const ArgumentSet &args, const ArgumentMap &kwarg
     if(!concise)
     {
       // note which device we're testing
-      cudaDeviceProp deviceProp;
-      cudaGetDeviceProperties(&deviceProp, *device);
+      hipDeviceProp_t deviceProp;
+      hipGetDeviceProperties(&deviceProp, *device);
       
       std::cout << "Testing Device " << *device << ": \"" << deviceProp.name << "\"" << std::endl;
     }
@@ -187,9 +189,9 @@ bool CUDATestDriver::run_tests(const ArgumentSet &args, const ArgumentMap &kwarg
 int CUDATestDriver::current_device_architecture() const
 {
   int current = -1;
-  cudaGetDevice(&current);
-  cudaDeviceProp deviceProp;
-  cudaGetDeviceProperties(&deviceProp, current);
+  hipGetDevice(&current);
+  hipDeviceProp_t deviceProp;
+  hipGetDeviceProperties(&deviceProp, current);
 
   return 100 * deviceProp.major + 10 * deviceProp.minor;
 }

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 
 #if defined(__CUDACC__)
@@ -240,5 +241,5 @@ void TestUnknownDeviceRobustness(void)
 }
 DECLARE_UNITTEST(TestUnknownDeviceRobustness);
 
-#endif // defined(__CUDACC__)
+#endif // defined(__HIPCC__)
 

@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/unique.h>
 #include <thrust/execution_policy.h>
@@ -48,7 +49,7 @@ void TestUniqueDevice(ExecutionPolicy exec)
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
   
-  unique_kernel<<<1,1>>>(exec, data.begin(), data.end(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 7);
@@ -60,7 +61,7 @@ void TestUniqueDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(data[5], 31);
   ASSERT_EQUAL(data[6], 37);
 
-  unique_kernel<<<1,1>>>(exec, data.begin(), new_last, is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), new_last, is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 3);
@@ -104,11 +105,11 @@ void TestUniqueCudaStreams()
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   new_last = thrust::unique(thrust::cuda::par.on(s), data.begin(), data.end());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last - data.begin(), 7);
   ASSERT_EQUAL(data[0], 11);
@@ -120,14 +121,14 @@ void TestUniqueCudaStreams()
   ASSERT_EQUAL(data[6], 37);
 
   new_last = thrust::unique(thrust::cuda::par.on(s), data.begin(), new_last, is_equal_div_10_unique<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last - data.begin(), 3);
   ASSERT_EQUAL(data[0], 11);
   ASSERT_EQUAL(data[1], 20);
   ASSERT_EQUAL(data[2], 31);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUniqueCudaStreams);
 
@@ -171,7 +172,7 @@ void TestUniqueCopyDevice(ExecutionPolicy exec)
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
   
-  unique_copy_kernel<<<1,1>>>(exec, data.begin(), data.end(), output.begin(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), output.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - output.begin(), 7);
@@ -183,7 +184,7 @@ void TestUniqueCopyDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(output[5], 31);
   ASSERT_EQUAL(output[6], 37);
 
-  unique_copy_kernel<<<1,1>>>(exec, output.begin(), new_last, data.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernel(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, output.begin(), new_last, data.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 3);
@@ -229,11 +230,11 @@ void TestUniqueCopyCudaStreams()
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
   
   new_last = thrust::unique_copy(thrust::cuda::par.on(s), data.begin(), data.end(), output.begin());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last - output.begin(), 7);
   ASSERT_EQUAL(output[0], 11);
@@ -245,14 +246,14 @@ void TestUniqueCopyCudaStreams()
   ASSERT_EQUAL(output[6], 37);
 
   new_last = thrust::unique_copy(thrust::cuda::par.on(s), output.begin(), new_last, data.begin(), is_equal_div_10_unique<T>());
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL(new_last - data.begin(), 3);
   ASSERT_EQUAL(data[0], 11);
   ASSERT_EQUAL(data[1], 20);
   ASSERT_EQUAL(data[2], 31);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestUniqueCopyCudaStreams);
 

@@ -2,6 +2,7 @@
 #include <thrust/functional.h>
 #include <thrust/sequence.h>
 #include <thrust/device_malloc_allocator.h>
+#include "hip/hip_runtime.h"
 
 #include <thrust/sort.h>
 #include <thrust/system/cuda/detail/detail/stable_radix_sort.h>

@@ -1,4 +1,5 @@
 #include <unittest/unittest.h>
+#include "hip/hip_runtime.h"
 
 #include <thrust/functional.h>
 #include <thrust/system/detail/internal/decompose.h>

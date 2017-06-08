@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 #include <thrust/merge.h>
 #include <thrust/functional.h>
@@ -53,7 +54,7 @@ void TestMergeByKeyDevice(ExecutionPolicy exec)
 
   thrust::device_vector<thrust::pair<Iterator,Iterator> > result_ends(1);
 
-  merge_by_key_kernel<<<1,1>>>(exec,
+  hipLaunchKernel(HIP_KERNEL_NAME(merge_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
                                a_key.begin(), a_key.end(),
                                b_key.begin(), b_key.end(),
                                a_val.begin(), b_val.begin(),
@@ -107,8 +108,8 @@ void TestMergeByKeyCudaStreams()
 
   Vector result_key(7), result_val(7);
 
-  cudaStream_t s;
-  cudaStreamCreate(&s);
+  hipStream_t s;
+  hipStreamCreate(&s);
 
   thrust::pair<Iterator,Iterator> ends =
     thrust::merge_by_key(thrust::cuda::par.on(s),
@@ -118,14 +119,14 @@ void TestMergeByKeyCudaStreams()
                          result_key.begin(),
                          result_val.begin());
 
-  cudaStreamSynchronize(s);
+  hipStreamSynchronize(s);
 
   ASSERT_EQUAL_QUIET(result_key.end(), ends.first);
   ASSERT_EQUAL_QUIET(result_val.end(), ends.second);
   ASSERT_EQUAL(ref_key, result_key);
   ASSERT_EQUAL(ref_val, result_val);
 
-  cudaStreamDestroy(s);
+  hipStreamDestroy(s);
 }
 DECLARE_UNITTEST(TestMergeByKeyCudaStreams);
 
