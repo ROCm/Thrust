@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -207,7 +208,13 @@ template <class T0, class T1, class T2, class T3, class T4,
    */
 
   public:
-  /*! \p tuple's no-argument constructor initializes each element.
+  
+  //Stub, fix for compilation errors
+ inline __host__ __device__
+  ~tuple() {}
+
+
+   /*! \p tuple's no-argument constructor initializes each element.
    */
   inline __host__ __device__
   tuple(void) {}

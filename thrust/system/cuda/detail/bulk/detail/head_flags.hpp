@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -97,6 +98,14 @@ template<typename RandomAccessIterator,
                                                 head_flag_functor(init, last - first, binary_pred))),
         m_end(m_begin + (last - first))
     {}
+
+    
+    //stub, fix for compilation errors
+  __bulk_exec_check_disable__
+    __host__ __device__
+    ~head_flags_with_init()
+    {}
+
 
     __host__ __device__
     iterator begin() const

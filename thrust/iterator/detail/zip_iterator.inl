@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -21,6 +22,15 @@
 
 namespace thrust
 {
+
+//Stub to fix for compilation error
+
+template<typename IteratorTuple>
+__host__ __device__
+  zip_iterator<IteratorTuple>
+    ::~zip_iterator()
+{
+} // end zip_iterator::~zip_iterator()
 
 
 template<typename IteratorTuple>

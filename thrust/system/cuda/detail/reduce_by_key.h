@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-
+#include "hip/hip_runtime.h"
 /*! \file reduce_by_key.h
  *  \brief CUDA implementation of reduce_by_key
  */

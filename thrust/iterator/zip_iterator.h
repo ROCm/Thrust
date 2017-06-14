@@ -1,3 +1,4 @@
+#include "hip/hip_runtime.h"
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -141,6 +142,11 @@ template <typename IteratorTuple>
     : public detail::zip_iterator_base<IteratorTuple>::type
 {
   public:
+    
+      //stub, fix for compilation issue  
+   inline __host__ __device__
+    ~zip_iterator();
+
     /*! Null constructor does nothing.
      */
     inline __host__ __device__
