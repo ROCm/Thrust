@@ -99,7 +99,7 @@ parameter_ptr<T> make_parameter(const T& x)
 
   // do a trivial copy
 //#ifndef __CUDA_ARCH__
-#if __HIP_DEVICE_COMPILE__
+#if __HIP_DEVICE_COMPILE_ == 0
   bulk::detail::throw_on_error(hipMemcpy(raw_ptr, &x, sizeof(T), hipMemcpyHostToDevice),
                                "make_parameter(): after hipMemcpy");
 #else

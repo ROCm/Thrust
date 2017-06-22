@@ -49,7 +49,8 @@ void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
   // XXX use hipMalloc in __device__ code when it becomes available
-  #if __BULK_HAS_CUDART__
+
+
   hipError_t error = hipMalloc(reinterpret_cast<void**>(&result), n);
 
   if(error)
@@ -57,7 +58,7 @@ void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
     //throw thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
   thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
   } // end if
-#endif
+
 #else
   result = thrust::raw_pointer_cast(thrust::malloc(thrust::seq, n));
 #endif
@@ -73,9 +74,9 @@ void free(execution_policy<DerivedPolicy> &, Pointer ptr)
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
   // XXX use hipFree in __device__ code when it becomes available
-  #if __BULK_HAS_CUDART__
+
   throw_on_error(hipFree(thrust::raw_pointer_cast(ptr)), "hipFree in free");
-  #endif
+
 #else
   thrust::free(thrust::seq, ptr);
 #endif

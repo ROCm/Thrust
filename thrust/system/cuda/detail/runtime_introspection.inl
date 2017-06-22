@@ -40,7 +40,7 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
 {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-#if __BULK_HAS_CUDART__
+
   hipDeviceProp_t properties;
 
   hipError_t error = hipGetDeviceProperties(&properties, device_id);
@@ -65,7 +65,7 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   };
 
   p = temp;
-#endif
+
 //#elif (__CUDA_ARCH__ >= 350) //need to recheck as it is not clear which flag to use
 //#else
 #elif __HIP_ARCH_HAS_SURFACE_FUNCS__ 
@@ -148,7 +148,7 @@ int current_device()
 //#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 350
 //Need to recheck as it is not clear which flag to use
 #if __HIP_DEVICE_COMPILE__ == 0 || (__HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ && __HIP_ARCH_HAS_DYNAMIC_PARALLEL__)
-  #if __BULK_HAS_CUDART__
+
   hipError_t error = hipGetDevice(&result);
 
   throw_on_error(error, "hipGetDevice in current_device");
@@ -157,7 +157,7 @@ int current_device()
   {
     throw_on_error(hipErrorNoDevice, "hipGetDevice in current_device");
   }
-#endif
+
 #else
   // dunno how to safely error here
 

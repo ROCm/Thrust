@@ -43,9 +43,9 @@ void synchronize(hipStream_t stream, const char *message)
 {
 //#if !defined(__CUDA_ARCH__)
 #if __HIP_DEVICE_COMPILE__ == 0
-  #if __BULK_HAS_CUDART__
+
   throw_on_error(hipStreamSynchronize(stream), message);
-  #endif
+
 #else
   synchronize(message);
 #endif

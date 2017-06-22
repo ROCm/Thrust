@@ -39,9 +39,9 @@ void throw_on_error(hipError_t e, const char *message)
 #if __HIP_DEVICE_COMPILE__ == 0
 
     //throw thrust::system_error(e, thrust::cuda_category(), message);
-#if __BULK_HAS_CUDART__
+
 thrust::system_error(e, thrust::system::cuda_category(), message);
-#endif
+
 #else
 #  if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
     printf("Error after %s: %s\n", message, hipGetErrorString(e));

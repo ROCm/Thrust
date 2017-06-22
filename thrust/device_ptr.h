@@ -121,12 +121,9 @@ template<typename T>
     /*! This method returns this \p device_ptr's raw pointer.
      *  \return This \p device_ptr's raw pointer.
      */
-    __host__ __device__
+/*    __host__ __device__
    // T *get(void) const;
-T *get(void) const
-{
- return NULL;
-}
+*/
 
 }; // end device_ptr
 
