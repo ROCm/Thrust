@@ -93,7 +93,7 @@ template<typename Function, typename Result>
   {
     // we static cast to Result to handle void Result without error
     // in case Function's result is non-void
-    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y)));
+    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), /*thrust::raw_reference_cast(y)*/y));
   }
 }; // end wrapped_function
 
