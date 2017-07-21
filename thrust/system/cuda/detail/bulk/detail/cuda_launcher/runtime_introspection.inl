@@ -96,9 +96,7 @@ inline device_properties_t device_properties(int device_id)
 {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-
- return device_properties_cached(device_id);
- 
+  return device_properties_cached(device_id);
 #else
   return device_properties_uncached(device_id);
 #endif
@@ -135,7 +133,7 @@ __host__ __device__
 inline function_attributes_t function_attributes(KernelFunction kernel)
 {
 #if __BULK_HAS_CUDART__
-#if 0
+
   typedef void (*fun_ptr_type)();
 
   fun_ptr_type fun_ptr = reinterpret_cast<fun_ptr_type>(kernel);
@@ -155,7 +153,7 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
   };
 
   return result;
-#endif
+
 #else
   return function_attributes_t();
 #endif // __HIPCC__

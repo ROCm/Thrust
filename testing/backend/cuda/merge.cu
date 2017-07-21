@@ -54,7 +54,7 @@ void TestMergeDevice(ExecutionPolicy exec)
                           h_result.begin());
     h_result.resize(h_end - h_result.begin());
 
-    hipLaunchKernel(HIP_KERNEL_NAME(merge_kernel), dim3(1), dim3(1), 0, 0, exec,
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(merge_kernel), dim3(1), dim3(1), 0, 0, exec,
                           d_a.begin(), d_a.end(),
                           d_b.begin(), d_b.begin() + size,
                           d_result.begin(),

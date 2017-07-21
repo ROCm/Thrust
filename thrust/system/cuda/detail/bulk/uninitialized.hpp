@@ -96,7 +96,7 @@ template<typename T>
     __host__ __device__ __thrust_forceinline__
     void construct(const Arg &a)
     {
-      //::new(ptr()) T(a);
+      ::new(ptr()) T(a);//reverted for nvcc
     }
 
     __bulk_exec_check_disable__

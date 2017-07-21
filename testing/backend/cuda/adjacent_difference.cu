@@ -29,18 +29,18 @@ void TestAdjacentDifferenceDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
   
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_output.begin(), thrust::plus<T>());
-  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), thrust::plus<T>());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), thrust::plus<T>());
   
   ASSERT_EQUAL(h_output, d_output);
   
   // in-place operation
   thrust::adjacent_difference(h_input.begin(), h_input.end(), h_input.begin(), thrust::plus<T>());
-  hipLaunchKernel(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_input.begin(), thrust::plus<T>());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(adjacent_difference_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_input.begin(), thrust::plus<T>());
   
   ASSERT_EQUAL(h_input, h_output); //computed previously
   ASSERT_EQUAL(d_input, d_output); //computed previously

@@ -35,7 +35,7 @@ void TestGenerateDevice(ExecutionPolicy exec, const size_t n)
   return_value<T> f(value);
   
   thrust::generate(h_result.begin(), h_result.end(), f);
-  hipLaunchKernel(HIP_KERNEL_NAME(generate_kernel), dim3(1), dim3(1), 0, 0, exec, d_result.begin(), d_result.end(), f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(generate_kernel), dim3(1), dim3(1), 0, 0, exec, d_result.begin(), d_result.end(), f);
   
   ASSERT_EQUAL(h_result, d_result);
 }
@@ -100,7 +100,7 @@ void TestGenerateNDevice(ExecutionPolicy exec, const size_t n)
   return_value<T> f(value);
   
   thrust::generate_n(h_result.begin(), h_result.size(), f);
-  hipLaunchKernel(HIP_KERNEL_NAME(generate_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_result.begin(), d_result.size(), f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(generate_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_result.begin(), d_result.size(), f);
   
   ASSERT_EQUAL(h_result, d_result);
 }

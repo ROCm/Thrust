@@ -31,7 +31,7 @@ void TestPartitionPointDevice(ExecutionPolicy exec)
   iterator ref = thrust::stable_partition(v.begin(), v.end(), is_even<int>());
 
   thrust::device_vector<iterator> result(1);
-  hipLaunchKernel(HIP_KERNEL_NAME(partition_point_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(partition_point_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(ref - v.begin(), (iterator)result[0] - v.begin());
 }

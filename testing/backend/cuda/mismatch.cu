@@ -28,20 +28,20 @@ void TestMismatchDevice(ExecutionPolicy exec)
 
   thrust::device_vector<pair_type> d_result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
 
   ASSERT_EQUAL(2, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(2, ((pair_type)d_result[0]).second - b.begin());
   
   b[2] = 3;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
   ASSERT_EQUAL(3, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(3, ((pair_type)d_result[0]).second - b.begin());
   
   b[3] = 4;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(mismatch_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), d_result.begin());
   ASSERT_EQUAL(4, ((pair_type)d_result[0]).first  - a.begin());
   ASSERT_EQUAL(4, ((pair_type)d_result[0]).second - b.begin());
 }

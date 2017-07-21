@@ -24,12 +24,12 @@ void TestIsSortedDevice(ExecutionPolicy exec)
   v[0] = 1;
   v[1] = 0;
 
-  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
   thrust::sort(v.begin(), v.end());
 
-  hipLaunchKernel(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(is_sorted_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 }
 

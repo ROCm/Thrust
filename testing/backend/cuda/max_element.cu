@@ -33,13 +33,13 @@ void TestMaxElementDevice(ExecutionPolicy exec)
   
   typename thrust::host_vector<int>::iterator   h_max = thrust::max_element(h_data.begin(), h_data.end());
 
-  hipLaunchKernel(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
   ASSERT_EQUAL(h_max - h_data.begin(), (iter_type)d_result[0] - d_data.begin());
 
   
   typename thrust::host_vector<int>::iterator   h_min = thrust::max_element(h_data.begin(), h_data.end(), thrust::greater<int>());
 
-  hipLaunchKernel(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(max_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
   ASSERT_EQUAL(h_min - h_data.begin(), (iter_type)d_result[0] - d_data.begin());
 }
 

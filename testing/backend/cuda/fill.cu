@@ -19,27 +19,27 @@ void TestFillDevice(ExecutionPolicy exec, size_t n)
   thrust::device_vector<T> d_data = h_data;
   
   thrust::fill(h_data.begin() + std::min((size_t)1, n), h_data.begin() + std::min((size_t)3, n), (T) 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)1, n), d_data.begin() + std::min((size_t)3, n), (T) 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)1, n), d_data.begin() + std::min((size_t)3, n), (T) 0);
   
   ASSERT_EQUAL(h_data, d_data);
   
   thrust::fill(h_data.begin() + std::min((size_t)117, n), h_data.begin() + std::min((size_t)367, n), (T) 1);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)117, n), d_data.begin() + std::min((size_t)367, n), (T) 1);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)117, n), d_data.begin() + std::min((size_t)367, n), (T) 1);
   
   ASSERT_EQUAL(h_data, d_data);
   
   thrust::fill(h_data.begin() + std::min((size_t)8, n), h_data.begin() + std::min((size_t)259, n), (T) 2);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)8, n), d_data.begin() + std::min((size_t)259, n), (T) 2);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)8, n), d_data.begin() + std::min((size_t)259, n), (T) 2);
   
   ASSERT_EQUAL(h_data, d_data);
   
   thrust::fill(h_data.begin() + std::min((size_t)3, n), h_data.end(), (T) 3);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)3, n), d_data.end(), (T) 3);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + std::min((size_t)3, n), d_data.end(), (T) 3);
   
   ASSERT_EQUAL(h_data, d_data);
   
   thrust::fill(h_data.begin(), h_data.end(), (T) 4);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), (T) 4);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), (T) 4);
   
   ASSERT_EQUAL(h_data, d_data);
 }
@@ -75,30 +75,30 @@ void TestFillNDevice(ExecutionPolicy exec, size_t n)
   
   size_t begin_offset = std::min<size_t>(1,n);
   thrust::fill_n(h_data.begin() + begin_offset, std::min((size_t)3, n) - begin_offset, (T) 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)3, n) - begin_offset, (T) 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)3, n) - begin_offset, (T) 0);
   
   ASSERT_EQUAL(h_data, d_data);
   
   begin_offset = std::min<size_t>(117, n);
   thrust::fill_n(h_data.begin() + begin_offset, std::min((size_t)367, n) - begin_offset, (T) 1);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)367, n) - begin_offset, (T) 1);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)367, n) - begin_offset, (T) 1);
   
   ASSERT_EQUAL(h_data, d_data);
   
   begin_offset = std::min<size_t>(8, n);
   thrust::fill_n(h_data.begin() + begin_offset, std::min((size_t)259, n) - begin_offset, (T) 2);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)259, n) - begin_offset, (T) 2);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, std::min((size_t)259, n) - begin_offset, (T) 2);
   
   ASSERT_EQUAL(h_data, d_data);
   
   begin_offset = std::min<size_t>(3, n);
   thrust::fill_n(h_data.begin() + begin_offset, h_data.size() - begin_offset, (T) 3);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, d_data.size() - begin_offset, (T) 3);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin() + begin_offset, d_data.size() - begin_offset, (T) 3);
   
   ASSERT_EQUAL(h_data, d_data);
   
   thrust::fill_n(h_data.begin(), h_data.size(), (T) 4);
-  hipLaunchKernel(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.size(), (T) 4);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(fill_n_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.size(), (T) 4);
   
   ASSERT_EQUAL(h_data, d_data);
 }

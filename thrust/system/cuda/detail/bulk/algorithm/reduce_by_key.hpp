@@ -84,17 +84,14 @@ void scatter_tails_n(ConcurrentGroup &group,
   
   // the zip_iterators in this scatter_if can confuse nvcc's pointer space tracking for __CUDA_ARCH__ < 200
   // separate the scatters for __CUDA_ARCH__ < 200
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ {
+#if __CUDA_ARCH__ >= 200
   bulk::scatter_if(group,
                    thrust::make_zip_iterator(thrust::make_tuple(values_first,         keys_first)),
                    thrust::make_zip_iterator(thrust::make_tuple(values_first + n - 1, keys_first)),
                    thrust::make_transform_iterator(flags_first, thrust::placeholders::_1 - 1),
                    bulk::detail::make_tail_flags(flags_first, flags_first + n).begin(),
                    thrust::make_zip_iterator(thrust::make_tuple(values_result, keys_result)));
-}
-//#else //commented while converting the flag
-else {
+#else
   bulk::scatter_if(group,
                    values_first, 
                    values_first + n - 1,
@@ -108,8 +105,7 @@ else {
                    thrust::make_transform_iterator(flags_first, thrust::placeholders::_1 - 1),
                    bulk::detail::make_tail_flags(flags_first, flags_first + n).begin(),
                    keys_result);
-}
-//#endif //commented while converting the flag
+#endif
 } // end scatter_tails_n()
 
 
@@ -150,23 +146,16 @@ reduce_by_key(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
 
   const size_type interval_size = groupsize * grainsize;
 
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-
-size_type *s_flags;
-value_type *s_values;
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
-  /*size_type *  */s_flags = reinterpret_cast<size_type*>(bulk::malloc(g, interval_size * sizeof(int)));
-/*  value_type *  */s_values = reinterpret_cast<value_type*>(bulk::malloc(g, interval_size * sizeof(value_type)));
-}
-//#else //commented while converting the flags
-else {
+#if __CUDA_ARCH__ >= 200
+  size_type *s_flags = reinterpret_cast<size_type*>(bulk::malloc(g, interval_size * sizeof(int)));
+  value_type *s_values = reinterpret_cast<value_type*>(bulk::malloc(g, interval_size * sizeof(value_type)));
+#else
   __shared__ uninitialized_array<size_type,interval_size> s_flags_impl;
-  /*size_type *  */s_flags = s_flags_impl.data();
+  size_type *s_flags = s_flags_impl.data();
 
   __shared__ uninitialized_array<value_type,interval_size> s_values_impl;
-  /*value_type *  */s_values = s_values_impl.data();
-}
-//#endif //commented while converting the flag
+  value_type *s_values = s_values_impl.data();
+#endif
 
   for(; keys_first < keys_last; keys_first += interval_size, values_first += interval_size)
   {
@@ -219,12 +208,10 @@ else {
     g.wait();
   } // end for
 
-//#if __CUDA_ARCH__ >= 200 //need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if __CUDA_ARCH__ >= 200
   bulk::free(g, s_flags);
   bulk::free(g, s_values);
-}
-//#endif //commented while converting the flag
+#endif
 
   return thrust::make_tuple(keys_result, values_result, init_key, init_value);
 } // end reduce_by_key()

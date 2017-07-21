@@ -77,7 +77,7 @@ void TestUniqueByKeyDevice(ExecutionPolicy exec)
   // basic test
   initialize_keys(keys);  initialize_values(values);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - keys.begin(),   5);
@@ -97,7 +97,7 @@ void TestUniqueByKeyDevice(ExecutionPolicy exec)
   // test BinaryPredicate
   initialize_keys(keys);  initialize_values(values);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
   
   ASSERT_EQUAL(new_last.first  - keys.begin(),   3);
@@ -214,7 +214,7 @@ void TestUniqueCopyByKeyDevice(ExecutionPolicy exec)
   Vector output_keys(keys.size());
   Vector output_values(values.size());
 
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   5);
@@ -234,7 +234,7 @@ void TestUniqueCopyByKeyDevice(ExecutionPolicy exec)
   // test BinaryPredicate
   initialize_keys(keys);  initialize_values(values);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_by_key_copy_kernel), dim3(1), dim3(1), 0, 0, exec, keys.begin(), keys.end(), values.begin(), output_keys.begin(), output_values.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last.first  - output_keys.begin(),   3);

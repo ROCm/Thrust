@@ -58,7 +58,7 @@ void TestGetTemporaryBufferDeviceSeq()
   typedef thrust::pair<pointer, std::ptrdiff_t> ptr_and_sz_type;
   thrust::device_vector<ptr_and_sz_type> d_result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(get_temporary_buffer_kernel), dim3(1), dim3(1), 0, 0, n, d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(get_temporary_buffer_kernel), dim3(1), dim3(1), 0, 0, n, d_result.begin());
 
   ptr_and_sz_type ptr_and_sz = d_result[0];
 
@@ -73,7 +73,7 @@ void TestGetTemporaryBufferDeviceSeq()
 
     ASSERT_EQUAL(true, thrust::all_of(thrust::device, ptr_and_sz.first, ptr_and_sz.first + n, thrust::placeholders::_1 == ref_val));
 
-    hipLaunchKernel(HIP_KERNEL_NAME(return_temporary_buffer_kernel), dim3(1), dim3(1), 0, 0, ptr_and_sz.first);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(return_temporary_buffer_kernel), dim3(1), dim3(1), 0, 0, ptr_and_sz.first);
   }
 }
 DECLARE_UNITTEST(TestGetTemporaryBufferDeviceSeq);
@@ -100,7 +100,7 @@ void TestMallocDeviceSeq()
   typedef thrust::pointer<int, thrust::detail::seq_t> pointer;
   thrust::device_vector<pointer> d_result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(malloc_kernel), dim3(1), dim3(1), 0, 0, n, d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(malloc_kernel), dim3(1), dim3(1), 0, 0, n, d_result.begin());
 
   pointer ptr = d_result[0];
 
@@ -113,7 +113,7 @@ void TestMallocDeviceSeq()
 
     ASSERT_EQUAL(true, thrust::all_of(thrust::device, ptr, ptr + n, thrust::placeholders::_1 == ref_val));
 
-    hipLaunchKernel(HIP_KERNEL_NAME(free_kernel), dim3(1), dim3(1), 0, 0, ptr);
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(free_kernel), dim3(1), dim3(1), 0, 0, ptr);
   }
 }
 DECLARE_UNITTEST(TestMallocDeviceSeq);

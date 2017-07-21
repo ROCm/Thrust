@@ -45,7 +45,7 @@ void TestMinMaxElementDevice(ExecutionPolicy exec)
   d_min = thrust::minmax_element(d_data.begin(), d_data.end()).first;
   d_max = thrust::minmax_element(d_data.begin(), d_data.end()).second;
 
-  hipLaunchKernel(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin());
   d_min = ((pair_type)d_result[0]).first;
   d_max = ((pair_type)d_result[0]).second;
   
@@ -55,7 +55,7 @@ void TestMinMaxElementDevice(ExecutionPolicy exec)
   h_max = thrust::minmax_element(h_data.begin(), h_data.end(), thrust::greater<int>()).first;
   h_min = thrust::minmax_element(h_data.begin(), h_data.end(), thrust::greater<int>()).second;
 
-  hipLaunchKernel(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(minmax_element_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), thrust::greater<int>(), d_result.begin());
   d_max = ((pair_type)d_result[0]).first;
   d_min = ((pair_type)d_result[0]).second;
   

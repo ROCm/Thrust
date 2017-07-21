@@ -33,7 +33,7 @@ void TestSetSymmetricDifferenceDevice(ExecutionPolicy exec)
   Vector result(5);
   thrust::device_vector<Iterator> end_vec(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(set_symmetric_difference_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(set_symmetric_difference_kernel), dim3(1), dim3(1), 0, 0, exec,
                                            a.begin(), a.end(),
                                            b.begin(), b.end(),
                                            result.begin(),

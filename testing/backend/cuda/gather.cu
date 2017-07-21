@@ -34,7 +34,7 @@ void TestGatherDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::gather(h_map.begin(), h_map.end(), h_source.begin(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(gather_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_source.begin(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(gather_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_source.begin(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -130,7 +130,7 @@ void TestGatherIfDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::gather_if(h_map.begin(), h_map.end(), h_stencil.begin(), h_source.begin(), h_output.begin(), is_even_gather_if<unsigned int>());
-  hipLaunchKernel(HIP_KERNEL_NAME(gather_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_stencil.begin(), d_source.begin(), d_output.begin(), is_even_gather_if<unsigned int>());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(gather_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_map.begin(), d_map.end(), d_stencil.begin(), d_source.begin(), d_output.begin(), is_even_gather_if<unsigned int>());
   
   ASSERT_EQUAL(h_output, d_output);
 }

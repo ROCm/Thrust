@@ -34,7 +34,7 @@ void TestScatterDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_output(output_size, 0);
   
   thrust::scatter(h_input.begin(), h_input.end(), h_map.begin(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(scatter_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(scatter_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_output.begin());
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -89,7 +89,7 @@ void TestScatterIfDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_output(output_size, 0);
   
   thrust::scatter_if(h_input.begin(), h_input.end(), h_map.begin(), h_map.begin(), h_output.begin(), is_even_scatter_if<unsigned int>());
-  hipLaunchKernel(HIP_KERNEL_NAME(scatter_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_map.begin(), d_output.begin(), is_even_scatter_if<unsigned int>());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(scatter_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_map.begin(), d_map.begin(), d_output.begin(), is_even_scatter_if<unsigned int>());
   
   ASSERT_EQUAL(h_output, d_output);
 }

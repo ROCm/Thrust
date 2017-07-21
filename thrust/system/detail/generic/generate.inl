@@ -51,7 +51,7 @@ __host__ __device__
                             Size n,
                             Generator gen)
 {
-  return thrust::for_each_n(exec, first, n, typename thrust::detail::generate_functor<ExecutionPolicy,Generator>::type(gen));
+ return thrust::for_each_n(exec, first, n, typename thrust::detail::generate_functor<ExecutionPolicy,Generator>::type(gen));
 } // end generate()
 
 } // end namespace generic

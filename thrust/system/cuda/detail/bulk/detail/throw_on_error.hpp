@@ -53,7 +53,7 @@ thrust::system_error(e, thrust::system::cuda_category(), message);
   } // end if
 } // end throw_on_error()
 
-#if 0
+#ifdef __HIP_PLATFORM_NVCC__
 inline __host__ __device__
 void throw_on_error(cudaError_t e, const char *message)
 {

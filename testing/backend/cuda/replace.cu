@@ -29,7 +29,7 @@ void TestReplaceDevice(ExecutionPolicy exec, const size_t n)
   T new_value = 1;
   
   thrust::replace(h_data.begin(), h_data.end(), old_value, new_value);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), old_value, new_value);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), old_value, new_value);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
 }
@@ -72,7 +72,7 @@ void TestReplaceCopyDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_dest(n);
   
   thrust::replace_copy(h_data.begin(), h_data.end(), h_dest.begin(), old_value, new_value);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_copy_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_dest.begin(), old_value, new_value);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_copy_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_dest.begin(), old_value, new_value);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
   ASSERT_ALMOST_EQUAL(h_dest, d_dest);
@@ -107,7 +107,7 @@ void TestReplaceIfDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_data = h_data;
   
   thrust::replace_if(h_data.begin(), h_data.end(), less_than_five<int>(), 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), less_than_five<int>(), 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), less_than_five<int>(), 0);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
 }
@@ -144,7 +144,7 @@ void TestReplaceIfStencilDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_stencil = h_stencil;
   
   thrust::replace_if(h_data.begin(), h_data.end(), h_stencil.begin(), less_than_five<int>(), 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), less_than_five<int>(), 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), less_than_five<int>(), 0);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
 }
@@ -181,7 +181,7 @@ void TestReplaceCopyIfDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_dest(n);
   
   thrust::replace_copy_if(h_data.begin(), h_data.end(), h_dest.begin(), less_than_five<int>(), 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_dest.begin(), less_than_five<int>(), 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_dest.begin(), less_than_five<int>(), 0);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
   ASSERT_ALMOST_EQUAL(h_dest, d_dest);
@@ -222,7 +222,7 @@ void TestReplaceCopyIfStencilDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_dest(n);
   
   thrust::replace_copy_if(h_data.begin(), h_data.end(), h_stencil.begin(), h_dest.begin(), less_than_five<int>(), 0);
-  hipLaunchKernel(HIP_KERNEL_NAME(replace_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), d_dest.begin(), less_than_five<int>(), 0);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(replace_copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_stencil.begin(), d_dest.begin(), less_than_five<int>(), 0);
   
   ASSERT_ALMOST_EQUAL(h_data, d_data);
   ASSERT_ALMOST_EQUAL(h_dest, d_dest);

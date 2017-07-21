@@ -25,7 +25,7 @@ void TestTransformReduceDevice(ExecutionPolicy exec)
 
   thrust::device_vector<T> result(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_reduce_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), thrust::negate<T>(), init, thrust::plus<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_reduce_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), thrust::negate<T>(), init, thrust::plus<T>(), result.begin());
   
   ASSERT_EQUAL(8, (T)result[0]);
 }

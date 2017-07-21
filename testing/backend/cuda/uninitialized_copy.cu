@@ -22,7 +22,7 @@ void TestUninitializedCopyDevice(ExecutionPolicy exec)
   
   // copy to Vector
   Vector v2(5);
-  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_copy_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(uninitialized_copy_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
   ASSERT_EQUAL(v2[2], 2);
@@ -90,7 +90,7 @@ void TestUninitializedCopyNDevice(ExecutionPolicy exec)
   
   // copy to Vector
   Vector v2(5);
-  hipLaunchKernel(HIP_KERNEL_NAME(uninitialized_copy_n_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.size(), v2.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(uninitialized_copy_n_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.size(), v2.begin());
   ASSERT_EQUAL(v2[0], 0);
   ASSERT_EQUAL(v2[1], 1);
   ASSERT_EQUAL(v2[2], 2);

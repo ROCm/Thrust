@@ -36,7 +36,7 @@ void TestPartitionDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iterator> result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin());
   
   thrust::device_vector<T> ref(5);
   ref[0] = 2;
@@ -94,7 +94,7 @@ void TestPartitionStencilDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iterator> result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin());
   
   thrust::device_vector<T> ref(5);
   ref[0] = 1;
@@ -149,7 +149,7 @@ void TestPartitionCopyDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
   
   thrust::device_vector<T> true_ref(2);
   true_ref[0] =  2;
@@ -217,7 +217,7 @@ void TestPartitionCopyStencilDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
 
   pair_type ends = iterators[0];
   
@@ -284,7 +284,7 @@ void TestStablePartitionDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> result(1);
   thrust::device_vector<bool> is_supported(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin(), is_supported.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), is_even<T>(), result.begin(), is_supported.begin());
   
   if(is_supported[0])
   {
@@ -355,7 +355,7 @@ void TestStablePartitionStencilDevice(ExecutionPolicy exec)
   thrust::device_vector<iterator> result(1);
   thrust::device_vector<bool> is_supported(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin(), is_supported.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(stable_partition_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), is_even<T>(), result.begin(), is_supported.begin());
   
   if(is_supported[0])
   {
@@ -413,7 +413,7 @@ void TestStablePartitionCopyDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
   
   thrust::device_vector<T> true_ref(2);
   true_ref[0] =  2;
@@ -481,7 +481,7 @@ void TestStablePartitionCopyStencilDevice(ExecutionPolicy exec)
   typedef thrust::pair<iterator,iterator> pair_type;
   thrust::device_vector<pair_type> iterators(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(stable_partition_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), stencil.begin(), true_results.begin(), false_results.begin(), is_even<T>(), iterators.begin());
 
   pair_type ends = iterators[0];
   

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -75,7 +75,7 @@ struct WarpReduceSmem
         /// The number of shared memory elements per warp
         WARP_SMEM_ELEMENTS =  LOGICAL_WARP_THREADS + HALF_WARP_THREADS,
 
-        /// Flag status (when not using ballot)
+        /// FlagT status (when not using ballot)
         UNSET   = 0x0,  // Is initially unset
         SET     = 0x1,  // Is initially set
         SEEN    = 0x2,  // Has seen another head flag from a successor peer
@@ -100,7 +100,7 @@ struct WarpReduceSmem
      ******************************************************************************/
 
     _TempStorage    &temp_storage;
-    int             lane_id;
+    unsigned int    lane_id;
 
 
     /******************************************************************************
@@ -137,7 +137,7 @@ struct WarpReduceSmem
         T                   input,                  ///< [in] Calling thread's input
         int                 folded_items_per_warp,  ///< [in] Total number of valid items folded into each logical warp
         ReductionOp         reduction_op,           ///< [in] Reduction operator
-        Int2Type<STEP>      step)
+        Int2Type<STEP>      /*step*/)
     {
         const int OFFSET = 1 << STEP;
 
@@ -159,14 +159,14 @@ struct WarpReduceSmem
      * Reduction step (terminate)
      */
     template <
-        bool                ALL_LANES_VALID,        ///< Whether all lanes in each warp are contributing a valid fold of items
-        int                 FOLDED_ITEMS_PER_LANE,  ///< Number of items folded into each lane
+        bool                ALL_LANES_VALID,            ///< Whether all lanes in each warp are contributing a valid fold of items
+        int                 FOLDED_ITEMS_PER_LANE,      ///< Number of items folded into each lane
         typename            ReductionOp>
     __device__ __forceinline__ T ReduceStep(
-        T                   input,                  ///< [in] Calling thread's input
-        int                 folded_items_per_warp,  ///< [in] Total number of valid items folded into each logical warp
-        ReductionOp         reduction_op,           ///< [in] Reduction operator
-        Int2Type<STEPS>     step)
+        T                   input,                      ///< [in] Calling thread's input
+        int                 /*folded_items_per_warp*/,  ///< [in] Total number of valid items folded into each logical warp
+        ReductionOp         /*reduction_op*/,           ///< [in] Reduction operator
+        Int2Type<STEPS>     /*step*/)
     {
         return input;
     }
@@ -182,13 +182,13 @@ struct WarpReduceSmem
      */
     template <
         bool            HEAD_SEGMENTED,     ///< Whether flags indicate a segment-head or a segment-tail
-        typename        Flag,
+        typename        FlagT,
         typename        ReductionOp>
     __device__ __forceinline__ T SegmentedReduce(
-        T               input,              ///< [in] Calling thread's input
-        Flag            flag,               ///< [in] Whether or not the current lane is a segment head/tail
-        ReductionOp     reduction_op,       ///< [in] Reduction operator
-        Int2Type<true>  has_ballot)         ///< [in] Marker type for whether the target arch has ballot functionality
+        T               input,                  ///< [in] Calling thread's input
+        FlagT           flag,                   ///< [in] Whether or not the current lane is a segment head/tail
+        ReductionOp     reduction_op,           ///< [in] Reduction operator
+        Int2Type<true>  /*has_ballot*/)         ///< [in] Marker type for whether the target arch has ballot functionality
     {
         // Get the start flags for each thread in the warp.
         int warp_flags = __ballot(flag);
@@ -221,7 +221,7 @@ struct WarpReduceSmem
             ThreadStore<STORE_VOLATILE>(&temp_storage.reduce[lane_id], input);
 
             // Update input if peer_addend is in range
-            if (OFFSET < next_flag - lane_id)
+            if (OFFSET + lane_id < next_flag)
             {
                 T peer_addend = ThreadLoad<LOAD_VOLATILE>(&temp_storage.reduce[lane_id + OFFSET]);
                 input = reduction_op(input, peer_addend);
@@ -237,13 +237,13 @@ struct WarpReduceSmem
      */
     template <
         bool            HEAD_SEGMENTED,     ///< Whether flags indicate a segment-head or a segment-tail
-        typename        Flag,
+        typename        FlagT,
         typename        ReductionOp>
     __device__ __forceinline__ T SegmentedReduce(
-        T               input,              ///< [in] Calling thread's input
-        Flag            flag,               ///< [in] Whether or not the current lane is a segment head/tail
-        ReductionOp     reduction_op,       ///< [in] Reduction operator
-        Int2Type<false> has_ballot)         ///< [in] Marker type for whether the target arch has ballot functionality
+        T               input,                  ///< [in] Calling thread's input
+        FlagT           flag,                   ///< [in] Whether or not the current lane is a segment head/tail
+        ReductionOp     reduction_op,           ///< [in] Reduction operator
+        Int2Type<false> /*has_ballot*/)         ///< [in] Marker type for whether the target arch has ballot functionality
     {
         enum
         {
@@ -339,11 +339,11 @@ struct WarpReduceSmem
      */
     template <
         bool            HEAD_SEGMENTED,     ///< Whether flags indicate a segment-head or a segment-tail
-        typename        Flag,
+        typename        FlagT,
         typename        ReductionOp>
     __device__ __forceinline__ T SegmentedReduce(
         T               input,              ///< [in] Calling thread's input
-        Flag            flag,               ///< [in] Whether or not the current lane is a segment head/tail
+        FlagT            flag,               ///< [in] Whether or not the current lane is a segment head/tail
         ReductionOp     reduction_op)       ///< [in] Reduction operator
     {
         return SegmentedReduce<HEAD_SEGMENTED>(input, flag, reduction_op, Int2Type<(PTX_ARCH >= 200)>());

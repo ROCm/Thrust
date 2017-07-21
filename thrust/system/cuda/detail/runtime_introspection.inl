@@ -82,7 +82,7 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   int temp;
   error = hipDeviceGetAttribute(&temp,                          hipDeviceAttributeMaxSharedMemoryPerBlock,     device_id);
   p.sharedMemPerBlock = temp;
-  error = hipDeviceGetAttribute(&p.warpSize,                    hipDeviceAttributeWarpSize,                    device_id);
+  error = hipDeviceGetAttribute(&p.hipWarpSize,                    hipDeviceAttributeWarpSize,                    device_id);
 
   throw_on_error(error, "cudaDeviceGetProperty in get_device_properties");
 

@@ -29,11 +29,11 @@ void TestEqualDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<bool> d_result(1, false);
   
   //empty ranges
-  hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin(), d_data1.begin(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin(), d_data1.begin(), d_result.begin());
   ASSERT_EQUAL(d_result[0], true);
   
   //symmetric cases
-  hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data1.begin(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data1.begin(), d_result.begin());
   ASSERT_EQUAL(d_result[0], true);
   
   if(n > 0)
@@ -41,13 +41,13 @@ void TestEqualDevice(ExecutionPolicy exec, const size_t n)
     d_data1[0] = 0; d_data2[0] = 1;
     
     //different vectors
-    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data2.begin(), d_result.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.end(), d_data2.begin(), d_result.begin());
     ASSERT_EQUAL(d_result[0], false);
     
     //different predicates
-    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::less<T>(), d_result.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::less<T>(), d_result.begin());
     ASSERT_EQUAL(d_result[0], true);
-    hipLaunchKernel(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::greater<T>(), d_result.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(equal_kernel), dim3(1), dim3(1), 0, 0, exec, d_data1.begin(), d_data1.begin() + 1, d_data2.begin(), thrust::greater<T>(), d_result.begin());
     ASSERT_EQUAL(d_result[0], false);
   }
 }

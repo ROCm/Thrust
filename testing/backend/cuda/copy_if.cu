@@ -48,7 +48,7 @@ void TestCopyIfDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), is_even<int>());
-    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -63,7 +63,7 @@ void TestCopyIfDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), mod_3<int>());
-    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -153,7 +153,7 @@ void TestCopyIfStencilDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), is_even<int>());
-    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), is_even<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());
@@ -168,7 +168,7 @@ void TestCopyIfStencilDevice(ExecutionPolicy exec)
     thrust::device_vector<int> d_result(n);
     
     h_new_end = thrust::copy_if(h_data.begin(), h_data.end(), h_result.begin(), mod_3<int>());
-    hipLaunchKernel(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
+    hipLaunchKernelGGL(HIP_KERNEL_NAME(copy_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), d_result.begin(), mod_3<int>(), d_new_end_vec.begin());
     d_new_end = d_new_end_vec[0];
     
     h_result.resize(h_new_end - h_result.begin());

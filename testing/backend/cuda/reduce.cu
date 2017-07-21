@@ -24,7 +24,7 @@ void TestReduceDevice(ExecutionPolicy exec, const size_t n)
   
   T h_result = thrust::reduce(h_data.begin(), h_data.end(), init);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(reduce_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), init, d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(reduce_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), init, d_result.begin());
   
   ASSERT_EQUAL(h_result, d_result[0]);
 }

@@ -20,24 +20,24 @@ void TestAllOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
   v[1] = 0;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(all_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 }
 
@@ -98,24 +98,24 @@ void TestAnyOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
   v[1] = 0;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(any_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 }
 
@@ -176,24 +176,24 @@ void TestNoneOfDevice(ExecutionPolicy exec)
   thrust::device_vector<T> v(3, 1);
   thrust::device_vector<bool> result(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
   v[1] = 0;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 0, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 1, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 0, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(false, result[0]);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(none_of_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin() + 1, v.begin() + 2, thrust::identity<T>(), result.begin());
   ASSERT_EQUAL(true, result[0]);
 }
 

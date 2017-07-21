@@ -147,8 +147,7 @@ stable_merge_sort_by_key(bulk::bounded<bound,bulk::concurrent_group<bulk::agent<
   size_type local_offset = grainsize * g.this_exec.index();
   size_type local_size = thrust::max<size_type>(0, thrust::min<size_type>(grainsize, n - local_offset));
 
-//#if __CUDA_ARCH__ >= 200  //Need to recheck
-#if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ 
+#if __CUDA_ARCH__ >= 200
   union
   {
     key_type   *keys;
@@ -156,18 +155,13 @@ stable_merge_sort_by_key(bulk::bounded<bound,bulk::concurrent_group<bulk::agent<
   } stage;
 
   stage.keys = static_cast<key_type*>(bulk::malloc(g, tile_size * thrust::max(sizeof(key_type), sizeof(value_type))));
-
-
-#else //commented while converting the flags
-
+#else
   __shared__ union
   {
     key_type   keys[tile_size];
     value_type values[tile_size];
   } stage;
-
-
-#endif //commented while converting the flag
+#endif
   
   // load each agent's keys into registers
   bulk::copy_n(bulk::bound<tile_size>(g), keys_first, n, stage.keys);
@@ -207,10 +201,9 @@ stable_merge_sort_by_key(bulk::bounded<bound,bulk::concurrent_group<bulk::agent<
 
   bulk::copy_n(bulk::bound<tile_size>(g), stage.values, n, values_first);
 
-//#if __CUDA_ARCH__ >= 200  //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ 
+#if __CUDA_ARCH__ >= 200
   bulk::free(g, stage.keys);
-//#endif //commented while converting flags
+#endif
 } // end stable_merge_sort_by_key()
 
 

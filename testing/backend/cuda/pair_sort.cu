@@ -50,7 +50,7 @@ void TestPairStableSortDevice(ExecutionPolicy exec)
 
   thrust::device_vector<bool> is_supported(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(stable_sort_kernel), dim3(1), dim3(1), 0, 0, exec, d_pairs.begin(), d_pairs.end(), is_supported.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(stable_sort_kernel), dim3(1), dim3(1), 0, 0, exec, d_pairs.begin(), d_pairs.end(), is_supported.begin());
 
   if(is_supported[0])
   {

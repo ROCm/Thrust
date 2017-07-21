@@ -42,7 +42,7 @@ void TestSetUnionByKeyDevice(ExecutionPolicy exec)
 
   thrust::device_vector<thrust::pair<Iterator,Iterator> > end_vec(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(set_union_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(set_union_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
                                    a_key.begin(), a_key.end(),
                                    b_key.begin(), b_key.end(),
                                    a_val.begin(),

@@ -22,7 +22,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   
   Vector v(5);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), thrust::identity<T>());
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -30,7 +30,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 3);
   ASSERT_EQUAL(v[4], 4);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), -_1);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), -_1);
 
   ASSERT_EQUAL(v[0],  0);
   ASSERT_EQUAL(v[1], -1);
@@ -38,7 +38,7 @@ void TestTabulateDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], -3);
   ASSERT_EQUAL(v[4], -4);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), _1 * _1 * _1);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(tabulate_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), _1 * _1 * _1);
 
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);

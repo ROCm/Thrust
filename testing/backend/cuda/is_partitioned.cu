@@ -35,13 +35,13 @@ void TestIsPartitionedDevice(ExecutionPolicy exec)
   v[0] = 1;
   v[1] = 0;
 
-  hipLaunchKernel(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(false, result[0]);
 
   thrust::partition(v.begin(), v.end(), is_even<int>());
 
-  hipLaunchKernel(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(is_partitioned_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), is_even<int>(), result.begin());
 
   ASSERT_EQUAL(true, result[0]);
 }

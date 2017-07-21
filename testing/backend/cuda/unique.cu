@@ -49,7 +49,7 @@ void TestUniqueDevice(ExecutionPolicy exec)
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 7);
@@ -61,7 +61,7 @@ void TestUniqueDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(data[5], 31);
   ASSERT_EQUAL(data[6], 37);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), new_last, is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), new_last, is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 3);
@@ -172,7 +172,7 @@ void TestUniqueCopyDevice(ExecutionPolicy exec)
   thrust::device_vector<Vector::iterator> new_last_vec(1);
   Vector::iterator new_last;
   
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), output.begin(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, data.begin(), data.end(), output.begin(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - output.begin(), 7);
@@ -184,7 +184,7 @@ void TestUniqueCopyDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(output[5], 31);
   ASSERT_EQUAL(output[6], 37);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, output.begin(), new_last, data.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(unique_copy_kernel), dim3(1), dim3(1), 0, 0, exec, output.begin(), new_last, data.begin(), is_equal_div_10_unique<T>(), new_last_vec.begin());
   new_last = new_last_vec[0];
 
   ASSERT_EQUAL(new_last - data.begin(), 3);

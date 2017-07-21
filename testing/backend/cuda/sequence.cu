@@ -33,7 +33,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
 {
   thrust::device_vector<int> v(5);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end());
   
   ASSERT_EQUAL(v[0], 0);
   ASSERT_EQUAL(v[1], 1);
@@ -41,7 +41,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 3);
   ASSERT_EQUAL(v[4], 4);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10);
   
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 11);
@@ -49,7 +49,7 @@ void TestSequenceDevice(ExecutionPolicy exec)
   ASSERT_EQUAL(v[3], 13);
   ASSERT_EQUAL(v[4], 14);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10, 2);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(sequence_kernel), dim3(1), dim3(1), 0, 0, exec, v.begin(), v.end(), 10, 2);
   
   ASSERT_EQUAL(v[0], 10);
   ASSERT_EQUAL(v[1], 12);

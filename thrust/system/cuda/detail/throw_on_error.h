@@ -38,7 +38,7 @@ void throw_on_error(hipError_t error, const char *message)
   thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
 }
 
-#if 0
+#ifdef __HIP_PLATFORM_NVCC__
 inline __host__ __device__
 void throw_on_error(cudaError_t error, const char *message)
 {

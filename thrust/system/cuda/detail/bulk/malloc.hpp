@@ -436,16 +436,11 @@ class singleton_on_chip_allocator
         inline __device__
         bool try_lock()
         {
-//#if __CUDA_ARCH__ >= 110
-if __HIP_ARCH_HAS_GLOBAL_INT32_ATOMICS__ 
-
-
-
+#if __CUDA_ARCH__ >= 110
           return atomicCAS(&m_in_use, 0, 1) != 0;
-//#else 
-else
+#else
           return false;
-//#endif
+#endif
         } // end try_lock()
 
 
@@ -477,12 +472,16 @@ else
 }; // end singleton_on_chip_allocator
 
 // put the object in an anonymous namespace so that non-CUDA compilers don't complain about multiple definitions
-//namespace
-//{
+#ifdef __HIP_PLATFORM_NVCC__
+namespace
+{
 
-  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+__shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 
-//} // end anon namespace
+} // end anon namespace
+#else
+uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+#endif
 
 inline __device__ void init_on_chip_malloc(size_t max_data_segment_size)
 {
@@ -523,15 +522,12 @@ inline __device__ void *shmalloc(size_t num_bytes)
   // first try on_chip_malloc
   void *result = detail::on_chip_malloc(num_bytes);
   
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
-
+#if __CUDA_ARCH__ >= 200
   if(!result)
   {
     result = std::malloc(num_bytes);
   } // end if
-}
-//#endif // __CUDA_ARCH__ // commented while converting flag
+#endif // __CUDA_ARCH__
 
   return result;
 } // end shmalloc()
@@ -542,14 +538,12 @@ inline __device__ void *unsafe_shmalloc(size_t num_bytes)
   // first try on_chip_malloc
   void *result = detail::unsafe_on_chip_malloc(num_bytes);
   
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if __CUDA_ARCH__ >= 200
   if(!result)
   {
     result = std::malloc(num_bytes);
   } // end if
-}
-//#endif // __CUDA_ARCH__ //commented while converting flag
+#endif // __CUDA_ARCH__
 
   return result;
 } // end unsafe_shmalloc()
@@ -557,8 +551,7 @@ if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
 
 inline __device__ void shfree(void *ptr)
 {
-//#if __CUDA_ARCH__ >= 200 //Neeed to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if __CUDA_ARCH__ >= 200
   if(bulk::is_on_chip(ptr))
   {
     bulk::detail::on_chip_free(bulk::on_chip_cast(ptr));
@@ -567,17 +560,14 @@ if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   {
     std::free(ptr);
   } // end else
-}
-//#else //commented while converting the flag
-else
+#else
   bulk::detail::on_chip_free(bulk::on_chip_cast(ptr));
-//#endif //commented while converting the flag
+#endif
 } // end shfree()
 
 inline __device__ void unsafe_shfree(void *ptr)
 {
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if __CUDA_ARCH__ >= 200
   if(bulk::is_on_chip(ptr))
   {
     bulk::detail::unsafe_on_chip_free(bulk::on_chip_cast(ptr));
@@ -586,11 +576,9 @@ if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   {
     std::free(ptr);
   } // end else
-}
-//#else //commented while converting thr flag
-else
+#else
   bulk::detail::unsafe_on_chip_free(bulk::on_chip_cast(ptr));
-//#endif //commented while converting the flag
+#endif
 } // end unsafe_shfree()
 
 template<typename ConcurrentGroup>

@@ -51,7 +51,7 @@ void TestSetDifferenceByKeyDevice(ExecutionPolicy exec)
 
   thrust::device_vector<iter_pair> end_vec(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(set_difference_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(set_difference_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,
                                         a_key.begin(), a_key.end(),
                                         b_key.begin(), b_key.end(),
                                         a_val.begin(),

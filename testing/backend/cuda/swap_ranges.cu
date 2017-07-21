@@ -23,7 +23,7 @@ void TestSwapRangesDevice(ExecutionPolicy exec)
   Vector v2(5);
   v2[0] = 5; v2[1] = 6; v2[2] = 7; v2[3] = 8; v2[4] = 9;
 
-  hipLaunchKernel(HIP_KERNEL_NAME(swap_ranges_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(swap_ranges_kernel), dim3(1), dim3(1), 0, 0, exec, v1.begin(), v1.end(), v2.begin());
 
   ASSERT_EQUAL(v1[0], 5);
   ASSERT_EQUAL(v1[1], 6);

@@ -48,14 +48,14 @@ namespace detail
 #if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
 template<typename Closure>
 __global__ __launch_bounds__(Closure::context_type::ThreadsPerBlock::value, Closure::context_type::BlocksPerMultiprocessor::value)
-void launch_closure_by_value(hipLaunchParm lp, Closure f)
+void launch_closure_by_value(Closure f)
 {
   f();
 }
 
 template<typename Closure>
 __global__ __launch_bounds__(Closure::context_type::ThreadsPerBlock::value, Closure::context_type::BlocksPerMultiprocessor::value)
-void launch_closure_by_pointer(hipLaunchParm lp, const Closure *f)
+void launch_closure_by_pointer( const Closure *f)
 {
   // copy to registers
   Closure f_reg = *f;
@@ -97,7 +97,7 @@ template<typename Closure,
     {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-      hipLaunchKernel(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
 #else
       // XXX we can't pass parameters with constructors to kernels launched through the triple chevrons in __device__ code
       //     use cudaLaunchDevice directly
@@ -140,7 +140,7 @@ template<typename Closure>
       thrust::detail::temporary_array<Closure,DerivedPolicy> closure_storage(exec, host_tag, &f, &f + 1);
 
       // launch
-      hipLaunchKernel(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), (&closure_storage[0]).get());
+      hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), (&closure_storage[0]).get());
       synchronize_if_enabled("launch_closure_by_pointer");
     }
 #endif // __BULK_HAS_CUDART__

@@ -56,28 +56,28 @@ void TestScanByKeyDevice(ExecutionPolicy exec)
   thrust::device_vector<int> d_output(n);
   
   thrust::inclusive_scan_by_key(h_keys.begin(), h_keys.end(), h_vals.begin(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(inclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan_by_key(h_keys.begin(), h_keys.end(), h_vals.begin(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan_by_key(h_keys.begin(), h_keys.end(), h_vals.begin(), h_output.begin(), 11);
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin(), 11);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_vals.begin(), d_output.begin(), 11);
   ASSERT_EQUAL(d_output, h_output);
   
   // in-place scans
   h_output = h_vals;
   d_output = d_vals;
   thrust::inclusive_scan_by_key(h_keys.begin(), h_keys.end(), h_output.begin(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,d_keys.begin(), d_keys.end(), d_output.begin(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(inclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec,d_keys.begin(), d_keys.end(), d_output.begin(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   h_output = h_vals;
   d_output = d_vals;
   thrust::exclusive_scan_by_key(h_keys.begin(), h_keys.end(), h_output.begin(), h_output.begin(), 11);
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_output.begin(), d_output.begin(), 11);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_by_key_kernel), dim3(1), dim3(1), 0, 0, exec, d_keys.begin(), d_keys.end(), d_output.begin(), d_output.begin(), 11);
   ASSERT_EQUAL(d_output, h_output);
 }
 

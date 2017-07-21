@@ -89,7 +89,7 @@ void TestForEachDeviceSeq(const size_t n)
   
   thrust::for_each(h_input.begin(), h_input.end(), h_f);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.end(), d_f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.end(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -118,7 +118,7 @@ void TestForEachDeviceDevice(const size_t n)
   
   thrust::for_each(h_input.begin(), h_input.end(), h_f);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.end(), d_f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(for_each_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.end(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -155,7 +155,7 @@ void TestForEachNDeviceSeq(const size_t n)
   
   thrust::for_each_n(h_input.begin(), h_input.size(), h_f);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.size(), d_f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::seq, d_input.begin(), d_input.size(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }
@@ -184,7 +184,7 @@ void TestForEachNDeviceDevice(const size_t n)
   
   thrust::for_each_n(h_input.begin(), h_input.size(), h_f);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.size(), d_f);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(for_each_n_kernel), dim3(1), dim3(1), 0, 0, thrust::device, d_input.begin(), d_input.size(), d_f);
   
   ASSERT_EQUAL(h_output, d_output);
 }

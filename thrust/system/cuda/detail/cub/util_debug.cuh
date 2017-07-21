@@ -1,7 +1,6 @@
-#include "hip/hip_runtime.h"
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,33 +54,32 @@ namespace cub {
 
 
 /// CUB error reporting macro (prints error messages to stderr)
-#if (defined(DEBUG) || defined(_DEBUG))
+#if (defined(DEBUG) || defined(_DEBUG)) && !defined(CUB_STDERR)
     #define CUB_STDERR
 #endif
 
 
 
 /**
- * \brief %If \p CUB_STDERR is defined and \p error is not \p hipSuccess, the corresponding error message is printed to \p stderr (or \p stdout in device code) along with the supplied source context.
+ * \brief %If \p CUB_STDERR is defined and \p error is not \p cudaSuccess, the corresponding error message is printed to \p stderr (or \p stdout in device code) along with the supplied source context.
  *
  * \return The CUDA error.
  */
-__host__ __device__ __forceinline__ hipError_t Debug(
-    hipError_t     error,
+__host__ __device__ __forceinline__ cudaError_t Debug(
+    cudaError_t     error,
     const char*     filename,
     int             line)
 {
-    // silence unused parameter warnings
     (void)filename;
     (void)line;
 #ifdef CUB_STDERR
     if (error)
     {
     #if (CUB_PTX_ARCH == 0)
-        fprintf(stderr, "CUDA error %d [%s, %d]: %s\n", error, filename, line, hipGetErrorString(error));
+        fprintf(stderr, "CUDA error %d [%s, %d]: %s\n", error, filename, line, cudaGetErrorString(error));
         fflush(stderr);
     #elif (CUB_PTX_ARCH >= 200)
-        printf("CUDA error %d [block %d, thread %d, %s, %d]\n", error, hipBlockIdx_x, hipThreadIdx_x, filename, line);
+        printf("CUDA error %d [block (%d,%d,%d) thread (%d,%d,%d), %s, %d]\n", error, blockIdx.z, blockIdx.y, blockIdx.x, threadIdx.z, threadIdx.y, threadIdx.x, filename, line);
     #endif
     }
 #endif
@@ -92,22 +90,50 @@ __host__ __device__ __forceinline__ hipError_t Debug(
 /**
  * \brief Debug macro
  */
-#define CubDebug(e) cub::Debug((e), __FILE__, __LINE__)
+#ifndef CubDebug
+    #define CubDebug(e) cub::Debug((e), __FILE__, __LINE__)
+#endif
 
 
 /**
  * \brief Debug macro with exit
  */
-#define CubDebugExit(e) if (cub::Debug((e), __FILE__, __LINE__)) { exit(1); }
+#ifndef CubDebugExit
+    #define CubDebugExit(e) if (cub::Debug((e), __FILE__, __LINE__)) { exit(1); }
+#endif
 
 
 /**
  * \brief Log macro for printf statements.
  */
-#if (CUB_PTX_ARCH == 0)
-    #define CubLog(format, ...) printf(format,__VA_ARGS__);
-#elif (CUB_PTX_ARCH >= 200)
-    #define CubLog(format, ...) printf("[block %d, thread %d]: " format, hipBlockIdx_x, hipThreadIdx_x, __VA_ARGS__);
+#if !defined(_CubLog)
+#if !(defined(__clang__) && defined(__CUDA__))
+    #if (CUB_PTX_ARCH == 0)
+        #define _CubLog(format, ...) printf(format,__VA_ARGS__);
+    #elif (CUB_PTX_ARCH >= 200)
+        #define _CubLog(format, ...) printf("[block (%d,%d,%d), thread (%d,%d,%d)]: " format, blockIdx.z, blockIdx.y, blockIdx.x, threadIdx.z, threadIdx.y, threadIdx.x, __VA_ARGS__);
+    #endif
+#else
+// XXX shameless hack for clang around variadic printf... 
+//     Compilies w/o supplying -std=c++11 but shows warning, 
+//     so we sielence them :)
+#pragma clang diagnostic ignored "-Wc++11-extensions"
+#pragma clang diagnostic ignored "-Wunnamed-type-template-args"
+    template <class... Args>
+    inline __host__ __device__ void va_printf(char const* format, Args const&... args)
+    {
+#ifdef __CUDA_ARCH__
+      printf(format, blockIdx.z, blockIdx.y, blockIdx.x, threadIdx.z, threadIdx.y, threadIdx.x, args...);
+#else
+      printf(format, args...);
+#endif
+    }
+    #ifndef __CUDA_ARCH__
+        #define _CubLog(format, ...) thrust::cuda_cub::cub::va_printf(format,__VA_ARGS__);
+    #else
+        #define _CubLog(format, ...) thrust::cuda_cub::cub::va_printf("[block (%d,%d,%d), thread (%d,%d,%d)]: " format, __VA_ARGS__);
+    #endif
+#endif
 #endif
 
 

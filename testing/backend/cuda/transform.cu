@@ -28,7 +28,7 @@ void TestTransformUnaryDevice(ExecutionPolicy exec)
 
   thrust::device_vector<typename Vector::iterator> iter_vec(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_kernel), dim3(1), dim3(1), 0, 0, exec, input.begin(), input.end(), output.begin(), thrust::negate<T>(), iter_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_kernel), dim3(1), dim3(1), 0, 0, exec, input.begin(), input.end(), output.begin(), thrust::negate<T>(), iter_vec.begin());
   iter = iter_vec[0];
   
   ASSERT_EQUAL(iter - output.begin(), input.size());
@@ -74,7 +74,7 @@ void TestTransformIfUnaryNoStencilDevice(ExecutionPolicy exec)
 
   thrust::device_vector<typename Vector::iterator> iter_vec(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
                                input.begin(), input.end(),
                                output.begin(),
                                thrust::negate<T>(),
@@ -127,7 +127,7 @@ void TestTransformIfUnaryDevice(ExecutionPolicy exec)
 
   thrust::device_vector<typename Vector::iterator> iter_vec(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
                                input.begin(), input.end(),
                                stencil.begin(),
                                output.begin(),
@@ -180,7 +180,7 @@ void TestTransformBinaryDevice(ExecutionPolicy exec)
 
   thrust::device_vector<typename Vector::iterator> iter_vec(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_kernel), dim3(1), dim3(1), 0, 0, exec, input1.begin(), input1.end(), input2.begin(), output.begin(), thrust::minus<T>(), iter_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_kernel), dim3(1), dim3(1), 0, 0, exec, input1.begin(), input1.end(), input2.begin(), output.begin(), thrust::minus<T>(), iter_vec.begin());
   iter = iter_vec[0];
   
   ASSERT_EQUAL(iter - output.begin(), input1.size());
@@ -232,7 +232,7 @@ void TestTransformIfBinaryDevice(ExecutionPolicy exec)
 
   thrust::device_vector<typename Vector::iterator> iter_vec(1);
   
-  hipLaunchKernel(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(transform_if_kernel), dim3(1), dim3(1), 0, 0, exec,
                                input1.begin(), input1.end(),
                                input2.begin(),
                                stencil.begin(),

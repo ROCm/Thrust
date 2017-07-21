@@ -251,16 +251,14 @@ class cuda_task<
           0
       );
 
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_3DGRID__   {
+#if __CUDA_ARCH__ >= 200
       // initialize shared storage
       if(this_grid.this_exec.this_exec.index() == 0)
       {
         bulk::detail::init_on_chip_malloc(this_grid.this_exec.heap_size());
       }
       this_grid.this_exec.wait();
-}
-//#endif //commented while converting the flag
+#endif
 
       super_t::substitute_placeholders_and_execute(this_grid, super_t::c);
 #endif
@@ -308,16 +306,14 @@ class cuda_task<
           0
         );
 
-//#if __CUDA_ARCH__ >= 200 //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if __CUDA_ARCH__ >= 200
       // initialize shared storage
       if(this_block.this_exec.index() == 0)
       {
         bulk::detail::init_on_chip_malloc(this_block.heap_size());
       }
       this_block.wait();
-}
-// #endif //commented while converting the flag
+#endif
 
       super_t::substitute_placeholders_and_execute(this_block, super_t::c);
 #endif

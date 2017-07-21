@@ -39,29 +39,29 @@ void TestScanDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<T> d_output(n);
   
   thrust::inclusive_scan(h_input.begin(), h_input.end(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan(h_input.begin(), h_input.end(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   thrust::exclusive_scan(h_input.begin(), h_input.end(), h_output.begin(), (T) 11);
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), (T) 11);
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_input.begin(), d_input.end(), d_output.begin(), (T) 11);
   ASSERT_EQUAL(d_output, h_output);
   
   // in-place scans
   h_output = h_input;
   d_output = d_input;
   thrust::inclusive_scan(h_output.begin(), h_output.end(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(inclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
   ASSERT_EQUAL(d_output, h_output);
   
   h_output = h_input;
   d_output = d_input;
   
   thrust::exclusive_scan(h_output.begin(), h_output.end(), h_output.begin());
-  hipLaunchKernel(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(exclusive_scan_kernel), dim3(1), dim3(1), 0, 0, exec, d_output.begin(), d_output.end(), d_output.begin());
   
   ASSERT_EQUAL(d_output, h_output);
 }

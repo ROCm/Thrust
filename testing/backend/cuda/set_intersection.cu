@@ -35,7 +35,7 @@ void TestSetIntersectionDevice(ExecutionPolicy exec)
   Vector result(2);
   thrust::device_vector<Iterator> end_vec(1);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(set_intersection_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), b.end(), result.begin(), end_vec.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(set_intersection_kernel), dim3(1), dim3(1), 0, 0, exec, a.begin(), a.end(), b.begin(), b.end(), result.begin(), end_vec.begin());
   Iterator end = end_vec.front();
 
   ASSERT_EQUAL_QUIET(result.end(), end);

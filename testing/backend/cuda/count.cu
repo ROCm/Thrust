@@ -22,7 +22,7 @@ void TestCountDevice(ExecutionPolicy exec, const size_t n)
   
   size_t h_result = thrust::count(h_data.begin(), h_data.end(), T(5));
 
-  hipLaunchKernel(HIP_KERNEL_NAME(count_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), T(5), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(count_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), T(5), d_result.begin());
   
   ASSERT_EQUAL(h_result, d_result[0]);
 }
@@ -68,7 +68,7 @@ void TestCountIfDevice(ExecutionPolicy exec, const size_t n)
   thrust::device_vector<size_t> d_result(1);
   
   size_t h_result = thrust::count_if(h_data.begin(), h_data.end(), greater_than_five<T>());
-  hipLaunchKernel(HIP_KERNEL_NAME(count_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), greater_than_five<T>(), d_result.begin());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(count_if_kernel), dim3(1), dim3(1), 0, 0, exec, d_data.begin(), d_data.end(), greater_than_five<T>(), d_result.begin());
   
   ASSERT_EQUAL(h_result, d_result[0]);
 }
