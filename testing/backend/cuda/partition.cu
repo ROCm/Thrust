@@ -260,7 +260,7 @@ if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
   *is_supported = true;
   *result = thrust::stable_partition(exec, first, last, pred);
 }
-#else  //commented while converting the flags
+//#else  //commented while converting the flags
 else {
   *is_supported = false;
 }

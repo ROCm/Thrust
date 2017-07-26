@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,7 @@
 #include "../../util_type.cuh"
 #include "../../util_macro.cuh"
 #include "../../util_namespace.cuh"
+#include "../../util_debug.cuh"
 
 /// Optional outer namespace(s)
 CUB_NS_PREFIX
@@ -55,9 +56,9 @@ template <
     int         PTX_ARCH>               ///< The PTX compute capability for which to to specialize this collective
 struct WarpReduceShfl
 {
-    //---------------------------------------------------------------------
-    // Constants and type definitions
-    //---------------------------------------------------------------------
+    /******************************************************************************
+     * Constants and type definitions
+     ******************************************************************************/
 
     enum
     {
@@ -75,8 +76,11 @@ struct WarpReduceShfl
     struct IsInteger
     {
         enum {
+            /// Whether the data type is a primitive integer
+            IS_INTEGER = (Traits<S>::CATEGORY == UNSIGNED_INTEGER) || (Traits<S>::CATEGORY == SIGNED_INTEGER),
+
             ///Whether the data type is a small (32b or less) integer for which we can use a single SFHL instruction per exchange
-            IS_SMALL_UNSIGNED = (Traits<S>::CATEGORY == UNSIGNED_INTEGER) && (sizeof(S) <= sizeof(unsigned int))
+            IS_SMALL_INTEGER = IS_INTEGER && (sizeof(S) <= sizeof(unsigned int))
         };
     };
 
@@ -106,40 +110,40 @@ struct WarpReduceShfl
     typedef NullType TempStorage;
 
 
-    //---------------------------------------------------------------------
-    // Thread fields
-    //---------------------------------------------------------------------
+    /******************************************************************************
+     * Thread fields
+     ******************************************************************************/
 
     int lane_id;
 
 
-    //---------------------------------------------------------------------
-    // Construction
-    //---------------------------------------------------------------------
+    /******************************************************************************
+     * Construction
+     ******************************************************************************/
 
     /// Constructor
     __device__ __forceinline__ WarpReduceShfl(
-        TempStorage &/*temp_storage*/)
+        TempStorage &temp_storage)
     :
         lane_id(LaneId())
     {}
 
 
-    //---------------------------------------------------------------------
-    // Reduction steps
-    //---------------------------------------------------------------------
+    /******************************************************************************
+     * Utility methods
+     ******************************************************************************/
 
     /// Reduction (specialized for summation across uint32 types)
     __device__ __forceinline__ unsigned int ReduceStep(
         unsigned int    input,              ///< [in] Calling thread's input item.
-        cub::Sum        /*reduction_op*/,       ///< [in] Binary reduction operator
+        cub::Sum        reduction_op,       ///< [in] Binary reduction operator
         int             last_lane,          ///< [in] Index of last lane in segment
         int             offset)             ///< [in] Up-offset to pull from
     {
         unsigned int output;
 
         // Use predicate set from SHFL to guard against invalid peers
-        asm volatile(
+        asm(
             "{"
             "  .reg .u32 r0;"
             "  .reg .pred p;"
@@ -156,14 +160,14 @@ struct WarpReduceShfl
     /// Reduction (specialized for summation across fp32 types)
     __device__ __forceinline__ float ReduceStep(
         float           input,              ///< [in] Calling thread's input item.
-        cub::Sum        /*reduction_op*/,       ///< [in] Binary reduction operator
+        cub::Sum        reduction_op,       ///< [in] Binary reduction operator
         int             last_lane,          ///< [in] Index of last lane in segment
         int             offset)             ///< [in] Up-offset to pull from
     {
         float output;
 
         // Use predicate set from SHFL to guard against invalid peers
-        asm volatile(
+        asm(
             "{"
             "  .reg .f32 r0;"
             "  .reg .pred p;"
@@ -180,13 +184,13 @@ struct WarpReduceShfl
     /// Reduction (specialized for summation across unsigned long long types)
     __device__ __forceinline__ unsigned long long ReduceStep(
         unsigned long long  input,              ///< [in] Calling thread's input item.
-        cub::Sum            /*reduction_op*/,       ///< [in] Binary reduction operator
+        cub::Sum            reduction_op,       ///< [in] Binary reduction operator
         int                 last_lane,          ///< [in] Index of last lane in segment
         int                 offset)             ///< [in] Up-offset to pull from
     {
         unsigned long long output;
 
-        asm volatile(
+        asm(
             "{"
             "  .reg .u32 lo;"
             "  .reg .u32 hi;"
@@ -206,14 +210,14 @@ struct WarpReduceShfl
     /// Reduction (specialized for summation across long long types)
     __device__ __forceinline__ long long ReduceStep(
         long long           input,              ///< [in] Calling thread's input item.
-        cub::Sum            /*reduction_op*/,       ///< [in] Binary reduction operator
+        cub::Sum            reduction_op,       ///< [in] Binary reduction operator
         int                 last_lane,          ///< [in] Index of last lane in segment
         int                 offset)             ///< [in] Up-offset to pull from
     {
         long long output;
 
         // Use predicate set from SHFL to guard against invalid peers
-        asm volatile(
+        asm(
             "{"
             "  .reg .u32 lo;"
             "  .reg .u32 hi;"
@@ -233,25 +237,23 @@ struct WarpReduceShfl
     /// Reduction (specialized for summation across double types)
     __device__ __forceinline__ double ReduceStep(
         double              input,              ///< [in] Calling thread's input item.
-        cub::Sum            /*reduction_op*/,       ///< [in] Binary reduction operator
+        cub::Sum            reduction_op,       ///< [in] Binary reduction operator
         int                 last_lane,          ///< [in] Index of last lane in segment
         int                 offset)             ///< [in] Up-offset to pull from
     {
         double output;
 
         // Use predicate set from SHFL to guard against invalid peers
-        asm volatile(
+        asm(
             "{"
             "  .reg .u32 lo;"
             "  .reg .u32 hi;"
             "  .reg .pred p;"
-            "  .reg .f64 r0;"
-            "  mov.b64 %0, %1;"
             "  mov.b64 {lo, hi}, %1;"
             "  shfl.down.b32 lo|p, lo, %2, %3;"
             "  shfl.down.b32 hi|p, hi, %2, %3;"
-            "  mov.b64 r0, {lo, hi};"
-            "  @p add.f64 %0, %0, r0;"
+            "  mov.b64 %0, {lo, hi};"
+            "  @p add.f64 %0, %0, %1;"
             "}"
             : "=d"(output) : "d"(input), "r"(offset), "r"(last_lane));
 
@@ -259,48 +261,23 @@ struct WarpReduceShfl
     }
 
 
-    /// Reduction (specialized for swizzled ReduceByKeyOp<cub::Sum> across KeyValuePair<KeyT, ValueT> types)
-    template <typename ValueT, typename KeyT>
-    __device__ __forceinline__ KeyValuePair<KeyT, ValueT> ReduceStep(
-        KeyValuePair<KeyT, ValueT>                  input,              ///< [in] Calling thread's input item.
-        SwizzleScanOp<ReduceByKeyOp<cub::Sum> >     /*reduction_op*/,       ///< [in] Binary reduction operator
-        int                                         last_lane,          ///< [in] Index of last lane in segment
-        int                                         offset)             ///< [in] Up-offset to pull from
+    /// Reduction (specialized for ReduceBySegmentOp<cub::Sum> across ItemOffsetPair<Value, Offset> types)
+    template <typename Value, typename Offset>
+    __device__ __forceinline__ ItemOffsetPair<Value, Offset> ReduceStep(
+        ItemOffsetPair<Value, Offset>                                   input,              ///< [in] Calling thread's input item.
+        ReduceBySegmentOp<cub::Sum, ItemOffsetPair<Value, Offset> >     reduction_op,       ///< [in] Binary reduction operator
+        int                                                             last_lane,          ///< [in] Index of last lane in segment
+        int                                                             offset)             ///< [in] Up-offset to pull from
     {
-        KeyValuePair<KeyT, ValueT> output;
+        ItemOffsetPair<Value, Offset> output;
 
-        KeyT other_key = ShuffleDown(input.key, offset, last_lane);
-        
-        output.key = input.key;
-        output.value = ReduceStep(
-            input.value, 
-            cub::Sum(), 
-            last_lane, 
-            offset, 
-            Int2Type<IsInteger<ValueT>::IS_SMALL_UNSIGNED>());
+        output.value = ReduceStep(input.value, cub::Sum(), last_lane, offset, Int2Type<IsInteger<Value>::IS_SMALL_INTEGER>());
+        output.offset = ReduceStep(input.offset, cub::Sum(), last_lane, offset, Int2Type<IsInteger<Offset>::IS_SMALL_INTEGER>());
 
-        if (input.key != other_key)
-            output.value = input.value;
+//        int last_value_lane = (input.offset > 0) ? 0 : last_lane;
+//        output.value = ReduceStep(input.value, cub::Sum(), last_value_lane, offset, Int2Type<IsInteger<Value>::IS_SMALL_INTEGER>());
 
-        return output;
-    }
-
-
-
-    /// Reduction (specialized for swizzled ReduceBySegmentOp<cub::Sum> across KeyValuePair<OffsetT, ValueT> types)
-    template <typename ValueT, typename OffsetT>
-    __device__ __forceinline__ KeyValuePair<OffsetT, ValueT> ReduceStep(
-        KeyValuePair<OffsetT, ValueT>                 input,              ///< [in] Calling thread's input item.
-        SwizzleScanOp<ReduceBySegmentOp<cub::Sum> >   /*reduction_op*/,       ///< [in] Binary reduction operator
-        int                                           last_lane,          ///< [in] Index of last lane in segment
-        int                                           offset)             ///< [in] Up-offset to pull from
-    {
-        KeyValuePair<OffsetT, ValueT> output;
-
-        output.value = ReduceStep(input.value, cub::Sum(), last_lane, offset, Int2Type<IsInteger<ValueT>::IS_SMALL_UNSIGNED>());
-        output.key = ReduceStep(input.key, cub::Sum(), last_lane, offset, Int2Type<IsInteger<OffsetT>::IS_SMALL_UNSIGNED>());
-
-        if (input.key > 0)
+        if (input.offset > 0)
             output.value = input.value;
 
         return output;
@@ -315,75 +292,50 @@ struct WarpReduceShfl
         int                 last_lane,          ///< [in] Index of last lane in segment
         int                 offset)             ///< [in] Up-offset to pull from
     {
-        _T output = input;
+        T output = input;
 
-        _T temp = ShuffleDown(output, offset);
+        T temp = ShuffleDown(output, offset);
 
         // Perform reduction op if valid
-        if (offset + lane_id <= last_lane)
-            output = reduction_op(input, temp);
+        if (offset <= last_lane - lane_id)
+            output = reduction_op(temp, output);
 
         return output;
     }
 
 
-    /// Reduction step (specialized for small unsigned integers size 32b or less)
+    /// Reduction step (specialized for small integers size 32b or less)
     template <typename _T, typename ReductionOp>
     __device__ __forceinline__ _T ReduceStep(
         _T              input,              ///< [in] Calling thread's input item.
         ReductionOp     reduction_op,       ///< [in] Binary reduction operator
         int             last_lane,          ///< [in] Index of last lane in segment
         int             offset,             ///< [in] Up-offset to pull from
-        Int2Type<true>  /*is_small_unsigned*/)  ///< [in] Marker type indicating whether T is a small unsigned integer
+        Int2Type<true>  is_small_integer)   ///< [in] Marker type indicating whether T is a small integer
     {
-        // Recast as uint32 to take advantage of any specializations
         unsigned int temp = reinterpret_cast<unsigned int &>(input);
+
         temp = ReduceStep(temp, reduction_op, last_lane, offset);
+
         return reinterpret_cast<_T&>(temp);
     }
 
-
-    /// Reduction step (specialized for types other than small unsigned integers size 32b or less)
+    /// Reduction step (specialized for types other than small integers size 32b or less)
     template <typename _T, typename ReductionOp>
     __device__ __forceinline__ _T ReduceStep(
         _T              input,              ///< [in] Calling thread's input item.
         ReductionOp     reduction_op,       ///< [in] Binary reduction operator
         int             last_lane,          ///< [in] Index of last lane in segment
         int             offset,             ///< [in] Up-offset to pull from
-        Int2Type<false> /*is_small_unsigned*/)  ///< [in] Marker type indicating whether T is a small unsigned integer
+        Int2Type<false> is_small_integer)   ///< [in] Marker type indicating whether T is a small integer
     {
         return ReduceStep(input, reduction_op, last_lane, offset);
     }
 
 
-    //---------------------------------------------------------------------
-    // Templated inclusive scan iteration
-    //---------------------------------------------------------------------
-
-    template <typename ReductionOp, int STEP>
-    __device__ __forceinline__ void ReduceStep(
-        T&              input,              ///< [in] Calling thread's input item.
-        ReductionOp     reduction_op,       ///< [in] Binary reduction operator
-        int             last_lane,          ///< [in] Index of last lane in segment
-        Int2Type<STEP>  /*step*/)
-    {
-        input = ReduceStep(input, reduction_op, last_lane, 1 << STEP, Int2Type<IsInteger<T>::IS_SMALL_UNSIGNED>());
-
-        ReduceStep(input, reduction_op, last_lane, Int2Type<STEP + 1>());
-    }
-
-    template <typename ReductionOp>
-    __device__ __forceinline__ void ReduceStep(
-        T&              /*input*/,              ///< [in] Calling thread's input item.
-        ReductionOp     /*reduction_op*/,       ///< [in] Binary reduction operator
-        int             /*last_lane*/,          ///< [in] Index of last lane in segment
-        Int2Type<STEPS> /*step*/)
-    {}
-
-
-    //---------------------------------------------------------------------
-    // Reduction operations
-    //---------------------------------------------------------------------
+    /******************************************************************************
+     * Interface
+     ******************************************************************************/
 
     /// Reduction
     template <
@@ -414,15 +366,12 @@ struct WarpReduceShfl
 
         T output = input;
 
-/*
         // Iterate reduction steps
         #pragma unroll
         for (int STEP = 0; STEP < STEPS; STEP++)
         {
-            output = ReduceStep(output, reduction_op, last_lane, 1 << STEP, Int2Type<IsInteger<T>::IS_SMALL_UNSIGNED>());
+            output = ReduceStep(output, reduction_op, last_lane, 1 << STEP, Int2Type<IsInteger<T>::IS_SMALL_INTEGER>());
         }
-*/
-        ReduceStep(output, reduction_op, last_lane, Int2Type<0>());
 
         return output;
     }
@@ -431,11 +380,11 @@ struct WarpReduceShfl
     /// Segmented reduction
     template <
         bool            HEAD_SEGMENTED,     ///< Whether flags indicate a segment-head or a segment-tail
-        typename        FlagT,
+        typename        Flag,
         typename        ReductionOp>
     __device__ __forceinline__ T SegmentedReduce(
         T               input,              ///< [in] Calling thread's input
-        FlagT           flag,               ///< [in] Whether or not the current lane is a segment head/tail
+        Flag            flag,               ///< [in] Whether or not the current lane is a segment head/tail
         ReductionOp     reduction_op)       ///< [in] Binary reduction operator
     {
         // Get the start flags for each thread in the warp.
@@ -454,15 +403,13 @@ struct WarpReduceShfl
         int last_lane = __clz(__brev(warp_flags));
 
         T output = input;
-/*
+
         // Iterate reduction steps
         #pragma unroll
         for (int STEP = 0; STEP < STEPS; STEP++)
         {
-            output = ReduceStep(output, reduction_op, last_lane, 1 << STEP, Int2Type<IsInteger<T>::IS_SMALL_UNSIGNED>());
+            output = ReduceStep(output, reduction_op, last_lane, 1 << STEP, Int2Type<IsInteger<T>::IS_SMALL_INTEGER>());
         }
-*/
-        ReduceStep(output, reduction_op, last_lane, Int2Type<0>());
 
         return output;
     }

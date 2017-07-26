@@ -39,18 +39,12 @@ inline __device__ unsigned int __isShared(const void *ptr)
                 "    selp.u32 %0, 1, 0, p;  \n\t"
 #  if (defined(_MSC_VER) && defined(_WIN64)) || defined(__LP64__)
                 "} \n\t" : "=r"(ret) : "l"(ptr));
-
-#  else 
-
+#  else
                 "} \n\t" : "=r"(ret) : "r"(ptr));
-
-
-#  endif 
-
- #else //commented while converting the flags
+#  endif
+#else
   ret = 0;
-#endif //commented while converting the flag
-
+#endif
 
   return ret;
 } // end __isShared()
@@ -69,10 +63,9 @@ inline __device__ bool is_global(const void *ptr)
 
 #if __CUDA_ARCH__ >= 200
   return __isGlobal(ptr);
-#else //commented while converting the flag
-//else*/ //commented as __isGlobal() is undefined 
+#else
   return false;
-#endif //commented while converting the flag
+#endif
 } // end is_global()
 
 

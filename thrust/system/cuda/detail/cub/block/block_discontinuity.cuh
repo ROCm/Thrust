@@ -1,6 +1,7 @@
+#include "hip/hip_runtime.h"
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -146,7 +147,7 @@ private:
     struct ApplyOp
     {
         // Apply flag operator
-        static __device__ __forceinline__ bool FlagT(FlagOp flag_op, const T &a, const T &b, int idx)
+        static __device__ __forceinline__ bool Flag(FlagOp flag_op, const T &a, const T &b, int idx)
         {
             return flag_op(a, b, idx);
         }
@@ -157,7 +158,7 @@ private:
     struct ApplyOp<FlagOp, false>
     {
         // Apply flag operator
-        static __device__ __forceinline__ bool FlagT(FlagOp flag_op, const T &a, const T &b, int /*idx*/)
+        static __device__ __forceinline__ bool Flag(FlagOp flag_op, const T &a, const T &b, int idx)
         {
             return flag_op(a, b);
         }
@@ -176,18 +177,15 @@ private:
             int                     linear_tid,
             FlagT                   (&flags)[ITEMS_PER_THREAD],         ///< [out] Calling thread's discontinuity head_flags
             T                       (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
-            T                       (&preds)[ITEMS_PER_THREAD],         ///< [out] Calling thread's predecessor items
             FlagOp                  flag_op)                            ///< [in] Binary boolean flag predicate
         {
-            preds[ITERATION] = input[ITERATION - 1];
-
-            flags[ITERATION] = ApplyOp<FlagOp>::FlagT(
+            flags[ITERATION] = ApplyOp<FlagOp>::Flag(
                 flag_op,
-                preds[ITERATION],
+                input[ITERATION - 1],
                 input[ITERATION],
                 (linear_tid * ITEMS_PER_THREAD) + ITERATION);
 
-            Iterate<ITERATION + 1, MAX_ITERATIONS>::FlagHeads(linear_tid, flags, input, preds, flag_op);
+            Iterate<ITERATION + 1, MAX_ITERATIONS>::FlagHeads(linear_tid, flags, input, flag_op);
         }
 
         // Tail flags
@@ -201,11 +199,11 @@ private:
             T                       (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
             FlagOp                  flag_op)                            ///< [in] Binary boolean flag predicate
         {
-            flags[ITERATION] = ApplyOp<FlagOp>::FlagT(
+            flags[ITERATION] = ApplyOp<FlagOp>::Flag(
                 flag_op,
                 input[ITERATION],
                 input[ITERATION + 1],
-                (linear_tid * ITEMS_PER_THREAD) + ITERATION + 1);
+                (linear_tid * ITEMS_PER_THREAD) + ITERATION);
 
             Iterate<ITERATION + 1, MAX_ITERATIONS>::FlagTails(linear_tid, flags, input, flag_op);
         }
@@ -222,11 +220,10 @@ private:
             typename        FlagT,
             typename        FlagOp>
         static __device__ __forceinline__ void FlagHeads(
-            int                     /*linear_tid*/,
-            FlagT                   (&/*flags*/)[ITEMS_PER_THREAD],         ///< [out] Calling thread's discontinuity head_flags
-            T                       (&/*input*/)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
-            T                       (&/*preds*/)[ITEMS_PER_THREAD],         ///< [out] Calling thread's predecessor items
-            FlagOp                  /*flag_op*/)                            ///< [in] Binary boolean flag predicate
+            int                     linear_tid,
+            FlagT                   (&flags)[ITEMS_PER_THREAD],         ///< [out] Calling thread's discontinuity head_flags
+            T                       (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
+            FlagOp                  flag_op)                            ///< [in] Binary boolean flag predicate
         {}
 
         // Tail flags
@@ -235,10 +232,10 @@ private:
             typename        FlagT,
             typename        FlagOp>
         static __device__ __forceinline__ void FlagTails(
-            int                     /*linear_tid*/,
-            FlagT                   (&/*flags*/)[ITEMS_PER_THREAD],         ///< [out] Calling thread's discontinuity head_flags
-            T                       (&/*input*/)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
-            FlagOp                  /*flag_op*/)                            ///< [in] Binary boolean flag predicate
+            int                     linear_tid,
+            FlagT                   (&flags)[ITEMS_PER_THREAD],         ///< [out] Calling thread's discontinuity head_flags
+            T                       (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
+            FlagOp                  flag_op)                            ///< [in] Binary boolean flag predicate
         {}
     };
 
@@ -251,7 +248,7 @@ private:
     _TempStorage &temp_storage;
 
     /// Linear thread-id
-    unsigned int linear_tid;
+    int linear_tid;
 
 
 public:
@@ -291,68 +288,6 @@ public:
      * \name Head flag operations
      *********************************************************************/
     //@{
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS    // Do not document
-
-    template <
-        int             ITEMS_PER_THREAD,
-        typename        FlagT,
-        typename        FlagOp>
-    __device__ __forceinline__ void FlagHeads(
-        FlagT           (&head_flags)[ITEMS_PER_THREAD],    ///< [out] Calling thread's discontinuity head_flags
-        T               (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
-        T               (&preds)[ITEMS_PER_THREAD],         ///< [out] Calling thread's predecessor items
-        FlagOp          flag_op)                            ///< [in] Binary boolean flag predicate
-    {
-        // Share last item
-        temp_storage.last_items[linear_tid] = input[ITEMS_PER_THREAD - 1];
-
-        __syncthreads();
-
-        if (linear_tid == 0)
-        {
-            // Set flag for first thread-item (preds[0] is undefined)
-            head_flags[0] = 1;
-        }
-        else
-        {
-            preds[0] = temp_storage.last_items[linear_tid - 1];
-            head_flags[0] = ApplyOp<FlagOp>::FlagT(flag_op, preds[0], input[0], linear_tid * ITEMS_PER_THREAD);
-        }
-
-        // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
-    }
-
-    template <
-        int             ITEMS_PER_THREAD,
-        typename        FlagT,
-        typename        FlagOp>
-    __device__ __forceinline__ void FlagHeads(
-        FlagT           (&head_flags)[ITEMS_PER_THREAD],    ///< [out] Calling thread's discontinuity head_flags
-        T               (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
-        T               (&preds)[ITEMS_PER_THREAD],         ///< [out] Calling thread's predecessor items
-        FlagOp          flag_op,                            ///< [in] Binary boolean flag predicate
-        T               tile_predecessor_item)              ///< [in] <b>[<em>thread</em><sub>0</sub> only]</b> Item with which to compare the first tile item (<tt>input<sub>0</sub></tt> from <em>thread</em><sub>0</sub>).
-    {
-        // Share last item
-        temp_storage.last_items[linear_tid] = input[ITEMS_PER_THREAD - 1];
-
-        __syncthreads();
-
-        // Set flag for first thread-item
-        preds[0] = (linear_tid == 0) ?
-            tile_predecessor_item :              // First thread
-            temp_storage.last_items[linear_tid - 1];
-
-        head_flags[0] = ApplyOp<FlagOp>::FlagT(flag_op, preds[0], input[0], linear_tid * ITEMS_PER_THREAD);
-
-        // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
-    }
-
-#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
     /**
@@ -413,8 +348,22 @@ public:
         T               (&input)[ITEMS_PER_THREAD],         ///< [in] Calling thread's input items
         FlagOp          flag_op)                            ///< [in] Binary boolean flag predicate
     {
-        T preds[ITEMS_PER_THREAD];
-        FlagHeads(head_flags, input, preds, flag_op);
+        // Share last item
+        temp_storage.last_items[linear_tid] = input[ITEMS_PER_THREAD - 1];
+
+        __syncthreads();
+
+        // Set flag for first thread-item
+        head_flags[0] = (linear_tid == 0) ?
+            1 :                                 // First thread
+            ApplyOp<FlagOp>::Flag(
+                flag_op,
+                temp_storage.last_items[linear_tid - 1],
+                input[0],
+                linear_tid * ITEMS_PER_THREAD);
+
+        // Set head_flags for remaining items
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
     }
 
 
@@ -455,7 +404,7 @@ public:
      *
      *     // Have thread0 obtain the predecessor item for the entire tile
      *     int tile_predecessor_item;
-     *     if (threadIdx.x == 0) tile_predecessor_item == ...
+     *     if (hipThreadIdx_x == 0) tile_predecessor_item == ...
      *
      *     // Collectively compute head flags for discontinuities in the segment
      *     int head_flags[4];
@@ -483,10 +432,25 @@ public:
         FlagOp          flag_op,                            ///< [in] Binary boolean flag predicate
         T               tile_predecessor_item)              ///< [in] <b>[<em>thread</em><sub>0</sub> only]</b> Item with which to compare the first tile item (<tt>input<sub>0</sub></tt> from <em>thread</em><sub>0</sub>).
     {
-        T preds[ITEMS_PER_THREAD];
-        FlagHeads(head_flags, input, preds, flag_op, tile_predecessor_item);
-    }
+        // Share last item
+        temp_storage.last_items[linear_tid] = input[ITEMS_PER_THREAD - 1];
 
+        __syncthreads();
+
+        // Set flag for first thread-item
+        T predecessor_item = (linear_tid == 0) ?
+            tile_predecessor_item :              // First thread
+            temp_storage.last_items[linear_tid - 1];
+
+        head_flags[0] = ApplyOp<FlagOp>::Flag(
+            flag_op,
+            predecessor_item,
+            input[0],
+            linear_tid * ITEMS_PER_THREAD);
+
+        // Set head_flags for remaining items
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
+    }
 
 
     //@}  end member group
@@ -563,11 +527,11 @@ public:
         // Set flag for last thread-item
         tail_flags[ITEMS_PER_THREAD - 1] = (linear_tid == BLOCK_THREADS - 1) ?
             1 :                             // Last thread
-            ApplyOp<FlagOp>::FlagT(
+            ApplyOp<FlagOp>::Flag(
                 flag_op,
                 input[ITEMS_PER_THREAD - 1],
                 temp_storage.first_items[linear_tid + 1],
-                (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+                (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);
@@ -612,7 +576,7 @@ public:
      *
      *     // Have thread127 obtain the successor item for the entire tile
      *     int tile_successor_item;
-     *     if (threadIdx.x == 127) tile_successor_item == ...
+     *     if (hipThreadIdx_x == 127) tile_successor_item == ...
      *
      *     // Collectively compute tail flags for discontinuities in the segment
      *     int tail_flags[4];
@@ -650,11 +614,11 @@ public:
             tile_successor_item :              // Last thread
             temp_storage.first_items[linear_tid + 1];
 
-        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::FlagT(
+        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::Flag(
             flag_op,
             input[ITEMS_PER_THREAD - 1],
             successor_item,
-            (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+            (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);
@@ -744,35 +708,26 @@ public:
 
         __syncthreads();
 
-        T preds[ITEMS_PER_THREAD];
-
         // Set flag for first thread-item
-        preds[0] = temp_storage.last_items[linear_tid - 1];
-        if (linear_tid == 0)
-        {
-            head_flags[0] = 1;
-        }
-        else
-        {
-            head_flags[0] = ApplyOp<FlagOp>::FlagT(
+        head_flags[0] = (linear_tid == 0) ?
+            1 :                                 // First thread
+            ApplyOp<FlagOp>::Flag(
                 flag_op,
-                preds[0],
+                temp_storage.last_items[linear_tid - 1],
                 input[0],
                 linear_tid * ITEMS_PER_THREAD);
-        }
-
 
         // Set flag for last thread-item
         tail_flags[ITEMS_PER_THREAD - 1] = (linear_tid == BLOCK_THREADS - 1) ?
             1 :                             // Last thread
-            ApplyOp<FlagOp>::FlagT(
+            ApplyOp<FlagOp>::Flag(
                 flag_op,
                 input[ITEMS_PER_THREAD - 1],
                 temp_storage.first_items[linear_tid + 1],
-                (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+                (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);
@@ -823,7 +778,7 @@ public:
      *
      *     // Have thread127 obtain the successor item for the entire tile
      *     int tile_successor_item;
-     *     if (threadIdx.x == 127) tile_successor_item == ...
+     *     if (hipThreadIdx_x == 127) tile_successor_item == ...
      *
      *     // Collectively compute head and flags for discontinuities in the segment
      *     int head_flags[4];
@@ -861,36 +816,28 @@ public:
 
         __syncthreads();
 
-        T preds[ITEMS_PER_THREAD];
-
         // Set flag for first thread-item
-        if (linear_tid == 0)
-        {
-            head_flags[0] = 1;
-        }
-        else
-        {
-            preds[0] = temp_storage.last_items[linear_tid - 1];
-            head_flags[0] = ApplyOp<FlagOp>::FlagT(
+        head_flags[0] = (linear_tid == 0) ?
+            1 :                                 // First thread
+            ApplyOp<FlagOp>::Flag(
                 flag_op,
-                preds[0],
+                temp_storage.last_items[linear_tid - 1],
                 input[0],
                 linear_tid * ITEMS_PER_THREAD);
-        }
 
         // Set flag for last thread-item
         T successor_item = (linear_tid == BLOCK_THREADS - 1) ?
             tile_successor_item :              // Last thread
             temp_storage.first_items[linear_tid + 1];
 
-        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::FlagT(
+        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::Flag(
             flag_op,
             input[ITEMS_PER_THREAD - 1],
             successor_item,
-            (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+            (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);
@@ -941,11 +888,11 @@ public:
      *
      *     // Have thread0 obtain the predecessor item for the entire tile
      *     int tile_predecessor_item;
-     *     if (threadIdx.x == 0) tile_predecessor_item == ...
+     *     if (hipThreadIdx_x == 0) tile_predecessor_item == ...
      *
      *     // Have thread127 obtain the successor item for the entire tile
      *     int tile_successor_item;
-     *     if (threadIdx.x == 127) tile_successor_item == ...
+     *     if (hipThreadIdx_x == 127) tile_successor_item == ...
      *
      *     // Collectively compute head and flags for discontinuities in the segment
      *     int head_flags[4];
@@ -985,30 +932,28 @@ public:
 
         __syncthreads();
 
-        T preds[ITEMS_PER_THREAD];
-
         // Set flag for first thread-item
-        preds[0] = (linear_tid == 0) ?
+        T predecessor_item = (linear_tid == 0) ?
             tile_predecessor_item :              // First thread
             temp_storage.last_items[linear_tid - 1];
 
-        head_flags[0] = ApplyOp<FlagOp>::FlagT(
+        head_flags[0] = ApplyOp<FlagOp>::Flag(
             flag_op,
-            preds[0],
+            predecessor_item,
             input[0],
             linear_tid * ITEMS_PER_THREAD);
 
         // Set flag for last thread-item
         tail_flags[ITEMS_PER_THREAD - 1] = (linear_tid == BLOCK_THREADS - 1) ?
             1 :                             // Last thread
-            ApplyOp<FlagOp>::FlagT(
+            ApplyOp<FlagOp>::Flag(
                 flag_op,
                 input[ITEMS_PER_THREAD - 1],
                 temp_storage.first_items[linear_tid + 1],
-                (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+                (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);
@@ -1060,11 +1005,11 @@ public:
      *
      *     // Have thread0 obtain the predecessor item for the entire tile
      *     int tile_predecessor_item;
-     *     if (threadIdx.x == 0) tile_predecessor_item == ...
+     *     if (hipThreadIdx_x == 0) tile_predecessor_item == ...
      *
      *     // Have thread127 obtain the successor item for the entire tile
      *     int tile_successor_item;
-     *     if (threadIdx.x == 127) tile_successor_item == ...
+     *     if (hipThreadIdx_x == 127) tile_successor_item == ...
      *
      *     // Collectively compute head and flags for discontinuities in the segment
      *     int head_flags[4];
@@ -1105,16 +1050,14 @@ public:
 
         __syncthreads();
 
-        T preds[ITEMS_PER_THREAD];
-
         // Set flag for first thread-item
-        preds[0] = (linear_tid == 0) ?
+        T predecessor_item = (linear_tid == 0) ?
             tile_predecessor_item :              // First thread
             temp_storage.last_items[linear_tid - 1];
 
-        head_flags[0] = ApplyOp<FlagOp>::FlagT(
+        head_flags[0] = ApplyOp<FlagOp>::Flag(
             flag_op,
-            preds[0],
+            predecessor_item,
             input[0],
             linear_tid * ITEMS_PER_THREAD);
 
@@ -1123,14 +1066,14 @@ public:
             tile_successor_item :              // Last thread
             temp_storage.first_items[linear_tid + 1];
 
-        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::FlagT(
+        tail_flags[ITEMS_PER_THREAD - 1] = ApplyOp<FlagOp>::Flag(
             flag_op,
             input[ITEMS_PER_THREAD - 1],
             successor_item,
-            (linear_tid * ITEMS_PER_THREAD) + ITEMS_PER_THREAD);
+            (linear_tid * ITEMS_PER_THREAD) + (ITEMS_PER_THREAD - 1));
 
         // Set head_flags for remaining items
-        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, preds, flag_op);
+        Iterate<1, ITEMS_PER_THREAD>::FlagHeads(linear_tid, head_flags, input, flag_op);
 
         // Set tail_flags for remaining items
         Iterate<0, ITEMS_PER_THREAD - 1>::FlagTails(linear_tid, tail_flags, input, flag_op);

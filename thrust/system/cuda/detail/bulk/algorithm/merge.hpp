@@ -554,8 +554,7 @@ merge_by_key(bulk::bounded<
   // copy keys into stage
   bulk::copy_n(g,
                thrust::detail::make_join_iterator(keys_first1, n1, keys_first2),
-               n,
-               stage.keys);
+               n,stage.keys);
 
   // find the start of each agent's sequential merge
   size_type diag = thrust::min<size_type>(n1 + n2, grainsize * g.this_exec.index());

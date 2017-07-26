@@ -40,7 +40,6 @@ __host__ __device__
                          UnaryFunction f)
 {
   using thrust::system::detail::generic::for_each;
-
   return for_each(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), first, last, f);
 }
 
@@ -68,7 +67,6 @@ __host__ __device__
 {
   #ifdef __HIP_PLATFORM_NVCC__
   using thrust::system::detail::generic::for_each_n;
-
   return for_each_n(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), first, n, f);
  #else
   return thrust::system::detail::generic::for_each_n(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), first, n, f);

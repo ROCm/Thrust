@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,6 @@
 
 #include "../util_macro.cuh"
 #include "../util_arch.cuh"
-#include "../util_type.cuh"
 #include "../util_namespace.cuh"
 
 /// Optional outer namespace(s)
@@ -107,10 +106,7 @@ struct BlockRakingLayout
     /**
      * \brief Shared memory storage type
      */
-    struct __align__(16) _TempStorage
-    {
-        T buff[BlockRakingLayout::GRID_ELEMENTS];
-    };
+    typedef T _TempStorage[BlockRakingLayout::GRID_ELEMENTS];
 
     /// Alias wrapper allowing storage to be unioned
     struct TempStorage : Uninitialized<_TempStorage> {};
@@ -121,7 +117,7 @@ struct BlockRakingLayout
      */
     static __device__ __forceinline__ T* PlacementPtr(
         TempStorage &temp_storage,
-        unsigned int linear_tid)
+        int linear_tid)
     {
         // Offset for partial
         unsigned int offset = linear_tid;
@@ -133,7 +129,7 @@ struct BlockRakingLayout
         }
 
         // Incorporating a block of padding partials every shared memory segment
-        return temp_storage.Alias().buff + offset;
+        return temp_storage.Alias() + offset;
     }
 
 
@@ -142,9 +138,9 @@ struct BlockRakingLayout
      */
     static __device__ __forceinline__ T* RakingPtr(
         TempStorage &temp_storage,
-        unsigned int linear_tid)
+        int linear_tid)
     {
-        return temp_storage.Alias().buff + (linear_tid * (SEGMENT_LENGTH + SEGMENT_PADDING));
+        return temp_storage.Alias() + (linear_tid * (SEGMENT_LENGTH + SEGMENT_PADDING));
     }
 };
 

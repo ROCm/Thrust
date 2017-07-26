@@ -1,7 +1,7 @@
 
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@
 
 /**
  * \file
- * cub::DeviceScan provides device-wide, parallel operations for computing a prefix scan across a sequence of data items residing within device-accessible memory.
+ * cub::DeviceScan provides device-wide, parallel operations for computing a prefix scan across a sequence of data items residing within global memory.
  */
 
 #pragma once
@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include <iterator>
 
-#include "dispatch/dispatch_scan.cuh"
+#include "dispatch/device_scan_dispatch.cuh"
 #include "../util_namespace.cuh"
 
 /// Optional outer namespace(s)
@@ -48,8 +48,8 @@ namespace cub {
 
 
 /**
- * \brief DeviceScan provides device-wide, parallel operations for computing a prefix scan across a sequence of data items residing within device-accessible memory. ![](device_scan.png)
- * \ingroup SingleModule
+ * \brief DeviceScan provides device-wide, parallel operations for computing a prefix scan across a sequence of data items residing within global memory. ![](device_scan.png)
+ * \ingroup DeviceModule
  *
  * \par Overview
  * Given a sequence of input elements and a binary reduction operator, a [<em>prefix scan</em>](http://en.wikipedia.org/wiki/Prefix_sum)
@@ -59,18 +59,6 @@ namespace cub {
  * that the <em>i</em><sup>th</sup> output reduction incorporates the <em>i</em><sup>th</sup> input.
  * The term \em exclusive indicates the <em>i</em><sup>th</sup> input is not incorporated into
  * the <em>i</em><sup>th</sup> output reduction.
- *
- * \par
- * As of CUB 1.0.1 (2013), CUB's device-wide scan APIs have implemented our <em>"decoupled look-back"</em> algorithm
- * for performing global prefix scan with only a single pass through the
- * input data, as described in our 2016 technical report [1].  The central
- * idea is to leverage a small, constant factor of redundant work in order to overlap the latencies
- * of global prefix propagation with local computation.  As such, our algorithm requires only
- * ~2<em>n</em> data movement (<em>n</em> inputs are read, <em>n</em> outputs are written), and typically
- * proceeds at "memcpy" speeds.
- *
- * \par
- * [1] [Duane Merrill and Michael Garland.  "Single-pass Parallel Prefix Scan with Decoupled Look-back", <em>NVIDIA Technical Report NVR-2016-002</em>, 2016.](https://research.nvidia.com/publication/single-pass-parallel-prefix-scan-decoupled-look-back)
  *
  * \par Usage Considerations
  * \cdp_class{DeviceScan}
@@ -94,11 +82,12 @@ struct DeviceScan
     //@{
 
     /**
-     * \brief Computes a device-wide exclusive prefix sum.  The value of 0 is applied as the initial value, and is assigned to *d_out.
+     * \brief Computes a device-wide exclusive prefix sum.
      *
      * \par
      * - Supports non-commutative sum operators.
      * - \devicestorage
+     * - \cdp
      *
      * \par Performance
      * The following charts illustrate saturated exclusive sum performance across different
@@ -113,7 +102,7 @@ struct DeviceScan
      * \code
      * #include <cub/cub.cuh>   // or equivalently <cub/device/device_scan.cuh>
      *
-     * // Declare, allocate, and initialize device-accessible pointers for input and output
+     * // Declare, allocate, and initialize device pointers for input and output
      * int  num_items;      // e.g., 7
      * int  *d_in;          // e.g., [8, 6, 7, 5, 3, 0, 9]
      * int  *d_out;         // e.g., [ ,  ,  ,  ,  ,  ,  ]
@@ -125,7 +114,7 @@ struct DeviceScan
      * cub::DeviceScan::ExclusiveSum(d_temp_storage, temp_storage_bytes, d_in, d_out, num_items);
      *
      * // Allocate temporary storage
-     * cudaMalloc(&d_temp_storage, temp_storage_bytes);
+     * hipMalloc(&d_temp_storage, temp_storage_bytes);
      *
      * // Run exclusive prefix sum
      * cub::DeviceScan::ExclusiveSum(d_temp_storage, temp_storage_bytes, d_in, d_out, num_items);
@@ -134,40 +123,35 @@ struct DeviceScan
      *
      * \endcode
      *
-     * \tparam InputIteratorT     <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
-     * \tparam OutputIteratorT    <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
+     * \tparam InputIterator      <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
+     * \tparam OutputIterator     <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
      */
     template <
-        typename        InputIteratorT,
-        typename        OutputIteratorT>
+        typename        InputIterator,
+        typename        OutputIterator>
     CUB_RUNTIME_FUNCTION
-    static cudaError_t ExclusiveSum(
-        void            *d_temp_storage,                    ///< [in] %Device-accessible allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
+    static hipError_t ExclusiveSum(
+        void            *d_temp_storage,                    ///< [in] %Device allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
         size_t          &temp_storage_bytes,                ///< [in,out] Reference to size in bytes of \p d_temp_storage allocation
-        InputIteratorT  d_in,                               ///< [in] Pointer to the input sequence of data items
-        OutputIteratorT d_out,                              ///< [out] Pointer to the output sequence of data items
+        InputIterator   d_in,                               ///< [in] Pointer to the input sequence of data items
+        OutputIterator  d_out,                              ///< [out] Pointer to the output sequence of data items
         int             num_items,                          ///< [in] Total number of input items (i.e., the length of \p d_in)
-        cudaStream_t    stream              = 0,            ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
+        hipStream_t    stream              = 0,            ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
         bool            debug_synchronous   = false)        ///< [in] <b>[optional]</b> Whether or not to synchronize the stream after every kernel launch to check for errors.  May cause significant slowdown.  Default is \p false.
     {
         // Signed integer type for global offsets
-        typedef int OffsetT;
+        typedef int Offset;
 
-        // The output value type
-        typedef typename If<(Equals<typename std::iterator_traits<OutputIteratorT>::value_type, void>::VALUE),  // OutputT =  (if output iterator's value type is void) ?
-            typename std::iterator_traits<InputIteratorT>::value_type,                                          // ... then the input iterator's value type,
-            typename std::iterator_traits<OutputIteratorT>::value_type>::Type OutputT;                          // ... else the output iterator's value type
+        // Scan data type
+        typedef typename std::iterator_traits<InputIterator>::value_type T;
 
-        // Initial value
-        OutputT init_value = 0;
-
-        return DispatchScan<InputIteratorT, OutputIteratorT, Sum, OutputT, OffsetT>::Dispatch(
+        return DeviceScanDispatch<InputIterator, OutputIterator, Sum, T, Offset>::Dispatch(
             d_temp_storage,
             temp_storage_bytes,
             d_in,
             d_out,
             Sum(),
-            init_value,
+            T(),
             num_items,
             stream,
             debug_synchronous);
@@ -175,11 +159,15 @@ struct DeviceScan
 
 
     /**
-     * \brief Computes a device-wide exclusive prefix scan using the specified binary \p scan_op functor.  The \p init_value value is applied as the initial value, and is assigned to *d_out.
+     * \brief Computes a device-wide exclusive prefix scan using the specified binary \p scan_op functor.
      *
      * \par
      * - Supports non-commutative scan operators.
      * - \devicestorage
+     * - \cdp
+     *
+     * \par Performance
+     * Performance is typically similar to DeviceScan::ExclusiveSum.
      *
      * \par Snippet
      * The code snippet below illustrates the exclusive prefix min-scan of an \p int device vector
@@ -197,7 +185,7 @@ struct DeviceScan
      *     }
      * };
      *
-     * // Declare, allocate, and initialize device-accessible pointers for input and output
+     * // Declare, allocate, and initialize device pointers for input and output
      * int          num_items;      // e.g., 7
      * int          *d_in;          // e.g., [8, 6, 7, 5, 3, 0, 9]
      * int          *d_out;         // e.g., [ ,  ,  ,  ,  ,  ,  ]
@@ -210,7 +198,7 @@ struct DeviceScan
      * cub::DeviceScan::ExclusiveScan(d_temp_storage, temp_storage_bytes, d_in, d_out, min_op, (int) MAX_INT, num_items);
      *
      * // Allocate temporary storage for exclusive prefix scan
-     * cudaMalloc(&d_temp_storage, temp_storage_bytes);
+     * hipMalloc(&d_temp_storage, temp_storage_bytes);
      *
      * // Run exclusive prefix min-scan
      * cub::DeviceScan::ExclusiveScan(d_temp_storage, temp_storage_bytes, d_in, d_out, min_op, (int) MAX_INT, num_items);
@@ -219,38 +207,38 @@ struct DeviceScan
      *
      * \endcode
      *
-     * \tparam InputIteratorT   <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
-     * \tparam OutputIteratorT  <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
+     * \tparam InputIterator    <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
+     * \tparam OutputIterator   <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
      * \tparam ScanOp           <b>[inferred]</b> Binary scan functor type having member <tt>T operator()(const T &a, const T &b)</tt>
      * \tparam Identity         <b>[inferred]</b> Type of the \p identity value used Binary scan functor type having member <tt>T operator()(const T &a, const T &b)</tt>
      */
     template <
-        typename        InputIteratorT,
-        typename        OutputIteratorT,
-        typename        ScanOpT,
-        typename        InitValueT>
+        typename        InputIterator,
+        typename        OutputIterator,
+        typename        ScanOp,
+        typename        Identity>
     CUB_RUNTIME_FUNCTION
-    static cudaError_t ExclusiveScan(
-        void            *d_temp_storage,                    ///< [in] %Device-accessible allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
+    static hipError_t ExclusiveScan(
+        void            *d_temp_storage,                    ///< [in] %Device allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
         size_t          &temp_storage_bytes,                ///< [in,out] Reference to size in bytes of \p d_temp_storage allocation
-        InputIteratorT  d_in,                               ///< [in] Pointer to the input sequence of data items
-        OutputIteratorT d_out,                              ///< [out] Pointer to the output sequence of data items
-        ScanOpT         scan_op,                            ///< [in] Binary scan functor
-        InitValueT      init_value,                         ///< [in] Initial value to seed the exclusive scan (and is assigned to *d_out)
+        InputIterator   d_in,                               ///< [in] Pointer to the input sequence of data items
+        OutputIterator  d_out,                              ///< [out] Pointer to the output sequence of data items
+        ScanOp          scan_op,                            ///< [in] Binary scan functor (e.g., an instance of cub::Sum, cub::Min, cub::Max, etc.)
+        Identity        identity,                           ///< [in] Identity element
         int             num_items,                          ///< [in] Total number of input items (i.e., the length of \p d_in)
-        cudaStream_t    stream              = 0,            ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
+        hipStream_t    stream              = 0,            ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
         bool            debug_synchronous   = false)        ///< [in] <b>[optional]</b> Whether or not to synchronize the stream after every kernel launch to check for errors.  May cause significant slowdown.  Default is \p false.
     {
         // Signed integer type for global offsets
-        typedef int OffsetT;
+        typedef int Offset;
 
-        return DispatchScan<InputIteratorT, OutputIteratorT, ScanOpT, InitValueT, OffsetT>::Dispatch(
+        return DeviceScanDispatch<InputIterator, OutputIterator, ScanOp, Identity, Offset>::Dispatch(
             d_temp_storage,
             temp_storage_bytes,
             d_in,
             d_out,
             scan_op,
-            init_value,
+            identity,
             num_items,
             stream,
             debug_synchronous);
@@ -270,6 +258,10 @@ struct DeviceScan
      * \par
      * - Supports non-commutative sum operators.
      * - \devicestorage
+     * - \cdp
+     *
+     * \par Performance
+     * Performance is typically similar to DeviceScan::ExclusiveSum.
      *
      * \par Snippet
      * The code snippet below illustrates the inclusive prefix sum of an \p int device vector.
@@ -277,7 +269,7 @@ struct DeviceScan
      * \code
      * #include <cub/cub.cuh>   // or equivalently <cub/device/device_scan.cuh>
      *
-     * // Declare, allocate, and initialize device-accessible pointers for input and output
+     * // Declare, allocate, and initialize device pointers for input and output
      * int  num_items;      // e.g., 7
      * int  *d_in;          // e.g., [8, 6, 7, 5, 3, 0, 9]
      * int  *d_out;         // e.g., [ ,  ,  ,  ,  ,  ,  ]
@@ -289,7 +281,7 @@ struct DeviceScan
      * cub::DeviceScan::InclusiveSum(d_temp_storage, temp_storage_bytes, d_in, d_out, num_items);
      *
      * // Allocate temporary storage for inclusive prefix sum
-     * cudaMalloc(&d_temp_storage, temp_storage_bytes);
+     * hipMalloc(&d_temp_storage, temp_storage_bytes);
      *
      * // Run inclusive prefix sum
      * cub::DeviceScan::InclusiveSum(d_temp_storage, temp_storage_bytes, d_in, d_out, num_items);
@@ -298,26 +290,26 @@ struct DeviceScan
      *
      * \endcode
      *
-     * \tparam InputIteratorT     <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
-     * \tparam OutputIteratorT    <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
+     * \tparam InputIterator      <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
+     * \tparam OutputIterator     <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
      */
     template <
-        typename            InputIteratorT,
-        typename            OutputIteratorT>
+        typename            InputIterator,
+        typename            OutputIterator>
     CUB_RUNTIME_FUNCTION
-    static cudaError_t InclusiveSum(
-        void*               d_temp_storage,                 ///< [in] %Device-accessible allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
-        size_t&             temp_storage_bytes,             ///< [in,out] Reference to size in bytes of \p d_temp_storage allocation
-        InputIteratorT      d_in,                           ///< [in] Pointer to the input sequence of data items
-        OutputIteratorT     d_out,                          ///< [out] Pointer to the output sequence of data items
-        int                 num_items,                      ///< [in] Total number of input items (i.e., the length of \p d_in)
-        cudaStream_t        stream             = 0,         ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
-        bool                debug_synchronous  = false)     ///< [in] <b>[optional]</b> Whether or not to synchronize the stream after every kernel launch to check for errors.  May cause significant slowdown.  Default is \p false.
+    static hipError_t InclusiveSum(
+        void                *d_temp_storage,                    ///< [in] %Device allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
+        size_t              &temp_storage_bytes,                ///< [in,out] Reference to size in bytes of \p d_temp_storage allocation
+        InputIterator       d_in,                               ///< [in] Pointer to the input sequence of data items
+        OutputIterator      d_out,                              ///< [out] Pointer to the output sequence of data items
+        int                 num_items,                          ///< [in] Total number of input items (i.e., the length of \p d_in)
+        hipStream_t        stream             = 0,             ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
+        bool                debug_synchronous  = false)         ///< [in] <b>[optional]</b> Whether or not to synchronize the stream after every kernel launch to check for errors.  May cause significant slowdown.  Default is \p false.
     {
         // Signed integer type for global offsets
-        typedef int OffsetT;
+        typedef int Offset;
 
-        return DispatchScan<InputIteratorT, OutputIteratorT, Sum, NullType, OffsetT>::Dispatch(
+        return DeviceScanDispatch<InputIterator, OutputIterator, Sum, NullType, Offset>::Dispatch(
             d_temp_storage,
             temp_storage_bytes,
             d_in,
@@ -336,6 +328,10 @@ struct DeviceScan
      * \par
      * - Supports non-commutative scan operators.
      * - \devicestorage
+     * - \cdp
+     *
+     * \par Performance
+     * Performance is typically similar to DeviceScan::ExclusiveSum.
      *
      * \par Snippet
      * The code snippet below illustrates the inclusive prefix min-scan of an \p int device vector.
@@ -353,7 +349,7 @@ struct DeviceScan
      *     }
      * };
      *
-     * // Declare, allocate, and initialize device-accessible pointers for input and output
+     * // Declare, allocate, and initialize device pointers for input and output
      * int          num_items;      // e.g., 7
      * int          *d_in;          // e.g., [8, 6, 7, 5, 3, 0, 9]
      * int          *d_out;         // e.g., [ ,  ,  ,  ,  ,  ,  ]
@@ -366,7 +362,7 @@ struct DeviceScan
      * cub::DeviceScan::InclusiveScan(d_temp_storage, temp_storage_bytes, d_in, d_out, min_op, num_items);
      *
      * // Allocate temporary storage for inclusive prefix scan
-     * cudaMalloc(&d_temp_storage, temp_storage_bytes);
+     * hipMalloc(&d_temp_storage, temp_storage_bytes);
      *
      * // Run inclusive prefix min-scan
      * cub::DeviceScan::InclusiveScan(d_temp_storage, temp_storage_bytes, d_in, d_out, min_op, num_items);
@@ -375,29 +371,29 @@ struct DeviceScan
      *
      * \endcode
      *
-     * \tparam InputIteratorT   <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
-     * \tparam OutputIteratorT  <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
+     * \tparam InputIterator    <b>[inferred]</b> Random-access input iterator type for reading scan inputs \iterator
+     * \tparam OutputIterator   <b>[inferred]</b> Random-access output iterator type for writing scan outputs \iterator
      * \tparam ScanOp           <b>[inferred]</b> Binary scan functor type having member <tt>T operator()(const T &a, const T &b)</tt>
      */
     template <
-        typename        InputIteratorT,
-        typename        OutputIteratorT,
-        typename        ScanOpT>
+        typename        InputIterator,
+        typename        OutputIterator,
+        typename        ScanOp>
     CUB_RUNTIME_FUNCTION
-    static cudaError_t InclusiveScan(
-        void            *d_temp_storage,                    ///< [in] %Device-accessible allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
+    static hipError_t InclusiveScan(
+        void            *d_temp_storage,                    ///< [in] %Device allocation of temporary storage.  When NULL, the required allocation size is written to \p temp_storage_bytes and no work is done.
         size_t          &temp_storage_bytes,                ///< [in,out] Reference to size in bytes of \p d_temp_storage allocation
-        InputIteratorT  d_in,                               ///< [in] Pointer to the input sequence of data items
-        OutputIteratorT d_out,                              ///< [out] Pointer to the output sequence of data items
-        ScanOpT         scan_op,                            ///< [in] Binary scan functor
+        InputIterator   d_in,                               ///< [in] Pointer to the input sequence of data items
+        OutputIterator  d_out,                              ///< [out] Pointer to the output sequence of data items
+        ScanOp          scan_op,                            ///< [in] Binary scan functor (e.g., an instance of cub::Sum, cub::Min, cub::Max, etc.)
         int             num_items,                          ///< [in] Total number of input items (i.e., the length of \p d_in)
-        cudaStream_t    stream             = 0,             ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
+        hipStream_t    stream             = 0,             ///< [in] <b>[optional]</b> CUDA stream to launch kernels within.  Default is stream<sub>0</sub>.
         bool            debug_synchronous  = false)         ///< [in] <b>[optional]</b> Whether or not to synchronize the stream after every kernel launch to check for errors.  May cause significant slowdown.  Default is \p false.
     {
         // Signed integer type for global offsets
-        typedef int OffsetT;
+        typedef int Offset;
 
-        return DispatchScan<InputIteratorT, OutputIteratorT, ScanOpT, NullType, OffsetT>::Dispatch(
+        return DeviceScanDispatch<InputIterator, OutputIterator, ScanOp, NullType, Offset>::Dispatch(
             d_temp_storage,
             temp_storage_bytes,
             d_in,

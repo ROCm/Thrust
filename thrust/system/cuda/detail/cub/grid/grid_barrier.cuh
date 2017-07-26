@@ -1,6 +1,7 @@
+#include "hip/hip_runtime.h"
 /******************************************************************************
  * Copyright (c) 2011, Duane Merrill.  All rights reserved.
- * Copyright (c) 2011-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -82,18 +83,18 @@ public:
         __threadfence();
         __syncthreads();
 
-        if (blockIdx.x == 0)
+        if (hipBlockIdx_x == 0)
         {
             // Report in ourselves
-            if (threadIdx.x == 0)
+            if (hipThreadIdx_x == 0)
             {
-                d_vol_sync[blockIdx.x] = 1;
+                d_vol_sync[hipBlockIdx_x] = 1;
             }
 
             __syncthreads();
 
             // Wait for everyone else to report in
-            for (int peer_block = threadIdx.x; peer_block < gridDim.x; peer_block += blockDim.x)
+            for (int peer_block = hipThreadIdx_x; peer_block < hipGridDim_x; peer_block += hipBlockDim_x)
             {
                 while (ThreadLoad<LOAD_CG>(d_sync + peer_block) == 0)
                 {
@@ -104,20 +105,20 @@ public:
             __syncthreads();
 
             // Let everyone know it's safe to proceed
-            for (int peer_block = threadIdx.x; peer_block < gridDim.x; peer_block += blockDim.x)
+            for (int peer_block = hipThreadIdx_x; peer_block < hipGridDim_x; peer_block += hipBlockDim_x)
             {
                 d_vol_sync[peer_block] = 0;
             }
         }
         else
         {
-            if (threadIdx.x == 0)
+            if (hipThreadIdx_x == 0)
             {
                 // Report in
-                d_vol_sync[blockIdx.x] = 1;
+                d_vol_sync[hipBlockIdx_x] = 1;
 
                 // Wait for acknowledgment
-                while (ThreadLoad<LOAD_CG>(d_sync + blockIdx.x) == 1)
+                while (ThreadLoad<LOAD_CG>(d_sync + hipBlockIdx_x) == 1)
                 {
                     __threadfence_block();
                 }
@@ -153,12 +154,12 @@ public:
     /**
      * DeviceFrees and resets the progress counters
      */
-    cudaError_t HostReset()
+    hipError_t HostReset()
     {
-        cudaError_t retval = cudaSuccess;
+        hipError_t retval = hipSuccess;
         if (d_sync)
         {
-            CubDebug(retval = cudaFree(d_sync));
+            CubDebug(retval = hipFree(d_sync));
             d_sync = NULL;
         }
         sync_bytes = 0;
@@ -179,23 +180,23 @@ public:
      * Sets up the progress counters for the next kernel launch (lazily
      * allocating and initializing them if necessary)
      */
-    cudaError_t Setup(int sweep_grid_size)
+    hipError_t Setup(int sweep_grid_size)
     {
-        cudaError_t retval = cudaSuccess;
+        hipError_t retval = hipSuccess;
         do {
             size_t new_sync_bytes = sweep_grid_size * sizeof(SyncFlag);
             if (new_sync_bytes > sync_bytes)
             {
                 if (d_sync)
                 {
-                    if (CubDebug(retval = cudaFree(d_sync))) break;
+                    if (CubDebug(retval = hipFree(d_sync))) break;
                 }
 
                 sync_bytes = new_sync_bytes;
 
                 // Allocate and initialize to zero
-                if (CubDebug(retval = cudaMalloc((void**) &d_sync, sync_bytes))) break;
-                if (CubDebug(retval = cudaMemset(d_sync, 0, new_sync_bytes))) break;
+                if (CubDebug(retval = hipMalloc((void**) &d_sync, sync_bytes))) break;
+                if (CubDebug(retval = hipMemset(d_sync, 0, new_sync_bytes))) break;
             }
         } while (0);
 

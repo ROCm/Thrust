@@ -69,7 +69,7 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                  hipStream_t stream,
                                  bool debug_synchronous)
     {
-      return cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
@@ -84,9 +84,9 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
-      return cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return cudaErrorNotSupported;
+      return (hipError_t)cudaErrorNotSupported;
 #endif
     }
   };
@@ -126,7 +126,7 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                  hipStream_t stream,
                                  bool debug_synchronous)
     {
-      return cub_::DeviceRadixSort::SortKeysDescending(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortKeysDescending(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
@@ -141,9 +141,9 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
-      return cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return cudaErrorNotSupported;
+      return (hipError_t)cudaErrorNotSupported;
 #endif
     }
   };
@@ -291,7 +291,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                  hipStream_t stream,
                                  bool debug_synchronous)
     {
-      return cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
@@ -307,9 +307,9 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
-      return cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return cudaErrorNotSupported;
+      return (hipError_t)cudaErrorNotSupported;
 #endif
     }
   };
@@ -351,7 +351,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                  hipStream_t stream,
                                  bool debug_synchronous)
     {
-      return cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
@@ -367,9 +367,9 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                    bool debug_synchronous)
     {
 #if __BULK_HAS_CUDART__
-      return cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
+      return (hipError_t)cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return cudaErrorNotSupported;
+      return (hipError_t)cudaErrorNotSupported;
 #endif
     }
   };

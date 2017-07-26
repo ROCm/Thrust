@@ -65,24 +65,20 @@ inline void uncached_device_properties(device_properties_t &p, int device_id)
   };
 
   p = temp;
-
-//#elif (__CUDA_ARCH__ >= 350) //need to recheck as it is not clear which flag to use
-//#else
-#elif __HIP_ARCH_HAS_SURFACE_FUNCS__ 
-
-  hipError_t error = hipDeviceGetAttribute(&p.major,           hipDeviceAttributeComputeCapabilityMajor,      device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDeviceAttributeMaxGridDimX,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[1],              hipDeviceAttributeMaxGridDimY,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxGridSize[2],              hipDeviceAttributeMaxGridDimZ,                 device_id);
-  error = hipDeviceGetAttribute(&p.maxThreadsPerBlock,          hipDeviceAttributeMaxThreadsPerBlock,          device_id);
-  error = hipDeviceGetAttribute(&p.maxThreadsPerMultiProcessor, hipDeviceAttributeMaxThreadsPerMultiProcessor, device_id);
-  error = hipDeviceGetAttribute(&p.minor,                       hipDeviceAttributeComputeCapabilityMinor,      device_id);
-  error = hipDeviceGetAttribute(&p.multiProcessorCount,         hipDeviceAttributeMultiprocessorCount,         device_id);
-  error = hipDeviceGetAttribute(&p.regsPerBlock,                hipDeviceAttributeMaxRegistersPerBlock,        device_id);
+#elif (__CUDA_ARCH__ >= 350)
+  hipError_t error = hipDeviceGetAttribute(&p.major,           hipDevAttrComputeCapabilityMajor,      device_id);
+  error = hipDeviceGetAttribute(&p.maxGridSize[0],              hipDevAttrMaxGridDimX,                 device_id);
+  error = hipDeviceGetAttribute(&p.maxGridSize[1],              hipDevAttrMaxGridDimY,                 device_id);
+  error = hipDeviceGetAttribute(&p.maxGridSize[2],              hipDevAttrMaxGridDimZ,                 device_id);
+  error = hipDeviceGetAttribute(&p.maxThreadsPerBlock,          hipDevAttrMaxThreadsPerBlock,          device_id);
+  error = hipDeviceGetAttribute(&p.maxThreadsPerMultiProcessor, hipDevAttrMaxThreadsPerMultiProcessor, device_id);
+  error = hipDeviceGetAttribute(&p.minor,                       hipDevAttrComputeCapabilityMinor,      device_id);
+  error = hipDeviceGetAttribute(&p.multiProcessorCount,         hipDevAttrMultiProcessorCount,         device_id);
+  error = hipDeviceGetAttribute(&p.regsPerBlock,                hipDevAttrMaxRegistersPerBlock,        device_id);
   int temp;
   error = hipDeviceGetAttribute(&temp,                          hipDeviceAttributeMaxSharedMemoryPerBlock,     device_id);
   p.sharedMemPerBlock = temp;
-  error = hipDeviceGetAttribute(&p.hipWarpSize,                    hipDeviceAttributeWarpSize,                    device_id);
+  error = hipDeviceGetAttribute(&p.warpSize,                    hipDeviceAttributeWarpSize,                    device_id);
 
   throw_on_error(error, "cudaDeviceGetProperty in get_device_properties");
 
@@ -180,7 +176,7 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
 {
 //#if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__ >= 350)
 //Need to recheck as it is not clear which flag to use
-#if __HIP_DEVICE_COMPILE__ == 0 || (__HIP_ARCH_HAS_WARP_FUNNEL_SHIFT__ && __HIP_ARCH_HAS_DYNAMIC_PARALLEL__)
+#if __HIP_DEVICE_COMPILE__ == 0 || (__CUDA_ARCH__ >= 350)
 #ifdef __HIP_PLATFORM_NVCC__
   cudaFuncAttributes attributes;
 
