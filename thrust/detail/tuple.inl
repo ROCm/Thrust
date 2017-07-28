@@ -122,6 +122,17 @@ template <class T> struct access_traits
 // be non-volatile and const. 8.5.3. (5)
 }; // end access_traits
 
+template<>
+class access_traits<void>
+{
+  public:
+  typedef const int& const_type;
+  typedef int& non_const_type;
+  typedef const typename thrust::detail::remove_cv<int>::type& parameter_type;
+
+};
+
+
 template <class T> struct access_traits<T&>
 {
   typedef T& const_type;
