@@ -1,2 +1,2 @@
 # Thrust
-HIP back-end for Thrust
+HIP back-end for Thrust (alpha release).
