@@ -68,9 +68,10 @@ class cuda_error_category
     {
       using namespace cuda::errc;
 
-      if(ev < hipErrorTbd)// ::cudaErrorApiFailureBase)
+      if(ev < hipErrorTbd)//::cudaErrorApiFailureBase) /*deprecated CUDA Runtime API*/
       {
         return make_error_condition(static_cast<errc_t>(ev));
+
       }
 
       return system_category().default_error_condition(ev);

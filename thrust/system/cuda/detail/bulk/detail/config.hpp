@@ -56,7 +56,6 @@
 #    define __BULK_HAS_PRINTF__ 0
 #  endif
 #else
-//#  define __BULK_HAS_PRINTF__ 1//changed while fixing nvcc
-#  define __BULK_HAS_PRINTF__ 0//changed while fixing nvcc
+#  define __BULK_HAS_PRINTF__ 0
 #endif
 

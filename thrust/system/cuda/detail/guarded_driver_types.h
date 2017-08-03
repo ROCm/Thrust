@@ -37,6 +37,8 @@
 #  endif
 #else // GNUC pre 4.5.0
 //#  if !defined(__DRIVER_TYPES_H__)
+/* In ROCm 1.5, driver_types.h has a macro HIP_INCLUDE_HIP_HCC_DETAIL_DRIVER_TYPES_H  
+whereas in ROCm 1.4 the macro is defined as HIP_HCC_DETAIL_DRIVER_TYPES_H .While using ROCm 1.4 use the macros defined in ROCm 1.4 */
 #if ((defined(__HCC__) && !defined(HIP_INCLUDE_HIP_HCC_DETAIL_DRIVER_TYPES_H)) || (defined(__NVCC__) && !defined(__DRIVER_TYPES_H__)))
 #    ifdef __host__
 #      undef __host__
