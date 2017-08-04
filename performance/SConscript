@@ -61,3 +61,4 @@ Type: 'scons <test name>' to build a single performance test program of interest
 Type: 'scons <test name>.xml' to run a single performance test of interest and output a report in an XML file.
 """)
 
+
