@@ -16,7 +16,14 @@ int main(void)
 {
   // generate random data on the host
   thrust::host_vector<int> h_vec(100);
-  thrust::generate(h_vec.begin(), h_vec.end(), my_rand);
+//  thrust::generate(h_vec.begin(), h_vec.end(), my_rand);
+
+  thrust::default_random_engine rng;
+  thrust::uniform_int_distribution<int> dist(0,9999);
+  for (int i =0; i< 100;i++)
+{
+    h_vec[i]=dist(rng);
+}
 
   // transfer to device and compute sum
   thrust::device_vector<int> d_vec = h_vec;
