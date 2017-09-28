@@ -14,6 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+#ifdef __HIP_PLATFORM_HCC__
+
+#define HIP_DYNAMIC_SHARED(type, var) \
+    type* var = (type*) nullptr; \
+
+#endif
 
 #pragma once
 
