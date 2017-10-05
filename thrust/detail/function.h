@@ -48,9 +48,7 @@ template<typename Function, typename Result>
   {
     // we static cast to Result to handle void Result without error
     // in case Function's result is non-void
-    #ifdef __HIP_PLATFORM_NVCC__
     return static_cast<Result>(m_f(thrust::raw_reference_cast(x))); //need to recheck the change
-    #endif
   }
 
   __thrust_exec_check_disable__
