@@ -42,7 +42,8 @@ namespace detail
 #ifdef __HIPCC__
 // if there are multiple versions of Bulk floating around, this may be #defined already
 #  ifndef __bulk_launch_bounds__
-#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm) __launch_bounds__(num_threads_per_block, num_blocks_per_sm)
+//#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm) __launch_bounds__(num_threads_per_block, num_blocks_per_sm)
+#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm)
 #  endif
 #else
 #  ifndef __bulk_launch_bounds__
