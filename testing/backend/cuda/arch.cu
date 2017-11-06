@@ -1,7 +1,7 @@
 #include "hip/hip_runtime.h"
 #include <unittest/unittest.h>
 
-#if defined(__CUDACC__)
+#if defined(__HIPCC__)
 
 #include <thrust/system/cuda/detail/runtime_introspection.h>
 #include <thrust/system/cuda/detail/cuda_launch_config.h>

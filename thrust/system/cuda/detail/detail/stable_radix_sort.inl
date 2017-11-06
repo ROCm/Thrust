@@ -1,3 +1,4 @@
+#include <hip/hip_runtime.h>
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -17,8 +18,8 @@
 #include <thrust/detail/config.h>
 
 // do not attempt to compile this file with any other compiler
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
 #include <thrust/detail/copy.h>
 #include <thrust/iterator/iterator_traits.h>
 #include <thrust/detail/temporary_array.h>
@@ -86,7 +87,7 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
 #if __BULK_HAS_CUDART__
       return (hipError_t)cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return (hipError_t)cudaErrorNotSupported;
+      return (hipError_t)hipErrorTbd;//cudaErrorNotSupported;
 #endif
     }
   };
@@ -143,7 +144,7 @@ hipError_t cub_sort_keys_wrapper(void *d_temp_storage,
 #if __BULK_HAS_CUDART__
       return (hipError_t)cub_::DeviceRadixSort::SortKeys(d_temp_storage, temp_storage_bytes, d_keys, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return (hipError_t)cudaErrorNotSupported;
+      return (hipError_t)hipErrorTbd;//cudaErrorNotSupported;
 #endif
     }
   };
@@ -291,7 +292,7 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
                                  hipStream_t stream,
                                  bool debug_synchronous)
     {
-      return (hipError_t)cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
+     return (hipError_t)cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
     }
 
     __device__
@@ -309,13 +310,13 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
 #if __BULK_HAS_CUDART__
       return (hipError_t)cub_::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return (hipError_t)cudaErrorNotSupported;
+      return (hipError_t)hipErrorTbd;//cudaErrorNotSupported;
 #endif
     }
   };
 
 //#ifndef __CUDA_ARCH__
-#if __HIP_DEVICE_COMPILE__ == 0
+#if __HIP_DEVICE_COMPILE__ == 0 
   return workaround::host_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
 #else
   return workaround::device_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
@@ -369,12 +370,14 @@ hipError_t cub_sort_pairs_wrapper(void *d_temp_storage,
 #if __BULK_HAS_CUDART__
       return (hipError_t)cub_::DeviceRadixSort::SortPairsDescending(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, begin_bit, end_bit, stream, debug_synchronous);
 #else
-      return (hipError_t)cudaErrorNotSupported;
+      return (hipError_t)hipErrorTbd;//cudaErrorNotSupported;
 #endif
     }
   };
 
-#ifndef __CUDA_ARCH__
+//#ifndef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__ == 0
+
   return workaround::host_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);
 #else
   return workaround::device_path(d_temp_storage, temp_storage_bytes, d_keys, d_values, num_items, comp, begin_bit, end_bit, stream, debug_synchronous);

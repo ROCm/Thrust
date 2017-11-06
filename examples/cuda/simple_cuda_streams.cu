@@ -32,21 +32,17 @@ struct ping
     {
       while(ball != next_state && attempt < 1000)
       {
-//#if __CUDA_ARCH__ >= 200
-if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ || __HIP_ARCH_HAS_SYNC_THREAD_EXT__ //need to revisit
-
+#if __CUDA_ARCH__ >= 200
         printf("ping waiting for return\n");
-//#endif
+#endif
         ++attempt;
       }
 
       ball += 1;
 
-//#if __CUDA_ARCH__ >= 200
-if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ || __HIP_ARCH_HAS_SYNC_THREAD_EXT__ //need to revisit
-
+#if __CUDA_ARCH__ >= 200
       printf("ping! ball is now %d\n", next_state + 1);
-//#endif
+#endif
     }
   }
 };
@@ -71,7 +67,7 @@ struct pong
 #if __CUDA_ARCH__ >= 200
 if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ || __HIP_ARCH_HAS_SYNC_THREAD_EXT__ //need to revisit
         printf("pong waiting for return\n");
-//#endif
+#endif
         ++attempt;
       }
 
@@ -80,7 +76,7 @@ if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ || __HIP_ARCH_HAS_SYNC_THREAD_EXT__ //ne
 #if __CUDA_ARCH__ >= 200
 if __HIP_ARCH_HAS_THREAD_FENCE_SYSTEM__ || __HIP_ARCH_HAS_SYNC_THREAD_EXT__ //need to revisit
       printf("pong! ball is now %d\n", next_state + 1);
-//#endif
+#endif
     }
   }
 };

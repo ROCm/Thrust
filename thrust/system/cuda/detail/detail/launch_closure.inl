@@ -89,21 +89,28 @@ template<typename Closure,
     // this ensures that the kernel gets instantiated identically for all values of __CUDA_ARCH__
     get_launch_function();
 
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
 #if __BULK_HAS_CUDART__
-    launch_function_t kernel = get_launch_function();
+
+    //launch_function_t kernel = get_launch_function();
 
     if(num_blocks > 0)
     {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-      hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
+      //workaround done for kernel compilation issue
+      hipLaunchKernelGGL(get_launch_function(), dim3((unsigned int) num_blocks), dim3((unsigned int) block_size), (unsigned int) smem_size, stream(thrust::detail::derived_cast(exec)), f);
+
 #else
       // XXX we can't pass parameters with constructors to kernels launched through the triple chevrons in __device__ code
       //     use cudaLaunchDevice directly
-      void *param_buffer = cudaGetParameterBuffer(alignment_of<Closure>::value, sizeof(Closure));
-      std::memcpy(param_buffer, &f, sizeof(Closure));
-      cudaLaunchDevice(reinterpret_cast<void*>(kernel), param_buffer, dim3(num_blocks), dim3(block_size), smem_size, stream(thrust::detail::derived_cast(exec)));
+      //void *param_buffer = cudaGetParameterBuffer(alignment_of<Closure>::value, sizeof(Closure));
+      //std::memcpy(param_buffer, &f, sizeof(Closure));
+      //cudaLaunchDevice(reinterpret_cast<void*>(kernel), param_buffer, dim3(num_blocks), dim3(block_size), smem_size, stream(thrust::detail::derived_cast(exec)));
+
+      hipLaunchKernelGGL(reinterpret_cast<void*>(get_launch_function()), dim3(num_blocks), dim3(block_size), smem_size, stream(thrust::detail::derived_cast(exec)),f);
+
 #endif // __CUDA_ARCH__
       synchronize_if_enabled("launch_closure_by_value");
     }

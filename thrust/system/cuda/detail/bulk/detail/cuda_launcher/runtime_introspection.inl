@@ -1,3 +1,4 @@
+#include <hip/hip_runtime.h>
 /*
  *  Copyright 2008-2013 NVIDIA Corporation
  *
@@ -133,7 +134,7 @@ __host__ __device__
 inline function_attributes_t function_attributes(KernelFunction kernel)
 {
 #if __BULK_HAS_CUDART__
-
+#ifdef __HIP_PLATFORM_NVCC__
   typedef void (*fun_ptr_type)();
 
   fun_ptr_type fun_ptr = reinterpret_cast<fun_ptr_type>(kernel);
@@ -153,7 +154,7 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
   };
 
   return result;
-
+#endif
 #else
   return function_attributes_t();
 #endif // __HIPCC__

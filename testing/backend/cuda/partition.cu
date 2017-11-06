@@ -255,16 +255,12 @@ template<typename ExecutionPolicy, typename Iterator1, typename Predicate, typen
 __global__
 void stable_partition_kernel(ExecutionPolicy exec, Iterator1 first, Iterator1 last, Predicate pred, Iterator2 result, Iterator3 is_supported)
 {
-//#if (__CUDA_ARCH__ >= 200) //Need to recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if (__CUDA_ARCH__ >= 200)
   *is_supported = true;
   *result = thrust::stable_partition(exec, first, last, pred);
-}
-//#else  //commented while converting the flags
-else {
+#else
   *is_supported = false;
-}
-//#endif //commented while converting the flags
+#endif
 }
 
 
@@ -319,16 +315,12 @@ template<typename ExecutionPolicy, typename Iterator1, typename Iterator2, typen
 __global__
 void stable_partition_kernel(ExecutionPolicy exec, Iterator1 first, Iterator1 last, Iterator2 stencil_first, Predicate pred, Iterator3 result, Iterator4 is_supported)
 {
-//#if (__CUDA_ARCH__ >= 200) //Need to Recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if (__CUDA_ARCH__ >= 200)
   *is_supported = true;
   *result = thrust::stable_partition(exec, first, last, stencil_first, pred);
-}
-//#else  //commented while converting the flags
-else{
+#else
   *is_supported = false;
-}
-//#endif //commented while converting the flags
+#endif
 }
 
 

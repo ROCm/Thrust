@@ -47,6 +47,10 @@ struct segmented_scan_functor
   
   __host__ __device__
   segmented_scan_functor(AssociativeOperator _binary_op) : binary_op(_binary_op) {}
+
+  //workaround
+   __host__ __device__
+  segmented_scan_functor(){}
   
   __host__ __device__
   result_type operator()(result_type a, result_type b)

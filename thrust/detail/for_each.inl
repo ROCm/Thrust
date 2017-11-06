@@ -65,12 +65,8 @@ __host__ __device__
                            Size n,
                            UnaryFunction f)
 {
-  #ifdef __HIP_PLATFORM_NVCC__
-  using thrust::system::detail::generic::for_each_n;
+using thrust::system::detail::generic::for_each_n;
   return for_each_n(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), first, n, f);
- #else
-  return thrust::system::detail::generic::for_each_n(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), first, n, f);
-#endif
 } // end for_each_n()
 
 

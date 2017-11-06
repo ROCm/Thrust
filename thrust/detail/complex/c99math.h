@@ -100,7 +100,7 @@ __host__ __device__ inline int isfinite(double x){
 
 #else
 
-#  if defined(__NVCC__) && !(defined(__CUDA__) && defined(__clang__))
+#  if defined(__HIPCC__) && !(defined(__CUDA__) && defined(__clang__))
 
 // sometimes the CUDA toolkit provides these these names as macros,
 // sometimes functions in the global scope
@@ -124,7 +124,7 @@ using std::isinf;
 using std::isnan;
 using std::signbit;
 using std::isfinite;
-#  endif // __NVCC__
+#  endif // __HIPCC__
 
 using ::atanh;
 #endif // _MSC_VER

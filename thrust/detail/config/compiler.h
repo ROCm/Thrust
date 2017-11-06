@@ -20,10 +20,9 @@
 
 #pragma once
 
-//#ifdef __HIPCC__
-#ifdef __CUDACC__
+#ifdef __HIPCC__
 
-#include <cuda.h>
+#include <hip/hip_runtime.h>
 
 // Thrust supports CUDA >= 3.0
 #if (defined(__NVCC__) && CUDA_VERSION < 3000)
@@ -90,8 +89,7 @@
 #endif // _OPENMP
 
 // disable specific MSVC warnings
-//#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && !defined(__CUDA_ARCH__)
-#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && __HIP_DEVICE_COMPILE__ == 0
+#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC) && !defined(__CUDA_ARCH__)
 #define __THRUST_DISABLE_MSVC_WARNING_BEGIN(x) \
 __pragma(warning(push)) \
 __pragma(warning(disable : x))

@@ -62,6 +62,9 @@ struct binary_negate
   
   __host__ __device__
   explicit binary_negate(const Predicate& pred) : pred(pred) {}
+ //workaround 
+  __host__ __device__
+  explicit binary_negate(){}
   
   template <typename T1, typename T2>
   __host__ __device__
@@ -95,6 +98,9 @@ struct predicate_to_integral
   __host__ __device__
   explicit predicate_to_integral(const Predicate& pred) : pred(pred) {}
   
+  //workaround 
+  __host__ __device__
+  explicit predicate_to_integral(){}
   template <typename T>
   __host__ __device__
   bool operator()(const T& x)
@@ -256,6 +262,10 @@ template<typename ResultType, typename BinaryFunction>
   zipped_binary_op(BinaryFunction binary_op)
     : m_binary_op(binary_op) {}
 
+ //workaround 
+ __host__ __device__
+  zipped_binary_op(){}
+
   template<typename Tuple>
   __host__ __device__
   inline result_type operator()(Tuple t)
@@ -311,7 +321,13 @@ template<typename UnaryFunction>
   unary_transform_functor(UnaryFunction f)
     : f(f)
   {}
-
+ 
+//Stub start` 
+    __host__ __device__
+  unary_transform_functor()
+    : f()
+  {}
+//end
   __thrust_exec_check_disable__
   template<typename Tuple>
   inline __host__ __device__
@@ -334,6 +350,10 @@ template<typename BinaryFunction>
   binary_transform_functor(BinaryFunction f)
     : f(f)
   {}
+ 
+ //workaround for compilation error 
+  __host__ __device__
+ binary_transform_functor():f(){}
 
   __thrust_exec_check_disable__
   template<typename Tuple>
@@ -410,6 +430,9 @@ struct binary_transform_if_functor
   binary_transform_if_functor(BinaryFunction binary_op, Predicate pred)
     : binary_op(binary_op), pred(pred) {} 
 
+  //workaround
+ __host__ __device__
+  binary_transform_if_functor(){}
   __thrust_exec_check_disable__
   template<typename Tuple>
   inline __host__ __device__
@@ -516,6 +539,8 @@ template<typename Compare>
 {
   Compare comp;
 
+  __host__ __device__
+  compare_first(){}
   __host__ __device__
   compare_first(Compare comp)
     : comp(comp)

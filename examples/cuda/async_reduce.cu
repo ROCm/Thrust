@@ -22,7 +22,7 @@
 // C++11-capable language and library constructs.
 
 template<typename Iterator, typename T, typename BinaryOperation, typename Pointer>
-__global__ void reduce_kernel(hipLaunchParm lp, Iterator first, Iterator last, T init, BinaryOperation binary_op, Pointer result)
+__global__ void reduce_kernel(Iterator first, Iterator last, T init, BinaryOperation binary_op, Pointer result)
 {
   *result = thrust::reduce(thrust::cuda::par, first, last, init, binary_op);
 }
@@ -40,7 +40,7 @@ int main()
   hipStreamCreate(&s);
 
   // launch a CUDA kernel with only 1 thread on our stream
-  hipLaunchKernel(HIP_KERNEL_NAME(reduce_kernel), dim3(1), dim3(1), 0, s, data.begin(), data.end(), 0, thrust::plus<int>(), result.data());
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(reduce_kernel), dim3(1), dim3(1), 0, s, data.begin(), data.end(), 0, thrust::plus<int>(), result.data());
 
   // wait for the stream to finish
   hipStreamSynchronize(s);

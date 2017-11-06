@@ -9,16 +9,12 @@ template<typename ExecutionPolicy, typename Iterator, typename Compare, typename
 __global__
 void sort_kernel(ExecutionPolicy exec, Iterator first, Iterator last, Compare comp, Iterator2 is_supported)
 {
-//#if (__CUDA_ARCH__ >= 200) //Need to Recheck
-if __HIP_ARCH_HAS_GLOBAL_INT64_ATOMICS__ {
+#if (__CUDA_ARCH__ >= 200)
   *is_supported = true;
   thrust::sort(exec, first, last, comp);
-}
-//#else //commented while converting the flags
-else{
+#else
   *is_supported = false;
-}
-//#endif //commented while converting the flags
+#endif
 }
 
 

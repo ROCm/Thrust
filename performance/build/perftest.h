@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-//#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 //#include <cuda.h>
 
 #define RECORD_RESULT(name, value, units)   { std::cout << "  <result  name=\"" << name << "\"  value=\"" << value  << "\"  units=\"" << units << "\"/>" << std::endl; }
@@ -46,16 +46,16 @@ inline void RECORD_PLATFORM_INFO(void)
 {
 #if THRUST_DEVICE_SYSTEM==THRUST_DEVICE_SYSTEM_CUDA
     int deviceCount;
-    cudaGetDeviceCount(&deviceCount);
+    hipGetDeviceCount(&deviceCount);
     if (deviceCount == 0){
         std::cerr << "There is no device supporting CUDA" << std::endl;
         exit(1);
     }
 
     int dev;
-    cudaGetDevice(&dev);
-    cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, dev);
+    hipGetDevice(&dev);
+    hipDeviceProp_t deviceProp;
+    hipGetDeviceProperties(&deviceProp, dev);
 
     if (dev == 0 && deviceProp.major == 9999 && deviceProp.minor == 9999){
         std::cerr << "There is no device supporting CUDA" << std::endl;
@@ -100,7 +100,7 @@ inline void PROCESS_ARGUMENTS(int argc, char **argv)
 
 #if THRUST_DEVICE_SYSTEM==THRUST_DEVICE_SYSTEM_CUDA
       int device_index = atoi(argv[i]);
-      cudaSetDevice(device_index);
+      hipSetDevice(device_index);
 #endif
     }
   }

@@ -22,10 +22,11 @@
 
 // for floating point infinity
 //#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-//#include <math_constants.h>
-//#else
+#if defined(__HIP_PLATFORM_NVCC__)
+#include <math_constants.h>
+#else
 #include <limits>
-//#endif
+#endif
 
 namespace thrust
 {

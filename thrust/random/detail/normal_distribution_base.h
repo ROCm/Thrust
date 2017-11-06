@@ -103,14 +103,14 @@ template<typename RealType>
     {
       // implementation from Boost
       // allow for Koenig lookup
-      using std::sqrt; using std::log; using std::sin; using std::cos;
+     // using std::sqrt; using std::log; using std::sin; using std::cos;
 
       if(!m_valid)
       {
         uniform_real_distribution<RealType> u01;
         m_r1 = u01(urng);
         m_r2 = u01(urng);
-        m_cached_rho = sqrt(-RealType(2) * log(RealType(1)-m_r2));
+        m_cached_rho = ::sqrt(-RealType(2) * ::log(RealType(1)-m_r2));
 
         m_valid = true;
       }
@@ -122,8 +122,8 @@ template<typename RealType>
       const RealType pi = RealType(3.14159265358979323846);
 
       RealType result = m_cached_rho * (m_valid ?
-                          cos(RealType(2)*pi*m_r1) :
-                          sin(RealType(2)*pi*m_r1));
+                          ::cos(RealType(2)*pi*m_r1) :
+                          ::sin(RealType(2)*pi*m_r1));
 
       return mean + stddev * result;
     }

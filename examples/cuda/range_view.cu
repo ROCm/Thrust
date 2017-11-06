@@ -196,7 +196,7 @@ void saxpy(float A, View1 X, View2 Y, View3 Z)
 
 template<class View1, class View2, class View3>
 __global__
-void saxpy_kernel(hipLaunchParm lp, float A, View1 X, View2 Y, View3 Z)
+void saxpy_kernel(float A, View1 X, View2 Y, View3 Z)
 {
   saxpy(A, X, Y, Z);
 }
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
   thrust::device_vector<float> Y(y, y + 4);
   thrust::device_vector<float> Z(z, z + 4);
 
-  hipLaunchKernel(HIP_KERNEL_NAME(saxpy_kernel), dim3(1), dim3(1), 0, 0, 
+  hipLaunchKernelGGL(HIP_KERNEL_NAME(saxpy_kernel), dim3(1), dim3(1), 0, 0, 
       2.0, 
 
       // make a range view of a pair of transform_iterators
