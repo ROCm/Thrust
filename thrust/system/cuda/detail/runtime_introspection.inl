@@ -128,7 +128,6 @@ device_properties_t device_properties(int device_id)
 #if __HIP_DEVICE_COMPILE__ == 0
 
   runtime_introspection_detail::cached_device_properties(result, device_id);
-#endif
 #else
   runtime_introspection_detail::uncached_device_properties(result, device_id);
 #endif
