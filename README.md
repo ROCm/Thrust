@@ -30,6 +30,82 @@ $ git clone  https://github.com/ROCmSoftwarePlatform/Thrust.git
 
 $ cd Thrust
 
+### Directory Structure
+```
+├── doc
+├── examples
+│   ├── cpp_integration
+│   ├── cuda
+│   └── include
+├── performance
+│   └── build
+├── site_scons
+│   └── site_tools
+├── testing
+│   ├── backend
+│   │   ├── cuda
+│   │   └── omp
+│   ├── trivial_tests
+│   └── unittest
+└── thrust
+    ├── detail
+    │   ├── allocator
+    │   ├── complex
+    │   ├── config
+    │   ├── dispatch
+    │   ├── functional
+    │   │   └── operators
+    │   ├── mpl
+    │   ├── range
+    │   ├── type_traits
+    │   │   ├── algorithm
+    │   │   └── iterator
+    │   └── util
+    ├── iterator
+    │   └── detail
+    ├── random
+    │   └── detail
+    └── system
+        ├── cpp
+        │   └── detail
+        ├── cuda
+        │   ├── detail
+        │   │   ├── block
+        │   │   ├── bulk
+        │   │   │   ├── algorithm
+        │   │   │   │   └── detail
+        │   │   │   ├── detail
+        │   │   │   │   └── cuda_launcher
+        │   │   │   └── iterator
+        │   │   ├── cub
+        │   │   │   ├── block
+        │   │   │   │   └── specializations
+        │   │   │   ├── block_range
+        │   │   │   │   └── specializations
+        │   │   │   ├── block_sweep
+        │   │   │   │   └── specializations
+        │   │   │   ├── device
+        │   │   │   │   └── dispatch
+        │   │   │   ├── grid
+        │   │   │   ├── host
+        │   │   │   ├── iterator
+        │   │   │   ├── thread
+        │   │   │   └── warp
+        │   │   │       └── specializations
+        │   │   └── detail
+        │   └── experimental
+        ├── detail
+        │   ├── adl
+        │   ├── generic
+        │   │   └── scalar
+        │   ├── internal
+        │   └── sequential
+        ├── omp
+        │   └── detail
+        └── tbb
+            └── detail
+```
+
 ### Executable generation
 
 $ export HIP_PLATFORM=hcc (For HCC Platform )
@@ -70,11 +146,17 @@ $ ./cu_to_cpp.sh
 
 $ ./script_compile_testing_hcc.sh												
 
-### Known Issues:
+### Known Issues
 A linker error is being faced while trying to generate executables for test cases in Thrust/testing/backend/cuda,thereby allowing to generate only object files. The compile only option “-c” alone works while compiling test cases in backend/cuda.					
 
+### Dependency
+ There exists a dependency on hipified version of cub to generate executables.
+ The hipified cub is available as cub-hip in <https://github.com/ROCmSoftwarePlatform/cub-hip/tree/hip_port_1.7.3>
+   
+ Credentials may be required to clone cub-hip.
+ The hipified cub should be placed according to the directory structure mentioned above.
 
-### Thrust API Functionality:
+### Thrust API Functionality
 
 S.NO  |  Thrust API                      |  HIP/CUDA   |  HIP/ROCm
 ------|----------------------------------|-------------|-------------
