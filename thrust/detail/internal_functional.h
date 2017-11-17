@@ -406,6 +406,11 @@ struct unary_transform_if_with_stencil_functor
     : unary_op(unary_op), pred(pred)
   {}
 
+//workaround
+   __host__ __device__
+  unary_transform_if_with_stencil_functor(){}
+
+
   __thrust_exec_check_disable__
   template<typename Tuple>
   inline __host__ __device__

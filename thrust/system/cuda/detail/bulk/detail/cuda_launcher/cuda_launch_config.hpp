@@ -364,7 +364,8 @@ size_t max_blocksize_subject_to_smem_usage(const device_properties_t   &properti
                                            const function_attributes_t &attributes,
                                            UnaryFunction blocksize_to_dynamic_smem_usage)
 {
-  size_t largest_blocksize = (thrust::min)(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+ // size_t largest_blocksize = (thrust::min)(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+  size_t largest_blocksize  = properties.maxThreadsPerBlock;//Workaround to get largest_blocksize
   size_t granularity = properties.hipWarpSize;
   
   for(int blocksize = largest_blocksize; blocksize > 0; blocksize -= granularity)

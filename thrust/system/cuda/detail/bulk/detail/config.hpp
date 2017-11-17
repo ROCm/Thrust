@@ -43,7 +43,8 @@
 //#if defined(__CUDACC__)
 #if defined(__HIPCC__)
 //#  if !defined(__CUDA_ARCH__) || (__CUDA_ARCH__>= 350 && defined(__CUDACC_RDC__))
-#if (__HIP_DEVICE_COMPILE__ == 0) || (__CUDA_ARCH__>= 350 && defined(__CUDACC_RDC__))
+#if (! defined __HIP_DEVICE_COMPILE__ ) || (__CUDA_ARCH__>= 350 && defined(__CUDACC_RDC__))
+
 #    define __BULK_HAS_CUDART__ 1
 #  else
 #    define __BULK_HAS_CUDART__ 0

@@ -154,10 +154,12 @@ inline function_attributes_t function_attributes(KernelFunction kernel)
   };
 
   return result;
-#endif
 #else
   return function_attributes_t();
 #endif // __HIPCC__
+#else
+  return function_attributes_t();
+#endif
 }
 
 __host__ __device__

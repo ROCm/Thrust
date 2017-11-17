@@ -309,7 +309,8 @@ std::size_t block_size_with_maximum_potential_occupancy(const function_attribute
                                                         UnaryFunction block_size_to_dynamic_smem_size)
 {
   size_t max_occupancy      = properties.maxThreadsPerMultiProcessor;
-  size_t largest_blocksize  = cuda_launch_config_detail::util::min_(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+//  size_t largest_blocksize  = cuda_launch_config_detail::util::min_(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+  size_t largest_blocksize  = properties.maxThreadsPerBlock;//TODO workaround 
   size_t granularity        = properties.hipWarpSize;
   size_t max_blocksize      = 0;
   size_t highest_occupancy  = 0;
@@ -362,7 +363,9 @@ size_t max_blocksize_subject_to_smem_usage(const device_properties_t   &properti
                                            const function_attributes_t &attributes,
                                            UnaryFunction blocksize_to_dynamic_smem_usage)
 {
-  size_t largest_blocksize = (thrust::min)(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+ // size_t largest_blocksize = (thrust::min)(properties.maxThreadsPerBlock, attributes.maxThreadsPerBlock);
+  size_t largest_blocksize  = properties.maxThreadsPerBlock;//TODO workaround 
+  
   size_t granularity = properties.hipWarpSize;
   
   for(int blocksize = largest_blocksize; blocksize > 0; blocksize -= granularity)

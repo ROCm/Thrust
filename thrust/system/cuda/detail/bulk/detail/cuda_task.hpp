@@ -231,7 +231,9 @@ class cuda_task<
       : super_t(g,c),
         block_offset(offset)
     {}
-
+      //added in trail
+     __host__ __device__
+    ~cuda_task(){}
     __device__
     void operator()()
     {
