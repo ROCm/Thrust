@@ -227,7 +227,7 @@ OutputIterator adjacent_difference(execution_policy<DerivedPolicy> &exec,
                                         OutputIterator result,
                                         BinaryFunction binary_op)
     {
-      return t/system/cuda/detail/bulk/detail/config.hpphrust::system::cuda::detail::adjacent_difference_detail::adjacent_difference(exec, first, last, result, binary_op);
+      return thrust::system::cuda::detail::adjacent_difference_detail::adjacent_difference(exec, first, last, result, binary_op);
     }
 
     __host__ __device__
