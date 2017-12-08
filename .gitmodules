@@ -1,0 +1,4 @@
+[submodule "thrust/system/cuda/detail/cub-hip"]
+	path = thrust/system/cuda/detail/cub-hip
+	url = https://github.com/ROCmSoftwarePlatform/cub-hip.git
+	branch = hip_port_1.7.3
