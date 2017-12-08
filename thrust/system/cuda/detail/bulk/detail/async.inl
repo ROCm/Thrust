@@ -57,7 +57,9 @@ future<void> async(ExecutionGroup g, Closure c, hipEvent_t before_event)
 
   // XXX hipStreamCreate is __host__-only
   //     figure out a way to support this that does not require creating a new stream
-#if (__BULK_HAS_CUDART__ && !defined(__CUDA_ARCH__))
+//#if (__BULK_HAS_CUDART__ && !defined(__CUDA_ARCH__))
+#if (__BULK_HAS_CUDART__ && !defined(__HIP_DEVICE_COMPILE__))
+
   bulk::detail::throw_on_error(hipStreamCreate(&s), "hipStreamCreate in bulk::detail::async");
 #else
   s = 0;

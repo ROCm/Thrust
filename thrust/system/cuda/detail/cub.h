@@ -59,8 +59,10 @@
 // rename "cub" so it doesn't collide with another installation elsewhere
 #define cub cub_
 
-#include <thrust/system/cuda/detail/cub/util_namespace.cuh>
-#include <thrust/system/cuda/detail/cub/cub.cuh>
+//#include <thrust/system/cuda/detail/cub/util_namespace.cuh>
+#include "cub/util_namespace.cuh"
+//#include <thrust/system/cuda/detail/cub/cub.cuh>
+#include "cub/cub.cuh"
 
 // undef the top-level namespace name
 #undef cub

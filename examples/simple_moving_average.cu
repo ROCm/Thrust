@@ -25,7 +25,7 @@ template <typename T>
 struct minus_and_divide : public thrust::binary_function<T,T,T>
 {
     T w;
-
+    __host__ __device__
     minus_and_divide(T w) : w(w) {}
 
     __host__ __device__

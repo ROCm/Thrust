@@ -44,6 +44,10 @@ struct unary_negate
   __host__ __device__
   explicit unary_negate(const Predicate& pred) : pred(pred) {}
   
+  //workaround
+  __host__ __device__
+  explicit unary_negate(){}
+ 
   template <typename T>
   __host__ __device__
   bool operator()(const T& x)
@@ -148,7 +152,11 @@ struct tuple_binary_predicate
   
   __host__ __device__
   tuple_binary_predicate(const Predicate& p) : pred(p) {}
-  
+ 
+   //workaround
+  __host__ __device__
+  tuple_binary_predicate(){}
+
   template<typename Tuple>
   __host__ __device__
   bool operator()(const Tuple& t) const

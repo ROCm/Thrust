@@ -27,7 +27,7 @@ struct transform_tuple :
   typedef typename thrust::tuple<bool,ValueType,ValueType> OutputTuple;
 
   IndexType n, N;
-
+  __host__ __device__
   transform_tuple(IndexType n, IndexType N) : n(n), N(N) {}
 
   __host__ __device__

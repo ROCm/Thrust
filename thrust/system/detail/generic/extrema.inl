@@ -87,6 +87,10 @@ struct max_element_reduction
   __host__ __device__ 
   max_element_reduction(BinaryPredicate comp) : comp(comp){}
 
+  //workaround
+   __host__ __device__
+  max_element_reduction(){}
+
   __host__ __device__ 
   thrust::tuple<InputType, IndexType>
   operator()(const thrust::tuple<InputType, IndexType>& lhs, 

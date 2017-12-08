@@ -24,6 +24,7 @@ class strided_range
     struct stride_functor : public thrust::unary_function<difference_type,difference_type>
     {
         difference_type stride;
+        __host__ __device__
 
         stride_functor(difference_type stride)
             : stride(stride) {}
