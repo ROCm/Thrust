@@ -64,8 +64,8 @@ namespace detail
 {
 
 
-HIP_DYNAMIC_SHARED( int, s_data_segment_begin)
-
+//HIP_DYNAMIC_SHARED( int, s_data_segment_begin)
+extern  int s_data_segment_begin[];
 
 class os
 {
