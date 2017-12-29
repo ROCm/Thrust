@@ -63,9 +63,11 @@ inline __device__ T *on_chip_cast(T *ptr)
 namespace detail
 {
 
-
-//HIP_DYNAMIC_SHARED( int, s_data_segment_begin)
+#ifdef __HIP_PLATFORM_NVCC__
+HIP_DYNAMIC_SHARED( int, s_data_segment_begin)
+#else
 extern  int s_data_segment_begin[];
+#endif
 
 class os
 {

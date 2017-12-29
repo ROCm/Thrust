@@ -83,11 +83,19 @@ struct reduce_by_key_kernel
     typename Decomposition::size_type input_first, input_last;
     thrust::tie(input_first,input_last) = decomp[g.index()];
       
-      #ifdef __HIP_PLATFORM_NVCC__
+    /*  #ifdef __HIP_PLATFORM_NVCC__
     typename Decomposition::size_type output_first = g.index() == 0 ? 0 : interval_output_offsets[g.index() - 1];
       #else
       typename Decomposition::size_type output_first = g.index() == interval_output_offsets[g.index() - 1];
-      #endif
+      #endif*/
+      //workaround to fix compilation error
+      //typename Decomposition::size_type output_first = g.index() == 0 ? 0 : interval_output_offsets[g.index() - 1];
+      typename Decomposition::size_type output_first ;
+      if (g.index() == 0)
+      output_first = 0;
+      else
+      output_first = interval_output_offsets[g.index() - 1];
+
 
     key_type init_key     = keys_first[input_first];
     value_type init_value = values_first[input_first];
