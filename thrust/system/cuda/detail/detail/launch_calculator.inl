@@ -69,7 +69,8 @@ thrust::pair<size_t, size_t> launch_calculator<Closure>::default_block_configura
   std::size_t num_threads_per_block = block_size_with_maximum_potential_occupancy(attributes, properties);
 
   // choose a subscription rate
-  std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / num_threads_per_block;
+//  std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / num_threads_per_block;
+  std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / 1024 ;
 
   return thrust::make_pair(num_threads_per_block, num_blocks_per_multiprocessor);
 }

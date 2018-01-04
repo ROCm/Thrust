@@ -43,11 +43,23 @@ namespace trivial_copy_detail
 
 inline void checked_cudaMemcpyAsync(void *dst, const void *src, size_t count, enum hipMemcpyKind kind, hipStream_t stream)
 {
-  hipError_t error = hipMemcpyAsync(dst,src,count,kind,stream);
+  if (count==0){
+     int dummy;
+     src=&dummy;
+     hipError_t error = hipMemcpyAsync(dst,src,count,kind,stream);
+     if(error)
+     {
+     throw thrust::system_error(error, thrust::cuda_category());
+     }
+    }
+   else{
+ hipError_t error = hipMemcpyAsync(dst,src,count,kind,stream);
   if(error)
   {
     throw thrust::system_error(error, thrust::cuda_category());
-  } // end error
+  }
+}
+ 
 } // end checked_cudaMemcpy()
 
 
