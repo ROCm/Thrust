@@ -156,52 +156,7 @@ A linker error is being faced while trying to generate executables for test case
  Credentials may be required to clone cub-hip.
  The hipified cub should be placed according to the directory structure mentioned above.
 
-### Thrust API Functionality
+### API's supported
+ A list of [Thrust API's supported on HIP/CUDA and HIP/ROCm](https://github.com/ROCmSoftwarePlatform/Thrust/wiki/Thrust-API's-supported-on-HIP-CUDA-and-HIP-ROCm) can be found on wiki
 
-Serial No.  |  Thrust API                                            |  HIP/CUDA   |  HIP/ROCm
-------------|--------------------------------------------------------|-------------|-------------
-1           |  thrust::device_ptr                                    |  Supported  |  **Supported**
-2           |  thrust::make_zip_iterator                             |  Supported  |  **Supported**
-3           |  thrust::copy                                          |  Supported  |  **Supported**
-4           |  thrust::stable_sort_by_key                            |  Supported  |  **Supported**
-5           |  thrust::sequence                                      |  Supported  |  **Supported**
-6           |  thrust::inner_product                                 |  Supported  |  **Supported**
-7           |  thrust::plus                                          |  Supported  |  **Supported**
-8           |  thrust::distance                                      |  Supported  |  **Supported**
-9           |  thrust::transform                                     |  Supported  |  **Supported**
-10          |  thrust::inclusive_scan_by_key                         |  Supported  |  **Supported**
-11          |  thrust::exclusive_scan                                |  Supported  |  **Supported**
-12          |  thrust::inclusive_scan                                |  Supported  |  **Supported**
-13          |  thrust::iterator_difference                           |  Supported  |  **Supported**
-14          |  thrust::device_vector                                 |  Supported  |  **Supported**
-15          |  thrust::unary_function                                |  Supported  |  **Supported**
-16          |  thrust::get<>                                         |  Supported  |  **Supported**
-17          |  thrust::transform_iterator                            |  Supported  |  **Supported**
-18          |  thrust::permutation_iterator                          |  Supported  |  **Supported**
-19          |  thrust::make_tuple                                    |  Supported  |  **Supported**
-20          |  thrust::identity                                      |  Supported  |  **Supported**
-21          |  thrust::fill                                          |  Supported  |  **Supported**
-22          |  thrust::transform_reduce                              |  Supported  |  **Supported**
-23          |  thrust::counting_iterator                             |  Supported  |  **Supported**
-24          |  thrust::maximum                                       |  Supported  |  **Supported**
-25          |  thrust::tabulate                                      |  Supported  |  **Supported**
-26          |  thrust::make_pair                                     |  Supported  |  **Supported**
-27          |  thrust::pair                                          |  Supported  |  **Supported**
-28          |  thrust::make_reverse_iterator                         |  Supported  |  **Supported**
-29          |  thrust:sort_by_key                                    |  Supported  |  **Supported**
-30          |  thrust::uniform_real_distribution                     |  Supported  |  **Supported**
-31          |  thrust::system_error                                  |  Supported  |  **Supported**
-32          |  thrust::cuda_category                                 |  Supported  |  **Supported**
-33          |  thrust::cuda::par                                     |  Supported  |  **Supported**
-34          |  thrust::raw_pointer_cast                              |  Supported  |  **Supported**
-35          |  thrust::device_pointer_cast                           |  Supported  |  **Supported**
-36          |  thrust::minstd_rand                                   |  Supported  |  **Supported**
-37          |  thrust::constant_iterator                             |  Supported  |  **Supported**
-38          |  thrust::system::cuda::experimental::pinned_allocator  |  Supported  |  In-progress
-39          |  thrust::not_equal_to                                  |  Supported  |  In-progress
-40          |  thrust::reduce_by_key                                 |  Supported  |  In-progress
-41          |  thrust::max_element                                   |  Supported  |  In-progress
-42          |  thrust::find_if                                       |  Supported  |  In-progress
-43          |  thrust::find                                          |  Supported  |  In-progress
-44          |  thrust::copy_if                                       |  Supported  |  In-progress
-45          |  thrust::equal_to                                      |  Supported  |  In-progress
+
