@@ -219,7 +219,9 @@ typename thrust::detail::disable_if<
          OutputType init,
          BinaryFunction binary_op)
 {
-  return reduce_detail::general_reduce(exec, first, last, init, binary_op);
+//return reduce_detail::general_reduce(exec, first, last, init, binary_op);
+//Memory access fault issue appears for some of the Thrust API's on HIP/ROCm path,so tuned_reduce is used instead of general_reduce
+return reduce_detail::tuned_reduce(exec, first, last, init, binary_op);
 } // end reduce()
 
 
