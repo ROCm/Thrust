@@ -110,6 +110,9 @@ template <typename T1, typename T2>
    */
   inline __host__ __device__
   void swap(pair &p);
+
+  inline __host__ __device__ 
+  ~pair() {}
 }; // end pair
 
 
