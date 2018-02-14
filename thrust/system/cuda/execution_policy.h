@@ -42,7 +42,7 @@
 #include <thrust/system/cuda/detail/copy.h>
 #include <thrust/system/cuda/detail/reduce.h>
 #include <thrust/system/cuda/detail/scan.h>
-#include <thrust/system/cuda/detail/sort.h>
+//#include <thrust/system/cuda/detail/sort.h>
 
 // these are alphabetical
 #include <thrust/system/cuda/detail/adjacent_difference.h>
@@ -71,7 +71,7 @@
 #include <thrust/system/cuda/detail/scatter.h>
 #include <thrust/system/cuda/detail/sequence.h>
 #include <thrust/system/cuda/detail/set_operations.h>
-#include <thrust/system/cuda/detail/sort.h>
+//#include <thrust/system/cuda/detail/sort.h>
 #include <thrust/system/cuda/detail/swap_ranges.h>
 #include <thrust/system/cuda/detail/tabulate.h>
 #include <thrust/system/cuda/detail/transform.h>

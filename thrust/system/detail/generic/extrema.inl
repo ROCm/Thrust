@@ -60,6 +60,10 @@ struct min_element_reduction
   __host__ __device__ 
   min_element_reduction(BinaryPredicate comp) : comp(comp){}
 
+//Fix for compilation error
+ __host__ __device__
+ min_element_reduction(){}
+
   __host__ __device__ 
   thrust::tuple<InputType, IndexType>
   operator()(const thrust::tuple<InputType, IndexType>& lhs, 

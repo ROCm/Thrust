@@ -20,7 +20,7 @@ void set_G80(device_properties_t& properties)
   properties.multiProcessorCount         = 16;
   properties.sharedMemPerBlock           = 16384;
   properties.regsPerBlock                = 8192;
-  properties.warpSize                    = 32;
+  properties.hipWarpSize                    = 32;
   properties.maxThreadsPerBlock          = 512;
   properties.maxThreadsPerMultiProcessor = 768;
 }
@@ -31,7 +31,7 @@ void set_G84(device_properties_t& properties)
   properties.multiProcessorCount         = 4;
   properties.sharedMemPerBlock           = 16384;
   properties.regsPerBlock                = 8192;
-  properties.warpSize                    = 32;
+  properties.hipWarpSize                    = 32;
   properties.maxThreadsPerBlock          = 512;
   properties.maxThreadsPerMultiProcessor = 768;
 }
@@ -42,7 +42,7 @@ void set_GT200(device_properties_t& properties)
   properties.multiProcessorCount         = 30;
   properties.sharedMemPerBlock           = 16384;
   properties.regsPerBlock                = 16384;
-  properties.warpSize                    = 32;
+  properties.hipWarpSize                    = 32;
   properties.maxThreadsPerBlock          = 512;
   properties.maxThreadsPerMultiProcessor = 1024;
 }
@@ -53,7 +53,7 @@ void set_unknown(device_properties_t& properties)
   properties.multiProcessorCount         = 9001;
   properties.sharedMemPerBlock           = 4 * 16384;
   properties.regsPerBlock                = 32768;
-  properties.warpSize                    = 32;
+  properties.hipWarpSize                    = 32;
   properties.maxThreadsPerBlock          = 4096;
   properties.maxThreadsPerMultiProcessor = 8192;
 }

@@ -386,6 +386,9 @@ struct unary_transform_if_functor
   unary_transform_if_functor(UnaryFunction unary_op, Predicate pred)
     : unary_op(unary_op), pred(pred)
   {}
+//Workaround for compilation error 
+  __host__ __device__
+  unary_transform_if_functor() {}
 
   __thrust_exec_check_disable__
   template<typename Tuple>

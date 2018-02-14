@@ -52,7 +52,8 @@ OutputIterator copy_device_to_device(execution_policy<DerivedPolicy> &exec,
 
 #if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
     return thrust::transform(exec, begin, end, result, thrust::identity<InputType>());
-#else
+//Fix for compilation error
+/*#else
     // we're not compiling with nvcc: copy [begin, end) to temp host memory
     typename thrust::iterator_traits<InputIterator>::difference_type n = thrust::distance(begin, end);
 
@@ -68,7 +69,7 @@ OutputIterator copy_device_to_device(execution_policy<DerivedPolicy> &exec,
     cross_system<thrust::host_system_tag, DerivedPolicy> systems(temp_exec, exec);
     result = thrust::system::cuda::detail::copy_cross_system(systems, temp2.begin(), temp2.end(), result);
 
-    return result;
+    return result;*/
 #endif // THRUST_DEVICE_COMPILER_NVCC
 }
 
