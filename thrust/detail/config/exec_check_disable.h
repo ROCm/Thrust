@@ -23,8 +23,8 @@
 
 #include <thrust/detail/config.h>
 
-//#if defined(__HIPCC__) && !(defined(__CUDA__) && defined(__clang__))
-#if defined(__HIP_PLATFORM_NVCC__) && !(defined(__CUDA__) && defined(__clang__))
+//#if defined(__HIP_PLATFORM_NVCC__) && !(defined(__CUDA__) && defined(__clang__))
+#if defined(__HIP_PLATFORM_CUDACC__) && !(defined(__CUDA__) && defined(__clang__))
 
 
 #define __thrust_exec_check_disable__ #pragma nv_exec_check_disable

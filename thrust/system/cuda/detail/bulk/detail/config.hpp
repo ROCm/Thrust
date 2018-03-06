@@ -24,8 +24,8 @@
 #define BULK_NAMESPACE_SUFFIX
 #endif
 
-//#if defined(__CUDACC__) && !(defined(__CUDA__) && defined(__clang__))
-#if defined(__HIP_PLATFORM_NVCC__) && !(defined(__CUDA__) && defined(__clang__))
+#if defined(__CUDACC__) && !(defined(__CUDA__) && defined(__clang__))
+//#if defined(__HIP_PLATFORM_NVCC__) && !(defined(__CUDA__) && defined(__clang__))
 #  ifndef __bulk_exec_check_disable__
 #    define __bulk_exec_check_disable__ #pragma nv_exec_check_disable
 #  endif // __bulk_exec_check_disable__
