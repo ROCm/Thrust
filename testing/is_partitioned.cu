@@ -73,7 +73,7 @@ void TestIsPartitionedDispatchExplicit()
   thrust::device_vector<int> vec(1);
 
   my_system sys(0);
-  thrust::is_partitioned(sys, vec.begin(), vec.end(), 0);
+  thrust::is_partitioned(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
   ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -93,7 +93,7 @@ void TestIsPartitionedDispatchImplicit()
 
   thrust::is_partitioned(thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.end()),
-                         0);
+                         thrust::identity<int>());
 
   ASSERT_EQUAL(13, vec.front());
 }

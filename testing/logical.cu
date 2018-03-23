@@ -37,7 +37,7 @@ void TestAllOfDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::all_of(sys, vec.begin(), vec.end(), 0);
+    thrust::all_of(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -57,7 +57,7 @@ void TestAllOfDispatchImplicit()
 
     thrust::all_of(thrust::retag<my_tag>(vec.begin()),
                    thrust::retag<my_tag>(vec.end()),
-                   0);
+                   thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -97,7 +97,7 @@ void TestAnyOfDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::any_of(sys, vec.begin(), vec.end(), 0);
+    thrust::any_of(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -117,7 +117,7 @@ void TestAnyOfDispatchImplicit()
 
     thrust::any_of(thrust::retag<my_tag>(vec.begin()),
                    thrust::retag<my_tag>(vec.end()),
-                   0);
+                   thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -157,7 +157,7 @@ void TestNoneOfDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::none_of(sys, vec.begin(), vec.end(), 0);
+    thrust::none_of(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -177,7 +177,7 @@ void TestNoneOfDispatchImplicit()
 
     thrust::none_of(thrust::retag<my_tag>(vec.begin()),
                     thrust::retag<my_tag>(vec.end()),
-                    0);
+                    thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }

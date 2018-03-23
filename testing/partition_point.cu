@@ -66,7 +66,7 @@ void TestPartitionPointDispatchExplicit()
   thrust::partition_point(sys,
                           vec.begin(),
                           vec.begin(),
-                          0);
+                          thrust::identity<int>());
 
   ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -89,7 +89,7 @@ void TestPartitionPointDispatchImplicit()
 
   thrust::partition_point(thrust::retag<my_tag>(vec.begin()),
                           thrust::retag<my_tag>(vec.begin()),
-                          0);
+                          thrust::identity<int>());
 
   ASSERT_EQUAL(13, vec.front());
 }

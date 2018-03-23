@@ -1162,7 +1162,7 @@ void TestPartitionDispatchExplicit()
     thrust::partition(sys,
                       vec.begin(),
                       vec.begin(),
-                      0);
+                       thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1191,7 +1191,7 @@ void TestPartitionStencilDispatchExplicit()
                       vec.begin(),
                       vec.begin(),
                       vec.begin(),
-                      0);
+                       thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1215,7 +1215,7 @@ void TestPartitionDispatchImplicit()
 
     thrust::partition(thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                       thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1242,7 +1242,7 @@ void TestPartitionStencilDispatchImplicit()
     thrust::partition(thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                       thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1274,7 +1274,7 @@ void TestPartitionCopyDispatchExplicit()
                            vec.begin(),
                            vec.begin(),
                            vec.begin(),
-                           0);
+                            thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1310,7 +1310,7 @@ void TestPartitionCopyStencilDispatchExplicit()
                            vec.begin(),
                            vec.begin(),
                            vec.begin(),
-                           0);
+                            thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1341,7 +1341,7 @@ void TestPartitionCopyDispatchImplicit()
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
-                           0);
+                            thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1375,7 +1375,7 @@ void TestPartitionCopyStencilDispatchImplicit()
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
-                           0);
+                            thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1401,7 +1401,7 @@ void TestStablePartitionDispatchExplicit()
     thrust::stable_partition(sys,
                              vec.begin(),
                              vec.begin(),
-                             0);
+                              thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1430,7 +1430,7 @@ void TestStablePartitionStencilDispatchExplicit()
                              vec.begin(),
                              vec.begin(),
                              vec.begin(),
-                             0);
+                              thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1454,7 +1454,7 @@ void TestStablePartitionDispatchImplicit()
 
     thrust::stable_partition(thrust::retag<my_tag>(vec.begin()),
                              thrust::retag<my_tag>(vec.begin()),
-                             0);
+                              thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1481,7 +1481,7 @@ void TestStablePartitionStencilDispatchImplicit()
     thrust::stable_partition(thrust::retag<my_tag>(vec.begin()),
                              thrust::retag<my_tag>(vec.begin()),
                              thrust::retag<my_tag>(vec.begin()),
-                             0);
+                              thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1514,7 +1514,7 @@ void TestStablePartitionCopyDispatchExplicit()
                                   vec.begin(),
                                   vec.begin(),
                                   vec.begin(),
-                                  0);
+                                   thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1550,7 +1550,7 @@ void TestStablePartitionCopyStencilDispatchExplicit()
                                   vec.begin(),
                                   vec.begin(),
                                   vec.begin(),
-                                  0);
+                                   thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -1581,7 +1581,7 @@ void TestStablePartitionCopyDispatchImplicit()
                                   thrust::retag<my_tag>(vec.begin()),
                                   thrust::retag<my_tag>(vec.begin()),
                                   thrust::retag<my_tag>(vec.begin()),
-                                  0);
+                                   thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -1615,7 +1615,7 @@ void TestStablePartitionCopyStencilDispatchImplicit()
                                   thrust::retag<my_tag>(vec.begin()),
                                   thrust::retag<my_tag>(vec.begin()),
                                   thrust::retag<my_tag>(vec.begin()),
-                                  0);
+                                   thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }

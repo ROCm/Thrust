@@ -271,7 +271,7 @@ void TestReplaceIfDispatchExplicit()
     thrust::replace_if(sys,
                        vec.begin(),
                        vec.begin(),
-                       0,
+                       thrust::identity<int>(),
                        0);
 
     ASSERT_EQUAL(true, sys.is_valid());
@@ -294,7 +294,7 @@ void TestReplaceIfDispatchImplicit()
 
     thrust::replace_if(thrust::retag<my_tag>(vec.begin()),
                        thrust::retag<my_tag>(vec.begin()),
-                       0,
+                       thrust::identity<int>(),
                        0);
 
     ASSERT_EQUAL(13, vec.front());
@@ -354,7 +354,7 @@ void TestReplaceIfStencilDispatchExplicit()
                        vec.begin(),
                        vec.begin(),
                        vec.begin(),
-                       0,
+                       thrust::identity<int>(),
                        0);
 
     ASSERT_EQUAL(true, sys.is_valid());
@@ -379,7 +379,7 @@ void TestReplaceIfStencilDispatchImplicit()
     thrust::replace_if(thrust::retag<my_tag>(vec.begin()),
                        thrust::retag<my_tag>(vec.begin()),
                        thrust::retag<my_tag>(vec.begin()),
-                       0,
+                       thrust::identity<int>(),
                        0);
 
     ASSERT_EQUAL(13, vec.front());
@@ -466,7 +466,7 @@ void TestReplaceCopyIfDispatchExplicit()
                             vec.begin(),
                             vec.begin(),
                             vec.begin(),
-                            0,
+                            thrust::identity<int>(),
                             0);
 
     ASSERT_EQUAL(true, sys.is_valid());
@@ -492,7 +492,7 @@ void TestReplaceCopyIfDispatchImplicit()
     thrust::replace_copy_if(thrust::retag<my_tag>(vec.begin()),
                             thrust::retag<my_tag>(vec.begin()),
                             thrust::retag<my_tag>(vec.begin()),
-                            0,
+                            thrust::identity<int>(),
                             0);
 
     ASSERT_EQUAL(13, vec.front());
@@ -558,7 +558,7 @@ void TestReplaceCopyIfStencilDispatchExplicit()
                             vec.begin(),
                             vec.begin(),
                             vec.begin(),
-                            0,
+                            thrust::identity<int>(),
                             0);
 
     ASSERT_EQUAL(true, sys.is_valid());
@@ -586,7 +586,7 @@ void TestReplaceCopyIfStencilDispatchImplicit()
                             thrust::retag<my_tag>(vec.begin()),
                             thrust::retag<my_tag>(vec.begin()),
                             thrust::retag<my_tag>(vec.begin()),
-                            0,
+                            thrust::identity<int>(),
                             0);
 
     ASSERT_EQUAL(13, vec.front());

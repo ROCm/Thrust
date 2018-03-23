@@ -221,7 +221,7 @@ void TestRemoveIfDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::remove_if(sys, vec.begin(), vec.end(), 0);
+    thrust::remove_if(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -245,7 +245,7 @@ void TestRemoveIfDispatchImplicit()
 
     thrust::remove_if(thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                      thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -307,7 +307,7 @@ void TestRemoveIfStencilDispatchExplicit()
                       vec.begin(),
                       vec.begin(),
                       vec.begin(),
-                      0);
+                      thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -334,7 +334,7 @@ void TestRemoveIfStencilDispatchImplicit()
     thrust::remove_if(thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                      thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -391,7 +391,7 @@ void TestRemoveCopyIfDispatchExplicit()
                            vec.begin(),
                            vec.begin(),
                            vec.begin(),
-                           0);
+                           thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -418,7 +418,7 @@ void TestRemoveCopyIfDispatchImplicit()
     thrust::remove_copy_if(thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
-                           0);
+                           thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -486,7 +486,7 @@ void TestRemoveCopyIfStencilDispatchExplicit()
                            vec.begin(),
                            vec.begin(),
                            vec.begin(),
-                           0);
+                           thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -516,7 +516,7 @@ void TestRemoveCopyIfStencilDispatchImplicit()
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
                            thrust::retag<my_tag>(vec.begin()),
-                           0);
+                           thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
