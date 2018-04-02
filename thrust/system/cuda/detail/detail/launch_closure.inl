@@ -89,8 +89,8 @@ template<typename Closure,
     // this ensures that the kernel gets instantiated identically for all values of __CUDA_ARCH__
     get_launch_function();
 
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-//#ifdef __HIPCC__
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
 #if __BULK_HAS_CUDART__
 
     //launch_function_t kernel = get_launch_function();
