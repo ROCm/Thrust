@@ -46,7 +46,8 @@ struct launch_bounds
 struct thread_array : public launch_bounds<>
 {
 // CUDA built-in variables require nvcc
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
   __device__ __thrust_forceinline__ unsigned int thread_index(void) const { return hipThreadIdx_x; }
   __device__ __thrust_forceinline__ unsigned int thread_count(void) const { return hipBlockDim_x * hipGridDim_x; } 
 #else
@@ -59,7 +60,8 @@ struct thread_array : public launch_bounds<>
 struct blocked_thread_array : public launch_bounds<>
 {
 // CUDA built-in variables require nvcc
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
   __device__ __thrust_forceinline__ unsigned int thread_index(void)    const { return hipThreadIdx_x; }
   __device__ __thrust_forceinline__ unsigned int block_dimension(void) const { return hipBlockDim_x;  } 
   __device__ __thrust_forceinline__ unsigned int block_index(void)     const { return hipBlockIdx_x;  }
@@ -81,7 +83,8 @@ template <unsigned int _ThreadsPerBlock>
 struct statically_blocked_thread_array : public launch_bounds<_ThreadsPerBlock,1>
 {
 // CUDA built-in variables require nvcc
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
   __device__ __thrust_forceinline__ unsigned int thread_index(void)    const { return hipThreadIdx_x;      }
   __device__ __thrust_forceinline__ unsigned int block_dimension(void) const { return _ThreadsPerBlock; } // minor optimization
   __device__ __thrust_forceinline__ unsigned int block_index(void)     const { return hipBlockIdx_x;       }

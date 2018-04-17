@@ -34,7 +34,8 @@ template<typename T>
 {
 // don't attempt to compile with any compiler other than nvcc
 // due to use of __shared__ below
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
   public:
     __device__
     inline operator T * (void)

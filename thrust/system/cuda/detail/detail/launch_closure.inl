@@ -45,16 +45,25 @@ namespace detail
 namespace detail
 {
 
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
 template<typename Closure>
+#if defined(__HIP_PLATFORM_HCC__)
+__global__
+#else
 __global__ __launch_bounds__(Closure::context_type::ThreadsPerBlock::value, Closure::context_type::BlocksPerMultiprocessor::value)
+#endif
 void launch_closure_by_value(Closure f)
 {
   f();
 }
 
 template<typename Closure>
+#if defined(__HIP_PLATFORM_HCC__)
+__global__
+#else
 __global__ __launch_bounds__(Closure::context_type::ThreadsPerBlock::value, Closure::context_type::BlocksPerMultiprocessor::value)
+#endif
 void launch_closure_by_pointer( const Closure *f)
 {
   // copy to registers
@@ -187,7 +196,7 @@ __host__ __device__
 void launch_closure(execution_policy<DerivedPolicy> &exec, Closure f, Size num_blocks)
 {
   launch_calculator<Closure> calculator;
-  launch_closure(exec, f, num_blocks, thrust::get<1>(calculator.with_variable_block_size()));
+  launch_closure(exec, f, num_blocks, /*thrust::get<1>(calculator.with_variable_block_size())*/256);
 } // end launch_closure()
 
 template<typename DerivedPolicy, typename Closure, typename Size1, typename Size2>

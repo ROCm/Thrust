@@ -191,9 +191,14 @@ void reduce_intervals(execution_policy<ExecutionPolicy> &exec,
 
   thrust::tuple<size_t,size_t,size_t> config = calculator.with_variable_block_size_available_smem();
 
-  //size_t max_blocks = thrust::get<0>(config);
+  size_t max_blocks = thrust::get<0>(config);
   size_t block_size = thrust::get<1>(config);
   size_t max_memory = thrust::get<2>(config);
+
+  #if defined(__HIP_PLATFORM_HCC__)
+     max_blocks = 64;
+     block_size = 256;
+  #endif
 
   // determine shared array size
   size_t shared_array_size  = thrust::min(max_memory / sizeof(OutputType), block_size);
