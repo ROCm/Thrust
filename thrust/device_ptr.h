@@ -130,6 +130,7 @@ template<typename T>
 // declare these methods for the purpose of Doxygenating them
 // they actually are defined for a derived-from class
 
+#if 0
 /*! Writes to an output stream the value of a \p device_ptr's raw pointer.
  *
  *  \param os The output stream.
@@ -139,6 +140,7 @@ template<typename T>
 template<typename T, typename charT, typename traits>
 std::basic_ostream<charT, traits> &
 operator<<(std::basic_ostream<charT, traits> &os, const device_ptr<T> &p);
+#endif
 
 /*! \}
  */

@@ -10,11 +10,15 @@ bool binary_exists_for_current_device()
   // check against the dummy_kernel
   // if we're unable to get the attributes, then
   // we didn't compile a binary compatible with the current device
- hipFuncAttributes attr; 
-// cudaFuncAttributes attr;
-  hipError_t error = hipFuncGetAttributes(&attr, dummy_kernel);
-//  hipError_t error = cudaFuncGetAttributes(&attr, dummy_kernel);
+#ifdef __HIP_PLATFORM_NVCC__
+ //hipFuncAttributes attr; 
+cudaFuncAttributes attr;
+ // hipError_t error = hipFuncGetAttributes(&attr, dummy_kernel);
+  hipError_t error = cudaFuncGetAttributes(&attr, dummy_kernel);
   return error == hipSuccess;
+#else
+return true;
+#endif
 }
 
 void list_devices(void)

@@ -2,6 +2,7 @@
 #include <thrust/tuple.h>
 #include <thrust/scan.h>
 #include <thrust/transform.h>
+#include<backend/cuda/testframework.cu>
 
 #if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
 #include <backend/cuda/testframework.h>
