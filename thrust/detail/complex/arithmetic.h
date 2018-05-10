@@ -171,7 +171,7 @@ template<>
 template <typename ValueType>
   __host__ __device__
   inline ValueType arg(const complex<ValueType>& z){
-  return std::atan2(z.imag(),z.real());
+  return atan2(z.imag(),z.real());
 }
 
 template <typename ValueType>
@@ -211,7 +211,7 @@ template <>
 template <typename ValueType>
   __host__ __device__
   inline complex<ValueType> polar(const ValueType & m, const ValueType & theta){ 
-  return complex<ValueType>(m * std::cos(theta),m * std::sin(theta));
+  return complex<ValueType>(m * ::cos(theta),m * ::sin(theta));
 }
 
 }

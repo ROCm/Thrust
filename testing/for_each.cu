@@ -54,7 +54,7 @@ void TestForEachDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::for_each(sys, vec.begin(), vec.end(), 0);
+    thrust::for_each(sys, vec.begin(), vec.end(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -74,7 +74,7 @@ void TestForEachDispatchImplicit()
 
     thrust::for_each(thrust::retag<my_tag>(vec.begin()),
                      thrust::retag<my_tag>(vec.end()),
-                     0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -120,7 +120,7 @@ void TestForEachNDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::for_each_n(sys, vec.begin(), vec.size(), 0);
+    thrust::for_each_n(sys, vec.begin(), vec.size(), thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -140,7 +140,7 @@ void TestForEachNDispatchImplicit()
 
     thrust::for_each_n(thrust::retag<my_tag>(vec.begin()),
                        vec.size(),
-                       0);
+                       thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
