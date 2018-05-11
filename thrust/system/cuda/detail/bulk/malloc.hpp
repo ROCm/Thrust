@@ -478,11 +478,11 @@ class singleton_on_chip_allocator
 namespace
 {
 
-__shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+extern __shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 
 } // end anon namespace
 #else
-uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+extern uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 #endif
 
 inline __device__ void init_on_chip_malloc(size_t max_data_segment_size)
