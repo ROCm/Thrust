@@ -29,9 +29,9 @@ void TestTransformReduceDispatchExplicit()
     thrust::transform_reduce(sys,
                              vec.begin(),
                              vec.begin(),
-                             0,
-                             0,
-                             0);
+                             thrust::identity<int>(), 
+			     0, 
+			     thrust::plus<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -58,9 +58,10 @@ void TestTransformReduceDispatchImplicit()
 
     thrust::transform_reduce(thrust::retag<my_tag>(vec.begin()),
                              thrust::retag<my_tag>(vec.begin()),
-                             0,
-                             0,
-                             0);
+                             thrust::identity<int>(), 
+			     0, 
+			     thrust::plus<int>()
+                            );
 
     ASSERT_EQUAL(13, vec.front());
 }

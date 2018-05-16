@@ -50,7 +50,7 @@ void TestGenerateDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::generate(sys, vec.begin(), vec.end(), 0);
+    thrust::generate(sys, vec.begin(), vec.end(), return_value<int>(13));
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -69,7 +69,7 @@ void TestGenerateDispatchImplicit()
 
     thrust::generate(thrust::retag<my_tag>(vec.begin()),
                      thrust::retag<my_tag>(vec.end()),
-                     0);
+                     return_value<int>(13));
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -141,7 +141,7 @@ void TestGenerateNDispatchExplicit()
     thrust::device_vector<int> vec(1);
 
     my_system sys(0);
-    thrust::generate_n(sys, vec.begin(), vec.size(), 0);
+    thrust::generate_n(sys, vec.begin(), vec.size(), return_value<int>(13));
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -161,7 +161,7 @@ void TestGenerateNDispatchImplicit()
 
     thrust::generate_n(thrust::retag<my_tag>(vec.begin()),
                        vec.size(),
-                       0);
+                       return_value<int>(13));
 
     ASSERT_EQUAL(13, vec.front());
 }

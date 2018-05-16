@@ -489,7 +489,7 @@ void TestCopyIfDispatchExplicit()
                     vec.begin(),
                     vec.end(),
                     vec.begin(),
-                    0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -510,7 +510,7 @@ void TestCopyIfDispatchImplicit()
     thrust::copy_if(thrust::retag<my_tag>(vec.begin()),
                     thrust::retag<my_tag>(vec.end()),
                     thrust::retag<my_tag>(vec.begin()),
-                    0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -534,7 +534,7 @@ void TestCopyIfStencilDispatchExplicit()
                     vec.end(),
                     vec.begin(),
                     vec.begin(),
-                    0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -556,7 +556,7 @@ void TestCopyIfStencilDispatchImplicit()
                     thrust::retag<my_tag>(vec.end()),
                     thrust::retag<my_tag>(vec.begin()),
                     thrust::retag<my_tag>(vec.begin()),
-                    0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }

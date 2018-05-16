@@ -49,8 +49,8 @@ OutputIterator copy_device_to_device(execution_policy<DerivedPolicy> &exec,
 {
     // general case (mixed types)
     typedef typename thrust::iterator_traits<InputIterator>::value_type InputType;
-
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
     return thrust::transform(exec, begin, end, result, thrust::identity<InputType>());
 //Fix for compilation error
 #else

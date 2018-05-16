@@ -33,7 +33,7 @@ inline void terminate()
 {
 //#ifdef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__
-  asm("trap;");
+  asm("s_trap 0x2;");
 #else
   std::terminate();
 #endif

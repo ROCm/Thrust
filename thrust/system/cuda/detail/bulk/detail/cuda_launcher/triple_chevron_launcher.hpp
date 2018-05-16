@@ -116,17 +116,17 @@ class triple_chevron_launcher : protected triple_chevron_launcher_base<block_siz
   public:
     typedef Function task_type;
 
-    inline// __host__ __device__
+    inline  __host__ __device__
     void launch(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
     {
       struct workaround
       {
-        //__host__ __device__
-        /*static*/ void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
+        __host__ __device__
+        static void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
         {
 
-#if __BULK_HAS_CUDART__ || defined(__HIP_PLATFORM_HCC__)
-#if (!defined __HIP_DEVICE_COMPILE__)  || defined(__HIP_PLATFORM_HCC__)
+#if __BULK_HAS_CUDART__ /*|| defined(__HIP_PLATFORM_HCC__)*/
+#if (!defined __HIP_DEVICE_COMPILE__) /* || defined(__HIP_PLATFORM_HCC__)*/
 if (by_value)
 hipLaunchKernelGGL((launch_by_value<block_size_,Function>), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);
 else
@@ -158,10 +158,10 @@ hipLaunchKernelGGL((launch_by_pointer<block_size_,Function>), dim3(num_blocks), 
 
 
 
-#if __BULK_HAS_CUDART__ || defined(__HIP_PLATFORM_HCC__) //TODO Workaround for create kernel
-workaround wand;
-     wand.supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
-//workaround::supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+#if __BULK_HAS_CUDART__ /* || defined(__HIP_PLATFORM_HCC__)*/ //TODO Workaround for create kernel
+//workaround wand;
+     //wand.supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+workaround::supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
 
 #else
       workaround::unsupported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
@@ -191,22 +191,24 @@ class triple_chevron_launcher<block_size_,Function,false> : protected triple_che
         __host__ __device__
         static void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
         {
-          bulk::detail::parameter_ptr<task_type> parm = bulk::detail::make_parameter<task_type>(task);
+          //bulk::detail::parameter_ptr<task_type> parm = bulk::detail::make_parameter<task_type>(task);
 
-#if __BULK_HAS_CUDART__|| defined(__HIP_PLATFORM_HCC__)
+#if __BULK_HAS_CUDART__/*|| defined(__HIP_PLATFORM_HCC__)*/
 //#  ifndef __CUDA_ARCH__
-#if __HIP_DEVICE_COMPILE__ == 0 || defined(__HIP_PLATFORM_HCC__)        
+#if __HIP_DEVICE_COMPILE__ == 0 /*|| defined(__HIP_PLATFORM_HCC__) */       
  // cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
          // cudaSetupArgument(static_cast<const task_type*>(parm.get()), 0);
          // bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");
-         hipLaunchKernelGGL((super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);
+              hipLaunchKernelGGL((super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);
 #  else
           /*void *param_buffer = cudaGetParameterBuffer(alignment_of<task_type>::value, sizeof(task_type));
           task_type *task_ptr = parm.get();
           std::memcpy(param_buffer, &task_ptr, sizeof(task_type*));
           bulk::detail::throw_on_error(cudaLaunchDevice(reinterpret_cast<void*>(super_t::global_function_pointer()), param_buffer, dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream),
                                        "after cudaLaunchDevice in triple_chevron_launcher::launch()");*/
-         hipLaunchKernelGGL(reinterpret_cast<void*>(super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,alignment_of<task_type>::value);
+  hipLaunchKernelGGL((launch_by_pointer<block_size_,Function>), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,&task);
+
+          /* hipLaunchKernelGGL(reinterpret_cast<void*>(super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,alignment_of<task_type>::value);*/
 #  endif // __CUDA_ARCH__
 #endif // __BULK_HAS_CUDART__
         }
@@ -219,7 +221,7 @@ class triple_chevron_launcher<block_size_,Function,false> : protected triple_che
       };
 
 //workaround wand;
-#if __BULK_HAS_CUDART__ || __HIP_DEVICE_COMPILE__
+#if __BULK_HAS_CUDART__ /*|| __HIP_DEVICE_COMPILE__*/
       workaround::supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
 #else
       workaround::unsupported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);

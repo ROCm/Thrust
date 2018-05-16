@@ -146,8 +146,8 @@ template<typename Closure>
   {
     // this ensures that the kernel gets instantiated identically for all values of __CUDA_ARCH__
     launch_function_t kernel = get_launch_function();
-
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
 #if __BULK_HAS_CUDART__
     if(num_blocks > 0)
     {
@@ -196,7 +196,7 @@ __host__ __device__
 void launch_closure(execution_policy<DerivedPolicy> &exec, Closure f, Size num_blocks)
 {
   launch_calculator<Closure> calculator;
-  launch_closure(exec, f, num_blocks, /*thrust::get<1>(calculator.with_variable_block_size())*/256);
+  launch_closure(exec, f, num_blocks, thrust::get<1>(calculator.with_variable_block_size())/*256*/);
 } // end launch_closure()
 
 template<typename DerivedPolicy, typename Closure, typename Size1, typename Size2>

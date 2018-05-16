@@ -66,11 +66,14 @@ __host__ __device__
 thrust::pair<size_t, size_t> launch_calculator<Closure>::default_block_configuration(void) const
 {
   // choose a block size
+ #if defined(__HIP_PLATFORM_HCC__)
+  std::size_t num_threads_per_block =1024;
+#else
   std::size_t num_threads_per_block = block_size_with_maximum_potential_occupancy(attributes, properties);
-
+#endif
   // choose a subscription rate
-//  std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / num_threads_per_block;
-  std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / 1024 ;
+ std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / num_threads_per_block;
+ // std::size_t num_blocks_per_multiprocessor = properties.maxThreadsPerMultiProcessor / 1024 ;
 
   return thrust::make_pair(num_threads_per_block, num_blocks_per_multiprocessor);
 }

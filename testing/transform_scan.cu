@@ -32,8 +32,8 @@ void TestTransformInclusiveScanDispatchExplicit()
                                      vec.begin(),
                                      vec.begin(),
                                      vec.begin(),
-                                     0,
-                                     0);
+                                     thrust::identity<int>(),
+                                     thrust::plus<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -62,8 +62,8 @@ void TestTransformInclusiveScanDispatchImplicit()
     thrust::transform_inclusive_scan(thrust::retag<my_tag>(vec.begin()),
                                      thrust::retag<my_tag>(vec.begin()),
                                      thrust::retag<my_tag>(vec.begin()),
-                                     0,
-                                     0);
+                                     thrust::identity<int>(),
+                                     thrust::plus<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -96,9 +96,9 @@ void TestTransformExclusiveScanDispatchExplicit()
                                      vec.begin(),
                                      vec.begin(),
                                      vec.begin(),
+                                     thrust::identity<int>(),
                                      0,
-                                     0,
-                                     0);
+                                     thrust::plus<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -129,9 +129,9 @@ void TestTransformExclusiveScanDispatchImplicit()
     thrust::transform_exclusive_scan(thrust::retag<my_tag>(vec.begin()),
                                      thrust::retag<my_tag>(vec.begin()),
                                      thrust::retag<my_tag>(vec.begin()),
+                                     thrust::identity<int>(),
                                      0,
-                                     0,
-                                     0);
+                                     thrust::plus<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }

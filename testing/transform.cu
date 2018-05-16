@@ -47,7 +47,7 @@ void TestTransformUnaryDispatchExplicit()
                       vec.begin(),
                       vec.begin(),
                       vec.begin(),
-                      0);
+                      thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -70,7 +70,7 @@ void TestTransformUnaryDispatchImplicit()
     thrust::transform(thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                     thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -127,8 +127,8 @@ void TestTransformIfUnaryNoStencilDispatchExplicit()
                          vec.begin(),
                          vec.begin(),
                          vec.begin(),
-                         vec.begin(),
-                         0);
+                         thrust::identity<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -157,8 +157,8 @@ void TestTransformIfUnaryNoStencilDispatchImplicit()
     thrust::transform_if(thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
-                         thrust::retag<my_tag>(vec.begin()),
-                         0);
+                         thrust::identity<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -219,8 +219,8 @@ void TestTransformIfUnaryDispatchExplicit()
                          vec.begin(),
                          vec.begin(),
                          vec.begin(),
-                         0,
-                         0);
+                         thrust::identity<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -250,8 +250,8 @@ void TestTransformIfUnaryDispatchImplicit()
     thrust::transform_if(thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
-                         0,
-                         0);
+                         thrust::identity<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -301,7 +301,7 @@ void TestTransformBinaryDispatchExplicit()
                       vec.begin(),
                       vec.begin(),
                       vec.begin(),
-                      0);
+                      thrust::minus<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -326,7 +326,7 @@ void TestTransformBinaryDispatchImplicit()
                       thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
                       thrust::retag<my_tag>(vec.begin()),
-                      0);
+                      thrust::minus<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
@@ -399,8 +399,8 @@ void TestTransformIfBinaryDispatchExplicit()
                          vec.begin(),
                          vec.begin(),
                          vec.begin(),
-                         0,
-                         0);
+                         thrust::minus<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(true, sys.is_valid());
 }
@@ -435,8 +435,8 @@ void TestTransformIfBinaryDispatchImplicit()
                          thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
                          thrust::retag<my_tag>(vec.begin()),
-                         0,
-                         0);
+                         thrust::minus<int>(),
+                         thrust::identity<int>());
 
     ASSERT_EQUAL(13, vec.front());
 }
