@@ -75,7 +75,9 @@ inline void RECORD_PLATFORM_INFO(void)
     std::cout << "    <property name=\"clock rate\"" << " " << "value=\"" << (deviceProp.clockRate * 1e-6f) << "\"  units=\"GHz\"/>" << std::endl;
     std::cout << "  </device>" << std::endl;
     std::cout << "  <compilation>" << std::endl;
+    #if __HIP_PLATFORM_NVCC__
     std::cout << "    <property name=\"CUDA_VERSION\" value=\"" << CUDA_VERSION << "\"/>" << std::endl;
+    #endif
     std::cout << "    <property name=\"host compiler\" value=\"" << __HOST_COMPILER_NAME__ << " " << __HOST_COMPILER_VERSION__ << "\"/>" << std::endl;
     std::cout << "    <property name=\"__DATE__\" value=\"" << __DATE__ << "\"/>" << std::endl;
     std::cout << "    <property name=\"__TIME__\" value=\"" << __TIME__ << "\"/>" << std::endl;

@@ -129,21 +129,29 @@ def compile_test(input_name, output_name):
 if __name__ == '__main__':
     import os, sys
 
-    if len(sys.argv) not in [2,3]:
-        print "usage: %s test_input.py [test_output.cu]" % (sys.argv[0],)
-        os.exit()
-    
-    input_name = sys.argv[1]
+    cwd = os.getcwd()
+    for root, dirs, files in os.walk(cwd):
+        for file in files:
+                if file.endswith('.test'):
+                        input_name = file
+                        output_name = os.path.splitext(file)[0]+".cu"
+                        compile_test(input_name, output_name)
 
-    if len(sys.argv) == 2:
+   # if len(sys.argv) not in [2,3]:
+   #     print "usage: %s test_input.py [test_output.cu]" % (sys.argv[0],)
+   #     os.exit()
+    
+   # input_name = sys.argv[1]
+
+   # if len(sys.argv) == 2:
         # reduce.test -> reduce.cu
-        output_name = os.path.splitext(os.path.split(filename)[1])[0] + '.cu'
-    else:
-        output_name = sys.argv[2]
+   #     output_name = os.path.splitext(os.path.split(filename)[1])[0] + '.cu'
+   # else:
+   #     output_name = sys.argv[2]
         
     # process_test_file returns a string containing 
     # the whole test program (i.e. the text of a .cu file)
-    compile_test(input_name, output_name)
+   # compile_test(input_name, output_name)
 
     # this is just for show, scons integration would do this differently
     #import subprocess
