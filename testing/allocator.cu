@@ -54,22 +54,21 @@ void TestAllocatorCustomCopyConstruct()
 DECLARE_UNITTEST(TestAllocatorCustomCopyConstruct);
 
 static int g_state;
-
 struct my_allocator_with_custom_destroy
 {
   typedef int         value_type;
   typedef int &       reference;
   typedef const int & const_reference;
 
-  __host__
+  __host__ __device__
   my_allocator_with_custom_destroy(){}
 
-  __host__
+  __host__ __device__ 
   my_allocator_with_custom_destroy(const my_allocator_with_custom_destroy &other)
     : use_me_to_alloc(other.use_me_to_alloc)
   {}
 
-  __host__
+  __host__ __device__
   ~my_allocator_with_custom_destroy(){}
 
   template<typename T>
@@ -118,15 +117,15 @@ struct my_minimal_allocator
   typedef int &       reference;
   typedef const int & const_reference;
 
-  __host__
+  __host__ __device__
   my_minimal_allocator(){}
 
-  __host__
+  __host__ __device__
   my_minimal_allocator(const my_minimal_allocator &other)
     : use_me_to_alloc(other.use_me_to_alloc)
   {}
 
-  __host__
+  __host__ __device__
   ~my_minimal_allocator(){}
 
   value_type *allocate(std::ptrdiff_t n)
