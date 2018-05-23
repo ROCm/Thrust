@@ -81,9 +81,11 @@ int main(void)
     ClampedVectorIterator cv_end   = cv_begin + values.size();
     
     // now [clamped_begin, clamped_end) defines a sequence of clamped values
-    print_range("clamped values ", cv_begin, cv_end);
-
-
+   // print_range("clamped values ", cv_begin, cv_end);
+    std::cout<<"clamped values :";  
+     for(int i=0 ; i< values.size(); ++i)
+         std::cout<<cv_begin[i]<<" ";
+      std::cout<<std::endl;
 
     ////
     // compute the sum of the clamped sequence with reduce()
@@ -125,7 +127,11 @@ int main(void)
     NegatedVectorIterator nv_begin(values.begin(), simple_negate<int>());
     NegatedVectorIterator nv_end(values.end(), simple_negate<int>());
     
-    print_range("negated values ", nv_begin, nv_end);
+  //  print_range("negated values ", nv_begin, nv_end);
+      std::cout<<"negated values :";
+     for(int i=0 ; i< values.size(); ++i)
+         std::cout<<nv_begin[i]<<" ";
+      std::cout<<std::endl;
 
     return 0;
 }
