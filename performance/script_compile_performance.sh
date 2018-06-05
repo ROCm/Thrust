@@ -2,7 +2,7 @@
 for i in `find $pwd -name '*.test'` ;do python build/perftest.py ;
 done
 
-for i in `find $pwd -name '*.cu'` ;do hipify-perl --inplace $i
+for i in `find $pwd -name '*.cu'` ;do /opt/rocm/bin/hipify-perl --inplace $i
 done
 rm -rf *.prehip
 
