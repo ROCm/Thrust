@@ -482,7 +482,10 @@ __shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 
 } // end anon namespace
 #else
+namespace
+{
 uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
+} // end anon namespace
 #endif
 
 inline __device__ void init_on_chip_malloc(size_t max_data_segment_size)
