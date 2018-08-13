@@ -109,7 +109,9 @@ template<typename RealType>
       {
         uniform_real_distribution<RealType> u01;
         m_r1 = u01(urng);
-        m_r2 = u01(urng);
+        //m_r2 = u01(urng);
+        do{m_r2 = u01(urng);}
+        while(m_r2 >= 1);
         m_cached_rho = ::sqrt(-RealType(2) * ::log(RealType(1)-m_r2));
 
         m_valid = true;
@@ -136,7 +138,8 @@ template<typename RealType>
 template<typename RealType>
   struct normal_distribution_base
 {
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+//#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#ifdef __HIPCC__  
   typedef normal_distribution_nvcc<RealType> type;
 #else
   typedef normal_distribution_portable<RealType> type;
