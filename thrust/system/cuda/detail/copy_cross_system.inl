@@ -112,6 +112,7 @@ template<typename System1,
          typename RandomAccessIterator,
          typename Size,
          typename OutputIterator>
+  __host__ __device__
   OutputIterator copy_cross_system_n(cross_system<System1,System2> systems,
                                      RandomAccessIterator first,
                                      Size n,
@@ -252,6 +253,7 @@ template<typename System1,
          typename RandomAccessIterator1,
          typename Size,
          typename RandomAccessIterator2>
+  __host__ __device__
   RandomAccessIterator2 copy_cross_system_n(cross_system<System1,System2> systems,
                                             RandomAccessIterator1 first,
                                             Size n,
@@ -271,6 +273,7 @@ template<typename System1,
          typename System2,
          typename InputIterator,
          typename OutputIterator>
+  __host__ __device__
   OutputIterator copy_cross_system(cross_system<System1,System2> systems,
                                    InputIterator begin, 
                                    InputIterator end, 
@@ -286,6 +289,7 @@ template<typename System1,
          typename InputIterator,
          typename Size,
          typename OutputIterator>
+  __host__ __device__
   OutputIterator copy_cross_system_n(cross_system<System1,System2> systems,
                                      InputIterator begin, 
                                      Size n, 

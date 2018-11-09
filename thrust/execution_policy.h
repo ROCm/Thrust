@@ -340,7 +340,7 @@ static const detail::host_t host;
  *  \see host_execution_policy
  *  \see thrust::device
  */
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || __HIP__
 static const __device__ detail::device_t device;
 #else
 static const detail::device_t device;
