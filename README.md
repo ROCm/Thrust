@@ -26,7 +26,7 @@ $ sudo apt-get install rocm-dev
 
 ### Thrust
 
-$ git clone  https://github.com/ROCmSoftwarePlatform/Thrust.git
+$ git clone  --recursive  https://github.com/ROCmSoftwarePlatform/Thrust.git
 
 $ cd Thrust
 
