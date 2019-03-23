@@ -2,12 +2,12 @@
 
 
 
-mkdir -p Thrust-1.8.2-1.el7;
-cd Thrust-1.8.2-1.el7
+mkdir -p Thrust-1.8.3-2
+cd Thrust-1.8.3-2
 git clone --recursive https://github.com/ROCmSoftwarePlatform/Thrust.git
 cd Thrust
 commit_id=$(git log -1 --format=%h)
-commit_id="Thrust-1.8.2-1.el7-$commit_id"
+commit_id="Thrust-1.8.3-2-$commit_id"
 
 cd ..
 mkdir -p DEBIAN ;
@@ -17,7 +17,7 @@ cd DEBIAN/
 cat > control << EOF
 Package: $commit_id
 Essential: yes
-Version: 1.8.2 
+Version: 1.8.3 
 Maintainer: AMD 
 Priority: required
 Section: base 
@@ -48,7 +48,7 @@ cd ../
 rm -rf Thrust/
 
 cd ../ 
-mv Thrust-1.8.2-1.el7/ $commit_id/
+mv Thrust-1.8.3-2/ $commit_id/
 
 dpkg --build $commit_id
 
