@@ -1,17 +1,16 @@
+# ########################################################################
+# Copyright 2019 Advanced Micro Devices, Inc.
+# ########################################################################
+
 cmake_minimum_required(VERSION 3.5)
 
 # Consider removing this in the future
-
 # This should appear before the project command, because it does not use FORCE
 
 if( WIN32 )
-
   set( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/package" CACHE PATH "Install path prefix, prepended onto install directories" )
-
 else( )
-
   set( CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "Install path prefix, prepended onto install directories" )
-
 endif( )
 
 set (PROJECT_NAME "thrust")
@@ -53,10 +52,7 @@ include( ROCMInstallTargets )
 include( ROCMPackageConfigHelpers )
 include( ROCMInstallSymlinks )
 
-
-
-
-set ( VERSION_STRING "2.3.2." )
+set ( VERSION_STRING "2.3.0." )
 # Check if BUILD_NUMBER is defined in a Jenkins envirnment
 if ($ENV{BUILD_NUMBER} )
   string(CONCAT BUILD_VERSION ${VERSION_STRING} $ENV{BUILD_NUMBER})
@@ -66,18 +62,7 @@ endif ()
 
 rocm_setup_version( VERSION ${BUILD_VERSION} NO_GIT_TAG_VERSION )
 
-
-
-# Get the git tag version
-include ( cmake/version.cmake )
-
-rocm_get_git_commit_id ( rocblas_VERSION_COMMIT_ID )
-
 # force library install path to lib (CentOS 7 defaults to lib64)
-
 set(CMAKE_INSTALL_LIBDIR "lib" CACHE INTERNAL "Installation directory for libraries" FORCE)
-
-
-
 
 add_subdirectory( thrust )
