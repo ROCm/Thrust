@@ -65,4 +65,8 @@ rocm_setup_version( VERSION ${BUILD_VERSION} NO_GIT_TAG_VERSION )
 # force library install path to lib (CentOS 7 defaults to lib64)
 set(CMAKE_INSTALL_LIBDIR "lib" CACHE INTERNAL "Installation directory for libraries" FORCE)
 
+
+
+set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
+
 add_subdirectory( thrust )
