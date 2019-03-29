@@ -72,10 +72,7 @@ ThrustCI:
         platform, project->
 
         def command = """
-                      set -x
-                      cd ${project.paths.project_build_prefix}
-		      cmake -DBUILD_VERSION_MAJOR=1 -DBUILD_VERSION_MINOR=8 -DBUILD_VERSION_PATCH=2 -DCPACK_GENERATOR="RPM" -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/rocm ..
-		      make -j8 package
+	    	    echo "Disabled Packaging"
                       """
 
         platform.runCommand(this, command)
