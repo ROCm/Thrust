@@ -29,7 +29,7 @@ import java.nio.file.Path;
 ThrustCI:
 {
 
-    def Thrust = new rocProject('Thrust')
+    def Thrust = new rocProject('thrust')
     // customize for project
 
     // Define test architectures, optional rocm version argument is available
