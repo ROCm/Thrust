@@ -79,7 +79,7 @@ ThrustCI:
                       """
 
         platform.runCommand(this, command)
-        platform.archiveArtifacts(this, """${project.paths.project_build_prefix}/build/release/package/*.deb""")
+        platform.archiveArtifacts(this, """${project.paths.project_build_prefix}/package/*.deb""")
     }
 
     buildProject(Thrust, formatCheck, nodes.dockerArray, compileCommand, testCommand, packageCommand)
