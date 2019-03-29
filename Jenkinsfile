@@ -33,7 +33,7 @@ ThrustCI:
     // customize for project
 
     // Define test architectures, optional rocm version argument is available
-    def nodes = new dockerNodes(['gfx900', 'gfx906'], rocblas)
+    def nodes = new dockerNodes(['gfx900', 'gfx906'], Thrust)
 
     boolean formatCheck = false
 
