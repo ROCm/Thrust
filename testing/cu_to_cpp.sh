@@ -1,4 +1,4 @@
 # Rename all *.txt to *.text
-for f in *.cu; do 
-sudo cp -- "$f" "${f%.cu}.cpp"
+for f in *.cu; do
+    cp -- "$f" "${f%.cu}.cpp"
 done
