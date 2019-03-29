@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-// This shared library is available at https://github.com/ROCmSoftwarePlatform/rocJENKINS/
+0;136;0c// This shared library is available at https://github.com/ROCmSoftwarePlatform/rocJENKINS/
 @Library('rocJenkins') _
 
 // This is file for internal AMD use.
@@ -33,7 +33,7 @@ ThrustCI:
     // customize for project
 
     // Define test architectures, optional rocm version argument is available
-    def nodes = new dockerNodes(['gfx900', 'gfx906'], Thrust)
+    def nodes = new dockerNodes(['gfx900', 'gfx906', 'gfx803'], Thrust)
 
     boolean formatCheck = false
 
@@ -57,7 +57,7 @@ ThrustCI:
 
         command = """#!/usr/bin/env bash
                 set -x
-                cd ${project.paths.project_build_prefix}/Thrust/testing
+                cd ${project.paths.project_build_prefix}/testing
 		./cu_to_cpp.sh 
 		./script_compile_testing_hcc.sh
 		cd ..
