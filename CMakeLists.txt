@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (PROJECT_NAME "Thrust")
+set (PROJECT_NAME "hip-thrust")
 
 project(${PROJECT_NAME})
 
