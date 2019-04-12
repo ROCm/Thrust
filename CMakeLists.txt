@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (PROJECT_NAME "Thrust")
+set (PROJECT_NAME "hip-thrust")
 
 project(${PROJECT_NAME})
 
@@ -16,9 +16,4 @@ set(CPACK_PACKAGE_CONTACT "Ben Sander (ben.sander@amd.com)")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HIP back-end for Thrust (alpha release).")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/NOTICE")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-
-# Debian and RPM specific variables
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "cub-hip")
-set(CPACK_RPM_PACKAGE_DEPENDS "cub-hip")
-
 include(CPack)
