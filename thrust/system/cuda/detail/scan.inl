@@ -221,7 +221,7 @@ OutputIterator inclusive_scan(execution_policy<DerivedPolicy> &exec,
 
   hipStream_t s = stream(thrust::detail::derived_cast(exec));
   
-  const Size threshold_of_parallelism = 20000;
+  const Size threshold_of_parallelism = 512; //Workaround for inclusive scan issue
 
   if(n < threshold_of_parallelism)
   {
