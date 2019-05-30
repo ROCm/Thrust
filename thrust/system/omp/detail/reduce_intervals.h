@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce_intervals.h
  *  \brief OpenMP implementations of reduce_intervals algorithms.
  */
@@ -26,28 +25,27 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
-template <typename DerivedPolicy,
-          typename InputIterator,
-          typename OutputIterator,
-          typename BinaryFunction,
-          typename Decomposition>
-void reduce_intervals(execution_policy<DerivedPolicy> &exec,
-                      InputIterator input,
-                      OutputIterator output,
-                      BinaryFunction binary_op,
-                      Decomposition decomp);
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename BinaryFunction,
+                          typename Decomposition>
+                void reduce_intervals(execution_policy<DerivedPolicy>& exec,
+                                      InputIterator                    input,
+                                      OutputIterator                   output,
+                                      BinaryFunction                   binary_op,
+                                      Decomposition                    decomp);
 
-} // end namespace detail
-} // end namespace omp
-} // end namespace system
+            } // end namespace detail
+        } // end namespace omp
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/omp/detail/reduce_intervals.inl>
-

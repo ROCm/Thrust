@@ -34,12 +34,12 @@
 // the order of the following #includes seems to matter, unfortunately
 
 // primitives come first, in order of increasing sophistication
-#include <thrust/system/cuda/detail/get_value.h>
 #include <thrust/system/cuda/detail/assign_value.h>
+#include <thrust/system/cuda/detail/get_value.h>
 #include <thrust/system/cuda/detail/iter_swap.h>
 
-#include <thrust/system/cuda/detail/for_each.h>
 #include <thrust/system/cuda/detail/copy.h>
+#include <thrust/system/cuda/detail/for_each.h>
 #include <thrust/system/cuda/detail/reduce.h>
 #include <thrust/system/cuda/detail/scan.h>
 //#include <thrust/system/cuda/detail/sort.h>
@@ -81,7 +81,6 @@
 #include <thrust/system/cuda/detail/uninitialized_fill.h>
 #include <thrust/system/cuda/detail/unique.h>
 #include <thrust/system/cuda/detail/unique_by_key.h>
-
 
 // define these entities here for the purpose of Doxygenating them
 // they are actually defined elsewhere
@@ -217,5 +216,3 @@ static const unspecified par;
 } // end system
 } // end thrust
 #endif
-
-

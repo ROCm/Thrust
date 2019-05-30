@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file for_each.h
  *  \brief Defines the interface for a function that executes a 
  *  function or functional for each value in a given range.
@@ -27,39 +26,35 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator,
+                          typename UnaryFunction>
+                __host__ __device__ RandomAccessIterator
+                                    for_each(execution_policy<DerivedPolicy>& s,
+                                             RandomAccessIterator             first,
+                                             RandomAccessIterator             last,
+                                             UnaryFunction                    f);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename UnaryFunction>
-__host__ __device__
-RandomAccessIterator for_each(execution_policy<DerivedPolicy> &s,
-                              RandomAccessIterator first,
-                              RandomAccessIterator last,
-                              UnaryFunction f);
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator,
+                          typename Size,
+                          typename UnaryFunction>
+                __host__ __device__ RandomAccessIterator
+                                    for_each_n(execution_policy<DerivedPolicy>& s,
+                                               RandomAccessIterator             first,
+                                               Size                             n,
+                                               UnaryFunction                    f);
 
-
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename Size,
-         typename UnaryFunction>
-__host__ __device__
-RandomAccessIterator for_each_n(execution_policy<DerivedPolicy> &s,
-                                RandomAccessIterator first,
-                                Size n,
-                                UnaryFunction f);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/for_each.inl>
-

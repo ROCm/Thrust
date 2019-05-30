@@ -15,37 +15,29 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                inline __host__ __device__ void synchronize(const char* message = "");
 
-inline __host__ __device__
-void synchronize(const char *message = "");
+                inline __host__ __device__ void synchronize(hipStream_t stream,
+                                                            const char* message = "");
 
-inline __host__ __device__
-void synchronize(hipStream_t stream, const char *message = "");
+                inline __host__ __device__ void synchronize_if_enabled(const char* message = "");
 
-
-inline __host__ __device__
-void synchronize_if_enabled(const char *message = "");
-
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/synchronize.inl>
-

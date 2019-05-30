@@ -21,32 +21,28 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator1,
+                          typename InputIterator2,
+                          typename OutputIterator,
+                          typename Predicate>
+                __host__ __device__ OutputIterator copy_if(execution_policy<DerivedPolicy>& exec,
+                                                           InputIterator1                   first,
+                                                           InputIterator1                   last,
+                                                           InputIterator2                   stencil,
+                                                           OutputIterator                   result,
+                                                           Predicate                        pred);
 
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator,
-         typename Predicate>
-__host__ __device__
-OutputIterator copy_if(execution_policy<DerivedPolicy> &exec,
-                       InputIterator1 first,
-                       InputIterator1 last,
-                       InputIterator2 stencil,
-                       OutputIterator result,
-                       Predicate pred);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/copy_if.inl>
-

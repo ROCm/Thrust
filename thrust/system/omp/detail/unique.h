@@ -17,43 +17,39 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/system/omp/detail/execution_policy.h>
 #include <thrust/pair.h>
+#include <thrust/system/omp/detail/execution_policy.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename ForwardIterator,
+                          typename BinaryPredicate>
+                ForwardIterator unique(execution_policy<DerivedPolicy>& exec,
+                                       ForwardIterator                  first,
+                                       ForwardIterator                  last,
+                                       BinaryPredicate                  binary_pred);
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename BinaryPredicate>
-  ForwardIterator unique(execution_policy<DerivedPolicy> &exec,
-                         ForwardIterator first,
-                         ForwardIterator last,
-                         BinaryPredicate binary_pred);
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename BinaryPredicate>
+                OutputIterator unique_copy(execution_policy<DerivedPolicy>& exec,
+                                           InputIterator                    first,
+                                           InputIterator                    last,
+                                           OutputIterator                   output,
+                                           BinaryPredicate                  binary_pred);
 
-
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename BinaryPredicate>
-  OutputIterator unique_copy(execution_policy<DerivedPolicy> &exec,
-                             InputIterator first,
-                             InputIterator last,
-                             OutputIterator output,
-                             BinaryPredicate binary_pred);
-
-
-} // end namespace detail
-} // end namespace omp 
-} // end namespace system
+            } // end namespace detail
+        } // end namespace omp
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/omp/detail/unique.inl>
-

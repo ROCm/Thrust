@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce.h
  *  \brief Reduce a sequence of elements with a given length.
  */
@@ -26,30 +25,26 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputType,
+                          typename BinaryFunction>
+                __host__ __device__ OutputType reduce(execution_policy<DerivedPolicy>& exec,
+                                                      InputIterator                    first,
+                                                      InputIterator                    last,
+                                                      OutputType                       init,
+                                                      BinaryFunction                   binary_op);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputType,
-         typename BinaryFunction>
-__host__ __device__
-OutputType reduce(execution_policy<DerivedPolicy> &exec,
-                  InputIterator first,
-                  InputIterator last,
-                  OutputType init,
-                  BinaryFunction binary_op);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/reduce.inl>
-

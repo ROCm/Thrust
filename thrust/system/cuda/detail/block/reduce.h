@@ -21,47 +21,53 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
-namespace block
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
+                namespace block
+                {
 
-/* Reduces [data, data + n) using binary_op and stores the result in data[0]
+                    /* Reduces [data, data + n) using binary_op and stores the result in data[0]
  *
  * Upon return the elements in [data + 1, data + n) have unspecified values.
  */
-template <typename Context, typename ValueIterator, typename BinaryFunction>
-__device__ __thrust_forceinline__
-void reduce_n(Context context, ValueIterator data, unsigned int n, BinaryFunction binary_op)
-{
-  if (context.block_dimension() < n)
-  {
-    for (unsigned int i = context.block_dimension() + context.thread_index(); i < n; i += context.block_dimension())
-      data[context.thread_index()] = binary_op(data[context.thread_index()], data[i]);
+                    template <typename Context, typename ValueIterator, typename BinaryFunction>
+                    __device__ __thrust_forceinline__ void reduce_n(Context        context,
+                                                                    ValueIterator  data,
+                                                                    unsigned int   n,
+                                                                    BinaryFunction binary_op)
+                    {
+                        if(context.block_dimension() < n)
+                        {
+                            for(unsigned int i = context.block_dimension() + context.thread_index();
+                                i < n;
+                                i += context.block_dimension())
+                                data[context.thread_index()]
+                                    = binary_op(data[context.thread_index()], data[i]);
 
-    context.barrier();
-  }
+                            context.barrier();
+                        }
 
-  while (n > 1)
-  {
-    unsigned int half = n / 2;
+                        while(n > 1)
+                        {
+                            unsigned int half = n / 2;
 
-    if (context.thread_index() < half)
-      data[context.thread_index()] = binary_op(data[context.thread_index()], data[n - context.thread_index() - 1]);
+                            if(context.thread_index() < half)
+                                data[context.thread_index()]
+                                    = binary_op(data[context.thread_index()],
+                                                data[n - context.thread_index() - 1]);
 
-    context.barrier();
+                            context.barrier();
 
-    n = n - half;
-  }
-}
+                            n = n - half;
+                        }
+                    }
 
-} // end namespace block
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+                } // end namespace block
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
-

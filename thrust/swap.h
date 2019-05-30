@@ -23,31 +23,33 @@
 #include <thrust/detail/config.h>
 #include <thrust/detail/execution_policy.h>
 
-// empty Doxygen comment below so namespace thrust's documentation will be extracted
+// empty Doxygen comment below so namespace thrust's documentation will be
+// extracted
 
 /*!
  */
 namespace thrust
 {
 
-/*! \addtogroup utility
+    /*! \addtogroup utility
  *  \{
  */
 
-/*! \addtogroup swap
+    /*! \addtogroup swap
  *  \{
  */
 
-/*! \p swap assigns the contents of \c a to \c b and the
+    /*! \p swap assigns the contents of \c a to \c b and the
  *  contents of \c b to \c a. This is used as a primitive operation
  *  by many other algorithms.
- *  
+ *
  *  \param a The first value of interest. After completion,
  *           the value of b will be returned here.
  *  \param b The second value of interest. After completion,
  *           the value of a will be returned here.
  *
- *  \tparam Assignable is a model of <a href="http://www.sgi.com/tech/stl/Assignable.html">Assignable</a>.
+ *  \tparam Assignable is a model of <a
+ * href="http://www.sgi.com/tech/stl/Assignable.html">Assignable</a>.
  *
  *  The following code snippet demonstrates how to use \p swap to
  *  swap the contents of two variables.
@@ -62,48 +64,50 @@ namespace thrust
  *  // x == 2, y == 1
  *  \endcode
  */
-template<typename Assignable1, typename Assignable2>
-__host__ __device__ 
-inline void swap(Assignable1 &a, Assignable2 &b);
+    template <typename Assignable1, typename Assignable2>
+    __host__ __device__ inline void swap(Assignable1& a, Assignable2& b);
 
-/*! \} // swap
+    /*! \} // swap
  */
 
-/*! \} // utility
+    /*! \} // utility
  */
 
-
-/*! \addtogroup copying
+    /*! \addtogroup copying
  *  \{
  */
 
-
-/*! \p swap_ranges swaps each of the elements in the range <tt>[first1, last1)</tt>
- *  with the corresponding element in the range <tt>[first2, first2 + (last1 - first1))</tt>.
- *  That is, for each integer \c n such that <tt>0 <= n < (last1 - first1)</tt>, it swaps
- *  <tt>*(first1 + n)</tt> and <tt>*(first2 + n)</tt>. The return value is
- *  <tt>first2 + (last1 - first1)</tt>.
+    /*! \p swap_ranges swaps each of the elements in the range <tt>[first1,
+ * last1)</tt> with the corresponding element in the range <tt>[first2, first2 +
+ * (last1 - first1))</tt>. That is, for each integer \c n such that <tt>0 <= n <
+ * (last1 - first1)</tt>, it swaps <tt>*(first1 + n)</tt> and <tt>*(first2 +
+ * n)</tt>. The return value is <tt>first2 + (last1 - first1)</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
  *  \param exec The execution policy to use for parallelization.
  *  \param first1 The beginning of the first sequence to swap.
- *  \param last1 One position past the last element of the first sequence to swap.
- *  \param first2 The beginning of the second sequence to swap.
- *  \return An iterator pointing to one position past the last element of the second
+ *  \param last1 One position past the last element of the first sequence to
+ * swap. \param first2 The beginning of the second sequence to swap. \return An
+ * iterator pointing to one position past the last element of the second
  *          sequence to swap.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam ForwardIterator1 is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
- *          and \p ForwardIterator1's \c value_type must be convertible to \p ForwardIterator2's \c value_type.
- *  \tparam ForwardIterator2 is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
- *          and \p ForwardIterator2's \c value_type must be convertible to \p ForwardIterator1's \c value_type.
+ *  \tparam ForwardIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *          and \p ForwardIterator1's \c value_type must be convertible to \p
+ * ForwardIterator2's \c value_type. \tparam ForwardIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *          and \p ForwardIterator2's \c value_type must be convertible to \p
+ * ForwardIterator1's \c value_type.
  *
- *  \pre \p first1 may equal \p first2, but the range <tt>[first1, last1)</tt> shall not overlap the range <tt>[first2, first2 + (last1 - first1))</tt> otherwise.
+ *  \pre \p first1 may equal \p first2, but the range <tt>[first1, last1)</tt>
+ * shall not overlap the range <tt>[first2, first2 + (last1 - first1))</tt>
+ * otherwise.
  *
  *  The following code snippet demonstrates how to use \p swap_ranges to
- *  swap the contents of two \c thrust::device_vectors using the \p thrust::device execution
- *  policy for parallelization:
+ *  swap the contents of two \c thrust::device_vectors using the \p
+ * thrust::device execution policy for parallelization:
  *
  *  \code
  *  #include <thrust/swap.h>
@@ -124,34 +128,36 @@ inline void swap(Assignable1 &a, Assignable2 &b);
  *  \see http://www.sgi.com/tech/stl/swap_ranges.html
  *  \see \c swap
  */
-template<typename DerivedPolicy,
-         typename ForwardIterator1,
-         typename ForwardIterator2>
-__host__ __device__
-  ForwardIterator2 swap_ranges(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                               ForwardIterator1 first1,
-                               ForwardIterator1 last1,
-                               ForwardIterator2 first2);
+    template <typename DerivedPolicy, typename ForwardIterator1, typename ForwardIterator2>
+    __host__ __device__ ForwardIterator2
+                        swap_ranges(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                    ForwardIterator1                                            first1,
+                                    ForwardIterator1                                            last1,
+                                    ForwardIterator2                                            first2);
 
-
-/*! \p swap_ranges swaps each of the elements in the range <tt>[first1, last1)</tt>
- *  with the corresponding element in the range <tt>[first2, first2 + (last1 - first1))</tt>.
- *  That is, for each integer \c n such that <tt>0 <= n < (last1 - first1)</tt>, it swaps
- *  <tt>*(first1 + n)</tt> and <tt>*(first2 + n)</tt>. The return value is
- *  <tt>first2 + (last1 - first1)</tt>.
+    /*! \p swap_ranges swaps each of the elements in the range <tt>[first1,
+ * last1)</tt> with the corresponding element in the range <tt>[first2, first2 +
+ * (last1 - first1))</tt>. That is, for each integer \c n such that <tt>0 <= n <
+ * (last1 - first1)</tt>, it swaps <tt>*(first1 + n)</tt> and <tt>*(first2 +
+ * n)</tt>. The return value is <tt>first2 + (last1 - first1)</tt>.
  *
  *  \param first1 The beginning of the first sequence to swap.
- *  \param last1 One position past the last element of the first sequence to swap.
- *  \param first2 The beginning of the second sequence to swap.
- *  \return An iterator pointing to one position past the last element of the second
+ *  \param last1 One position past the last element of the first sequence to
+ * swap. \param first2 The beginning of the second sequence to swap. \return An
+ * iterator pointing to one position past the last element of the second
  *          sequence to swap.
  *
- *  \tparam ForwardIterator1 is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
- *          and \p ForwardIterator1's \c value_type must be convertible to \p ForwardIterator2's \c value_type.
- *  \tparam ForwardIterator2 is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
- *          and \p ForwardIterator2's \c value_type must be convertible to \p ForwardIterator1's \c value_type.
+ *  \tparam ForwardIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *          and \p ForwardIterator1's \c value_type must be convertible to \p
+ * ForwardIterator2's \c value_type. \tparam ForwardIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *          and \p ForwardIterator2's \c value_type must be convertible to \p
+ * ForwardIterator1's \c value_type.
  *
- *  \pre \p first1 may equal \p first2, but the range <tt>[first1, last1)</tt> shall not overlap the range <tt>[first2, first2 + (last1 - first1))</tt> otherwise.
+ *  \pre \p first1 may equal \p first2, but the range <tt>[first1, last1)</tt>
+ * shall not overlap the range <tt>[first2, first2 + (last1 - first1))</tt>
+ * otherwise.
  *
  *  The following code snippet demonstrates how to use \p swap_ranges to
  *  swap the contents of two \c thrust::device_vectors.
@@ -174,18 +180,13 @@ __host__ __device__
  *  \see http://www.sgi.com/tech/stl/swap_ranges.html
  *  \see \c swap
  */
-template<typename ForwardIterator1,
-         typename ForwardIterator2>
-  ForwardIterator2 swap_ranges(ForwardIterator1 first1,
-                               ForwardIterator1 last1,
-                               ForwardIterator2 first2);
+    template <typename ForwardIterator1, typename ForwardIterator2>
+    ForwardIterator2
+        swap_ranges(ForwardIterator1 first1, ForwardIterator1 last1, ForwardIterator2 first2);
 
-
-/*! \} // copying
+    /*! \} // copying
  */
 
-
-} // end thrust
+} // namespace thrust
 
 #include <thrust/detail/swap.inl>
-

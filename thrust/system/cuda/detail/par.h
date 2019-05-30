@@ -16,68 +16,63 @@
 
 #pragma once
 
+#include <thrust/detail/allocator/allocator_traits.h>
 #include <thrust/detail/config.h>
-#include <thrust/system/cuda/detail/execution_policy.h>
 #include <thrust/detail/execute_with_allocator.h>
 #include <thrust/system/cuda/detail/execute_on_stream.h>
-#include <thrust/detail/allocator/allocator_traits.h>
+#include <thrust/system/cuda/detail/execution_policy.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                struct par_t : thrust::system::cuda::detail::execution_policy<par_t>
+                {
+                    par_t()
+                        : thrust::system::cuda::detail::execution_policy<par_t>()
+                    {
+                    }
 
-struct par_t : thrust::system::cuda::detail::execution_policy<par_t>
-{
-  par_t() : thrust::system::cuda::detail::execution_policy<par_t>() {}
+                    template <typename Allocator>
+                    __host__ __device__ typename thrust::detail::enable_if<
+                        thrust::detail::is_allocator<Allocator>::value,
+                        thrust::detail::execute_with_allocator<Allocator,
+                                                               execute_on_stream_base>>::type
+                        operator()(Allocator& alloc) const
+                    {
+                        return thrust::detail::execute_with_allocator<Allocator,
+                                                                      execute_on_stream_base>(
+                            alloc);
+                    }
 
-  template<typename Allocator>
-  __host__ __device__
-  typename thrust::detail::enable_if<
-    thrust::detail::is_allocator<Allocator>::value,
-    thrust::detail::execute_with_allocator<Allocator, execute_on_stream_base>
-  >::type
-    operator()(Allocator &alloc) const
-  {
-    return thrust::detail::execute_with_allocator<Allocator, execute_on_stream_base>(alloc);
-  }
+                    __host__ __device__ inline execute_on_stream on(const hipStream_t& stream) const
+                    {
+                        return execute_on_stream(stream);
+                    }
+                };
 
-  __host__ __device__
-  inline execute_on_stream on(const hipStream_t &stream) const
-  {
-    return execute_on_stream(stream);
-  }
-};
-
-
-} // end detail
-
+            } // end detail
 
 //#ifdef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__
-static const __device__ detail::par_t par;
+            static const __device__ detail::par_t par;
 #else
-static const detail::par_t par;
+            static const detail::par_t par;
 #endif
 
+        } // end cuda
+    } // end system
 
-} // end cuda
-} // end system
+    // alias par here
+    namespace cuda
+    {
 
+        using thrust::system::cuda::par;
 
-// alias par here
-namespace cuda
-{
-
-
-using thrust::system::cuda::par;
-
-
-} // end cuda
+    } // end cuda
 } // end thrust
-

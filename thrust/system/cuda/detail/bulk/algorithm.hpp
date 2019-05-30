@@ -16,15 +16,14 @@
 
 #pragma once
 
-#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/copy.hpp> 
-#include <thrust/system/cuda/detail/bulk/algorithm/reduce.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/scan.hpp>
 #include <thrust/system/cuda/detail/bulk/algorithm/accumulate.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/merge.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/scatter.hpp>
 #include <thrust/system/cuda/detail/bulk/algorithm/adjacent_difference.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/reduce_by_key.hpp>
-#include <thrust/system/cuda/detail/bulk/algorithm/sort.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/copy.hpp>
 #include <thrust/system/cuda/detail/bulk/algorithm/gather.hpp>
-
+#include <thrust/system/cuda/detail/bulk/algorithm/merge.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/reduce.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/reduce_by_key.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/scan.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/scatter.hpp>
+#include <thrust/system/cuda/detail/bulk/algorithm/sort.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/config.hpp>

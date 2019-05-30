@@ -21,55 +21,54 @@
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
+    namespace detail
+    {
 
+        inline __device__ unsigned int __isShared(const void* ptr)
+        {
+            // XXX WAR unused variable warning
+            (void)ptr;
 
-inline __device__ unsigned int __isShared(const void *ptr)
-{
-  // XXX WAR unused variable warning
-  (void) ptr;
-
-  unsigned int ret;
-
-#if __CUDA_ARCH__ >= 200
-  asm volatile ("{ \n\t"
-                "    .reg .pred p; \n\t"
-                "    isspacep.shared p, %1; \n\t"
-                "    selp.u32 %0, 1, 0, p;  \n\t"
-#  if (defined(_MSC_VER) && defined(_WIN64)) || defined(__LP64__)
-                "} \n\t" : "=r"(ret) : "l"(ptr));
-#  else
-                "} \n\t" : "=r"(ret) : "r"(ptr));
-#  endif
-#else
-  ret = 0;
-#endif
-
-  return ret;
-} // end __isShared()
-
-
-inline __device__ bool is_shared(const void *ptr)
-{
-  return __isShared(ptr);
-} // end is_shared()
-
-
-inline __device__ bool is_global(const void *ptr)
-{
-  // XXX WAR unused variable warning
-  (void) ptr;
+            unsigned int ret;
 
 #if __CUDA_ARCH__ >= 200
-  return __isGlobal(ptr);
+            asm volatile("{ \n\t"
+                         "    .reg .pred p; \n\t"
+                         "    isspacep.shared p, %1; \n\t"
+                         "    selp.u32 %0, 1, 0, p;  \n\t"
+#if(defined(_MSC_VER) && defined(_WIN64)) || defined(__LP64__)
+                         "} \n\t"
+                         : "=r"(ret)
+                         : "l"(ptr));
 #else
-  return false;
+                         "} \n\t"
+                         : "=r"(ret)
+                         : "r"(ptr));
 #endif
-} // end is_global()
+#else
+            ret = 0;
+#endif
 
+            return ret;
+        } // end __isShared()
 
-} // end detail
+        inline __device__ bool is_shared(const void* ptr)
+        {
+            return __isShared(ptr);
+        } // end is_shared()
+
+        inline __device__ bool is_global(const void* ptr)
+        {
+            // XXX WAR unused variable warning
+            (void)ptr;
+
+#if __CUDA_ARCH__ >= 200
+            return __isGlobal(ptr);
+#else
+            return false;
+#endif
+        } // end is_global()
+
+    } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-

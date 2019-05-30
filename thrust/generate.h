@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file generate.h
  *  \brief Fills a range with values "generated" from a function of no arguments
  */
@@ -27,31 +26,33 @@
 namespace thrust
 {
 
-
-/*! \addtogroup transformations
+    /*! \addtogroup transformations
  *  \{
  */
 
-
-/*! \p generate assigns the result of invoking \p gen, a function object that takes no arguments,
- *  to each element in the range <tt>[first,last)</tt>.
+    /*! \p generate assigns the result of invoking \p gen, a function object that
+ * takes no arguments, to each element in the range <tt>[first,last)</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
  *  \param exec The execution policy to use for parallelization.
  *  \param first The first element in the range of interest.
  *  \param last The last element in the range of interest.
- *  \param gen A function argument, taking no parameters, used to generate values to assign to
- *             elements in the range <tt>[first,last)</tt>.
+ *  \param gen A function argument, taking no parameters, used to generate
+ * values to assign to elements in the range <tt>[first,last)</tt>.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam ForwardIterator is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *  \tparam ForwardIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
  *          and \p ForwardIterator is mutable.
- *  \tparam Generator is a model of <a href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>,
- *          and \p Generator's \c result_type is convertible to \p ForwardIterator's \c value_type.
+ *  \tparam Generator is a model of <a
+ * href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>, and \p
+ * Generator's \c result_type is convertible to \p ForwardIterator's \c
+ * value_type.
  *
- *  The following code snippet demonstrates how to fill a \c host_vector with random numbers,
- *  using the standard C library function \c rand using the \p thrust::host execution policy for parallelization:
+ *  The following code snippet demonstrates how to fill a \c host_vector with
+ * random numbers, using the standard C library function \c rand using the \p
+ * thrust::host execution policy for parallelization:
  *
  *  \code
  *  #include <thrust/generate.h>
@@ -69,31 +70,31 @@ namespace thrust
  *  \see generate_n
  *  \see http://www.sgi.com/tech/stl/generate.html
  */
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Generator>
-__host__ __device__
-  void generate(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                Generator gen);
+    template <typename DerivedPolicy, typename ForwardIterator, typename Generator>
+    __host__ __device__ void
+             generate(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                      ForwardIterator                                             first,
+                      ForwardIterator                                             last,
+                      Generator                                                   gen);
 
-
-/*! \p generate assigns the result of invoking \p gen, a function object that takes no arguments,
- *  to each element in the range <tt>[first,last)</tt>.
+    /*! \p generate assigns the result of invoking \p gen, a function object that
+ * takes no arguments, to each element in the range <tt>[first,last)</tt>.
  *
  *  \param first The first element in the range of interest.
  *  \param last The last element in the range of interest.
- *  \param gen A function argument, taking no parameters, used to generate values to assign to
- *             elements in the range <tt>[first,last)</tt>.
+ *  \param gen A function argument, taking no parameters, used to generate
+ * values to assign to elements in the range <tt>[first,last)</tt>.
  *
- *  \tparam ForwardIterator is a model of <a href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
+ *  \tparam ForwardIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/ForwardIterator.html">Forward Iterator</a>,
  *          and \p ForwardIterator is mutable.
- *  \tparam Generator is a model of <a href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>,
- *          and \p Generator's \c result_type is convertible to \p ForwardIterator's \c value_type.
+ *  \tparam Generator is a model of <a
+ * href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>, and \p
+ * Generator's \c result_type is convertible to \p ForwardIterator's \c
+ * value_type.
  *
- *  The following code snippet demonstrates how to fill a \c host_vector with random numbers,
- *  using the standard C library function \c rand.
+ *  The following code snippet demonstrates how to fill a \c host_vector with
+ * random numbers, using the standard C library function \c rand.
  *
  *  \code
  *  #include <thrust/generate.h>
@@ -111,32 +112,33 @@ __host__ __device__
  *  \see generate_n
  *  \see http://www.sgi.com/tech/stl/generate.html
  */
-template<typename ForwardIterator,
-         typename Generator>
-  void generate(ForwardIterator first,
-                ForwardIterator last,
-                Generator gen);
+    template <typename ForwardIterator, typename Generator>
+    void generate(ForwardIterator first, ForwardIterator last, Generator gen);
 
-
-/*! \p generate_n assigns the result of invoking \p gen, a function object that takes no arguments,
- *  to each element in the range <tt>[first,first + n)</tt>. The return value is <tt>first + n</tt>.
+    /*! \p generate_n assigns the result of invoking \p gen, a function object that
+ * takes no arguments, to each element in the range <tt>[first,first + n)</tt>.
+ * The return value is <tt>first + n</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
  *  \param exec The execution policy to use for parallelization.
  *  \param first The first element in the range of interest.
  *  \param n The size of the range of interest.
- *  \param gen A function argument, taking no parameters, used to generate values to assign to
- *             elements in the range <tt>[first,first + n)</tt>.
+ *  \param gen A function argument, taking no parameters, used to generate
+ * values to assign to elements in the range <tt>[first,first + n)</tt>.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *  \tparam Size is an integral type (either signed or unsigned).
- *  \tparam Generator is a model of <a href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>,
- *          and \p Generator's \c result_type is convertible to a type in \p OutputIterator's set of \c value_types.
+ *  \tparam Generator is a model of <a
+ * href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>, and \p
+ * Generator's \c result_type is convertible to a type in \p OutputIterator's
+ * set of \c value_types.
  *
- *  The following code snippet demonstrates how to fill a \c host_vector with random numbers,
- *  using the standard C library function \c rand using the \p thrust::host execution policy for parallelization:
+ *  The following code snippet demonstrates how to fill a \c host_vector with
+ * random numbers, using the standard C library function \c rand using the \p
+ * thrust::host execution policy for parallelization:
  *
  *  \code
  *  #include <thrust/generate.h>
@@ -154,32 +156,32 @@ template<typename ForwardIterator,
  *  \see generate
  *  \see http://www.sgi.com/tech/stl/generate.html
  */
-template<typename DerivedPolicy,
-         typename OutputIterator,
-         typename Size,
-         typename Generator>
-__host__ __device__
-  OutputIterator generate_n(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                            OutputIterator first,
-                            Size n,
-                            Generator gen);
+    template <typename DerivedPolicy, typename OutputIterator, typename Size, typename Generator>
+    __host__ __device__ OutputIterator
+                        generate_n(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                   OutputIterator                                              first,
+                                   Size                                                        n,
+                                   Generator                                                   gen);
 
-
-/*! \p generate_n assigns the result of invoking \p gen, a function object that takes no arguments,
- *  to each element in the range <tt>[first,first + n)</tt>. The return value is <tt>first + n</tt>.
+    /*! \p generate_n assigns the result of invoking \p gen, a function object that
+ * takes no arguments, to each element in the range <tt>[first,first + n)</tt>.
+ * The return value is <tt>first + n</tt>.
  *
  *  \param first The first element in the range of interest.
  *  \param n The size of the range of interest.
- *  \param gen A function argument, taking no parameters, used to generate values to assign to
- *             elements in the range <tt>[first,first + n)</tt>.
+ *  \param gen A function argument, taking no parameters, used to generate
+ * values to assign to elements in the range <tt>[first,first + n)</tt>.
  *
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *  \tparam Size is an integral type (either signed or unsigned).
- *  \tparam Generator is a model of <a href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>,
- *          and \p Generator's \c result_type is convertible to a type in \p OutputIterator's set of \c value_types.
+ *  \tparam Generator is a model of <a
+ * href="http://www.sgi.com/tech/stl/Generator.html">Generator</a>, and \p
+ * Generator's \c result_type is convertible to a type in \p OutputIterator's
+ * set of \c value_types.
  *
- *  The following code snippet demonstrates how to fill a \c host_vector with random numbers,
- *  using the standard C library function \c rand.
+ *  The following code snippet demonstrates how to fill a \c host_vector with
+ * random numbers, using the standard C library function \c rand.
  *
  *  \code
  *  #include <thrust/generate.h>
@@ -196,18 +198,12 @@ __host__ __device__
  *  \see generate
  *  \see http://www.sgi.com/tech/stl/generate.html
  */
-template<typename OutputIterator,
-         typename Size,
-         typename Generator>
-  OutputIterator generate_n(OutputIterator first,
-                            Size n,
-                            Generator gen);
+    template <typename OutputIterator, typename Size, typename Generator>
+    OutputIterator generate_n(OutputIterator first, Size n, Generator gen);
 
-
-/*! \} // end transformations
+    /*! \} // end transformations
  */
 
 } // end namespace thrust
 
 #include <thrust/detail/generate.inl>
-

@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce.h
  *  \brief OpenMP implementation of reduce algorithms.
  */
@@ -26,29 +25,26 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputType,
+                          typename BinaryFunction>
+                OutputType reduce(execution_policy<DerivedPolicy>& exec,
+                                  InputIterator                    first,
+                                  InputIterator                    last,
+                                  OutputType                       init,
+                                  BinaryFunction                   binary_op);
 
-template<typename DerivedPolicy,
-         typename InputIterator, 
-         typename OutputType,
-         typename BinaryFunction>
-  OutputType reduce(execution_policy<DerivedPolicy> &exec,
-                    InputIterator first,
-                    InputIterator last,
-                    OutputType init,
-                    BinaryFunction binary_op);
-
-
-} // end namespace detail
-} // end namespace omp
-} // end namespace system
+            } // end namespace detail
+        } // end namespace omp
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/omp/detail/reduce.inl>
-

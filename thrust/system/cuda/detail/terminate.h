@@ -21,30 +21,24 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                inline __device__ void terminate()
+                {
+                    thrust::system::cuda::detail::bulk_::detail::terminate();
+                }
 
-inline __device__
-void terminate()
-{
-  thrust::system::cuda::detail::bulk_::detail::terminate();
-}
+                __host__ __device__ inline void terminate_with_message(const char* message)
+                {
+                    thrust::system::cuda::detail::bulk_::detail::terminate_with_message(message);
+                }
 
-
-__host__ __device__
-inline void terminate_with_message(const char* message)
-{
-  thrust::system::cuda::detail::bulk_::detail::terminate_with_message(message);
-}
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

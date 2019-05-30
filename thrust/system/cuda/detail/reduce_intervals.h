@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce_intervals.h
  *  \brief CUDA implementations of reduce_intervals algorithms.
  */
@@ -26,31 +25,27 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename BinaryFunction,
+                          typename Decomposition>
+                __host__ __device__ void reduce_intervals(execution_policy<DerivedPolicy>& exec,
+                                                          InputIterator                    input,
+                                                          OutputIterator                   output,
+                                                          BinaryFunction binary_op,
+                                                          Decomposition  decomp);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename BinaryFunction,
-         typename Decomposition>
-__host__ __device__
-void reduce_intervals(execution_policy<DerivedPolicy> &exec,
-                      InputIterator input,
-                      OutputIterator output,
-                      BinaryFunction binary_op,
-                      Decomposition decomp);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/reduce_intervals.inl>
-

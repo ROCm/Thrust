@@ -25,21 +25,33 @@
 // if the macros are already defined, save them and undefine them
 
 #if !defined(__GNUC__) || (THRUST_GCC_VERSION >= 40300)
-#  ifdef BULK_NAMESPACE_PREFIX
-#    pragma push_macro("BULK_NAMESPACE_PREFIX")
-#    undef BULK_NAMESPACE_PREFIX
-#    define BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
-#  endif
-#  ifdef BULK_NAMESPACE_SUFFIX
-#    pragma push_macro("BULK_NAMESPACE_SUFFIX")
-#    undef BULK_NAMESPACE_SUFFIX
-#    define BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
-#  endif
+#ifdef BULK_NAMESPACE_PREFIX
+#pragma push_macro("BULK_NAMESPACE_PREFIX")
+#undef BULK_NAMESPACE_PREFIX
+#define BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
+#endif
+#ifdef BULK_NAMESPACE_SUFFIX
+#pragma push_macro("BULK_NAMESPACE_SUFFIX")
+#undef BULK_NAMESPACE_SUFFIX
+#define BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
+#endif
 #endif // __GNUC__
 
 // define the macros while we #include our version of bulk
-#define BULK_NAMESPACE_PREFIX namespace thrust { namespace system { namespace cuda { namespace detail {
-#define BULK_NAMESPACE_SUFFIX                  }                  }                }                  }
+#define BULK_NAMESPACE_PREFIX    \
+    namespace thrust             \
+    {                            \
+        namespace system         \
+        {                        \
+            namespace cuda       \
+            {                    \
+                namespace detail \
+                {
+#define BULK_NAMESPACE_SUFFIX \
+    }                         \
+    }                         \
+    }                         \
+    }
 
 // rename "bulk" so it doesn't collide with another installation elsewhere
 #define bulk bulk_
@@ -56,13 +68,12 @@
 // redefine the macros if they were defined previously
 
 #if !defined(__GNUC__) || (THRUST_GCC_VERSION >= 40300)
-#  ifdef BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
-#    pragma pop_macro("BULK_NAMESPACE_PREFIX")
-#    undef BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
-#  endif
-#  ifdef BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
-#    pragma pop_macro("BULK_NAMESPACE_SUFFIX")
-#    undef BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
-#  endif
+#ifdef BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
+#pragma pop_macro("BULK_NAMESPACE_PREFIX")
+#undef BULK_NAMESPACE_PREFIX_NEEDS_RESTORE
+#endif
+#ifdef BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
+#pragma pop_macro("BULK_NAMESPACE_SUFFIX")
+#undef BULK_NAMESPACE_SUFFIX_NEEDS_RESTORE
+#endif
 #endif // __GNUC__
-

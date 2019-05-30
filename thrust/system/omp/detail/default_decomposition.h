@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file default_decomposition.h
  *  \brief Return a decomposition that is appropriate for the OpenMP backend.
  */
@@ -26,20 +25,20 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
-template <typename IndexType>
-thrust::system::detail::internal::uniform_decomposition<IndexType> default_decomposition(IndexType n);
+                template <typename IndexType>
+                thrust::system::detail::internal::uniform_decomposition<IndexType>
+                    default_decomposition(IndexType n);
 
-} // end namespace detail
-} // end namespace omp
-} // end namespace system
+            } // end namespace detail
+        } // end namespace omp
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/omp/detail/default_decomposition.inl>
-

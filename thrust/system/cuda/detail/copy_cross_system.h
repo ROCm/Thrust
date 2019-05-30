@@ -21,41 +21,37 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename System1,
+                          typename System2,
+                          typename InputIterator,
+                          typename OutputIterator>
+                __host__ __device__ OutputIterator
+                                    copy_cross_system(cross_system<System1, System2> systems,
+                                                      InputIterator                  begin,
+                                                      InputIterator                  end,
+                                                      OutputIterator                 result);
 
-template<typename System1,
-         typename System2,
-         typename InputIterator,
-         typename OutputIterator>
-  __host__ __device__
-  OutputIterator copy_cross_system(cross_system<System1,System2> systems,
-                                   InputIterator begin, 
-                                   InputIterator end, 
-                                   OutputIterator result);
+                template <typename System1,
+                          typename System2,
+                          typename InputIterator,
+                          typename Size,
+                          typename OutputIterator>
+                __host__ __device__ OutputIterator
+                                    copy_cross_system_n(cross_system<System1, System2> systems,
+                                                        InputIterator                  begin,
+                                                        Size                           n,
+                                                        OutputIterator                 result);
 
-
-template<typename System1,
-         typename System2,
-         typename InputIterator,
-         typename Size,
-         typename OutputIterator>
-  __host__ __device__
-  OutputIterator copy_cross_system_n(cross_system<System1,System2> systems,
-                                     InputIterator begin, 
-                                     Size n, 
-                                     OutputIterator result);
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
 
 #include <thrust/system/cuda/detail/copy_cross_system.inl>
-

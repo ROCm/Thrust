@@ -26,15 +26,14 @@
 namespace thrust
 {
 
-typedef thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::tag device_system_tag;
+    typedef thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::tag device_system_tag;
 
-} // end thrust
+} // namespace thrust
 
 // TODO remove this in 1.8.0
 namespace thrust
 {
 
-typedef THRUST_DEPRECATED device_system_tag device_space_tag;
+    typedef THRUST_DEPRECATED device_system_tag device_space_tag;
 
-} // end thrust
-
+} // namespace thrust

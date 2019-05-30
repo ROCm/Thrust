@@ -18,45 +18,39 @@
 
 #include <thrust/detail/config.h>
 #include <thrust/system/cuda/detail/bulk/detail/config.hpp>
-#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
-#include <thrust/system/cuda/detail/bulk/detail/terminate.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/guarded_cuda_runtime_api.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/terminate.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
+    namespace detail
+    {
 
-
-inline __host__ __device__
-void synchronize(const char* message = "")
-{
+        inline __host__ __device__ void synchronize(const char* message = "")
+        {
 #if __BULK_HAS_CUDART__
-  bulk::detail::throw_on_error(hipDeviceSynchronize(), message);
+            bulk::detail::throw_on_error(hipDeviceSynchronize(), message);
 #else
-  bulk::detail::terminate_with_message("hipDeviceSynchronize() requires CUDART");
-  (void)message; // Avoid unused parameter warnings
+            bulk::detail::terminate_with_message("hipDeviceSynchronize() requires CUDART");
+            (void)message; // Avoid unused parameter warnings
 #endif
-} // end terminate()
+        } // end terminate()
 
-
-inline __host__ __device__
-void synchronize_if_enabled(const char* message = "")
-{
+        inline __host__ __device__ void synchronize_if_enabled(const char* message = "")
+        {
 // XXX we rely on __THRUST_SYNCHRONOUS here
 //     note we always have to synchronize in __device__ code
 //#if __THRUST_SYNCHRONOUS || defined(__CUDA_ARCH__)
 #if __THRUST_SYNCHRONOUS || __HIP_DEVICE_COMPILE__
-  synchronize(message);
+            synchronize(message);
 #else
-  // WAR "unused parameter" warning
-  (void) message;
+            // WAR "unused parameter" warning
+            (void)message;
 #endif
-}
+        }
 
-
-} // end detail
+    } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-

@@ -15,14 +15,15 @@
  */
 
 /*! \file thrust/iterator/permutation_iterator.h
- *  \brief An iterator which performs a gather or scatter operation when dereferenced
+ *  \brief An iterator which performs a gather or scatter operation when
+ * dereferenced
  */
 
 /*
  * (C) Copyright Toon Knapen    2001.
  * (C) Copyright David Abrahams 2003.
  * (C) Copyright Roland Richter 2003.
- * 
+ *
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying NOTICE file for the complete license)
  *
@@ -40,36 +41,37 @@
 namespace thrust
 {
 
-
-/*! \addtogroup iterators
+    /*! \addtogroup iterators
  *  \{
  */
 
-/*! \addtogroup fancyiterator Fancy Iterators
+    /*! \addtogroup fancyiterator Fancy Iterators
  *  \ingroup iterators
  *  \{
  */
 
-/*! \p permutation_iterator is an iterator which represents a pointer into a
- *  reordered view of a given range. \p permutation_iterator is an imprecise name;
- *  the reordered view need not be a strict permutation. This iterator is useful
- *  for fusing a scatter or gather operation with other algorithms.
+    /*! \p permutation_iterator is an iterator which represents a pointer into a
+ *  reordered view of a given range. \p permutation_iterator is an imprecise
+ * name; the reordered view need not be a strict permutation. This iterator is
+ * useful for fusing a scatter or gather operation with other algorithms.
  *
  *  This iterator takes two arguments:
  *
  *    - an iterator to the range \c V on which the "permutation" will be applied
- *    - the reindexing scheme that defines how the elements of \c V will be permuted.
+ *    - the reindexing scheme that defines how the elements of \c V will be
+ * permuted.
  *
- *  Note that \p permutation_iterator is not limited to strict permutations of the
- *  given range \c V. The distance between begin and end of the reindexing iterators
- *  is allowed to be smaller compared to the size of the range \c V, in which case
- *  the \p permutation_iterator only provides a "permutation" of a subrange of \c V.
- *  The indices neither need to be unique. In this same context, it must be noted
- *  that the past-the-end \p permutation_iterator is completely defined by means of
- *  the past-the-end iterator to the indices.
+ *  Note that \p permutation_iterator is not limited to strict permutations of
+ * the given range \c V. The distance between begin and end of the reindexing
+ * iterators is allowed to be smaller compared to the size of the range \c V, in
+ * which case the \p permutation_iterator only provides a "permutation" of a
+ * subrange of \c V. The indices neither need to be unique. In this same
+ * context, it must be noted that the past-the-end \p permutation_iterator is
+ * completely defined by means of the past-the-end iterator to the indices.
  *
- *  The following code snippet demonstrates how to create a \p permutation_iterator
- *  which represents a reordering of the contents of a \p device_vector.
+ *  The following code snippet demonstrates how to create a \p
+ * permutation_iterator which represents a reordering of the contents of a \p
+ * device_vector.
  *
  *  \code
  *  #include <thrust/iterator/permutation_iterator.h>
@@ -94,7 +96,8 @@ namespace thrust
  *  typedef thrust::device_vector<float>::iterator ElementIterator;
  *  typedef thrust::device_vector<int>::iterator   IndexIterator;
  *
- *  thrust::permutation_iterator<ElementIterator,IndexIterator> iter(values.begin(), indices.begin());
+ *  thrust::permutation_iterator<ElementIterator,IndexIterator>
+ * iter(values.begin(), indices.begin());
  *
  *  *iter;   // returns 30.0f;
  *  iter[0]; // returns 30.0f;
@@ -115,75 +118,78 @@ namespace thrust
  *
  *  \see make_permutation_iterator
  */
-template <typename ElementIterator,
-          typename IndexIterator>
-  class permutation_iterator
-    : public thrust::detail::permutation_iterator_base<
-        ElementIterator,
-        IndexIterator
-      >::type
-{
-  /*! \cond
-   */
-  private:
-    typedef typename detail::permutation_iterator_base<ElementIterator,IndexIterator>::type super_t;
-
-    friend class thrust::iterator_core_access;
-  /*! \endcond
-   */
-
-  public:
-    /*! Null constructor calls the null constructor of this \p permutation_iterator's
-     *  element iterator.
-     */
-    __host__ __device__
-    permutation_iterator()
-      : m_element_iterator() {}
-
-    /*! Constructor accepts an \c ElementIterator into a range of values and an
-     *  \c IndexIterator into a range of indices defining the indexing scheme on the
-     *  values.
-     *
-     *  \param x An \c ElementIterator pointing this \p permutation_iterator's range of values.
-     *  \param y An \c IndexIterator pointing to an indexing scheme to use on \p x.
-     */
-    __host__ __device__
-    explicit permutation_iterator(ElementIterator x, IndexIterator y)
-      : super_t(y), m_element_iterator(x) {}
-
-    /*! Copy constructor accepts a related \p permutation_iterator.
-     *  \param r A compatible \p permutation_iterator to copy from.
-     */
-    template<typename OtherElementIterator, typename OtherIndexIterator>
-    __host__ __device__
-    permutation_iterator(permutation_iterator<OtherElementIterator,OtherIndexIterator> const &r
-    // XXX remove these guards when we have static_assert
-    , typename detail::enable_if_convertible<OtherElementIterator, ElementIterator>::type* = 0
-    , typename detail::enable_if_convertible<OtherIndexIterator, IndexIterator>::type* = 0
-    )
-      : super_t(r.base()), m_element_iterator(r.m_element_iterator)
-    {}
-
-  /*! \cond
-   */
-  private:
-    __thrust_exec_check_disable__
-    __host__ __device__
-    typename super_t::reference dereference() const
+    template <typename ElementIterator, typename IndexIterator>
+    class permutation_iterator
+        : public thrust::detail::permutation_iterator_base<ElementIterator, IndexIterator>::type
     {
-      return *(m_element_iterator + *this->base());
-    }
-
-    // make friends for the copy constructor
-    template<typename,typename> friend class permutation_iterator;
-
-    ElementIterator m_element_iterator;
-  /*! \endcond
+        /*! \cond
    */
-}; // end permutation_iterator
+    private:
+        typedef typename detail::permutation_iterator_base<ElementIterator, IndexIterator>::type
+            super_t;
 
+        friend class thrust::iterator_core_access;
+        /*! \endcond
+   */
 
-/*! \p make_permutation_iterator creates a \p permutation_iterator
+    public:
+        /*! Null constructor calls the null constructor of this \p
+   * permutation_iterator's element iterator.
+   */
+        __host__ __device__ permutation_iterator()
+            : m_element_iterator()
+        {
+        }
+
+        /*! Constructor accepts an \c ElementIterator into a range of values and an
+   *  \c IndexIterator into a range of indices defining the indexing scheme on
+   * the values.
+   *
+   *  \param x An \c ElementIterator pointing this \p permutation_iterator's
+   * range of values. \param y An \c IndexIterator pointing to an indexing
+   * scheme to use on \p x.
+   */
+        __host__ __device__ explicit permutation_iterator(ElementIterator x, IndexIterator y)
+            : super_t(y)
+            , m_element_iterator(x)
+        {
+        }
+
+        /*! Copy constructor accepts a related \p permutation_iterator.
+   *  \param r A compatible \p permutation_iterator to copy from.
+   */
+        template <typename OtherElementIterator, typename OtherIndexIterator>
+        __host__ __device__ permutation_iterator(
+            permutation_iterator<OtherElementIterator, OtherIndexIterator> const& r
+            // XXX remove these guards when we have static_assert
+            ,
+            typename detail::enable_if_convertible<OtherElementIterator,
+                                                   ElementIterator>::type*                   = 0,
+            typename detail::enable_if_convertible<OtherIndexIterator, IndexIterator>::type* = 0)
+            : super_t(r.base())
+            , m_element_iterator(r.m_element_iterator)
+        {
+        }
+
+        /*! \cond
+   */
+    private:
+        __thrust_exec_check_disable__ __host__ __device__ typename super_t::reference
+                                               dereference() const
+        {
+            return *(m_element_iterator + *this->base());
+        }
+
+        // make friends for the copy constructor
+        template <typename, typename>
+        friend class permutation_iterator;
+
+        ElementIterator m_element_iterator;
+        /*! \endcond
+   */
+    }; // end permutation_iterator
+
+    /*! \p make_permutation_iterator creates a \p permutation_iterator
  *  from an \c ElementIterator pointing to a range of elements to "permute"
  *  and an \c IndexIterator pointing to a range of indices defining an indexing
  *  scheme on the values.
@@ -193,18 +199,17 @@ template <typename ElementIterator,
  *  \return A new \p permutation_iterator which permutes the range \p e by \p i.
  *  \see permutation_iterator
  */
-template<typename ElementIterator, typename IndexIterator>
-__host__ __device__
-permutation_iterator<ElementIterator,IndexIterator> make_permutation_iterator(ElementIterator e, IndexIterator i)
-{
-  return permutation_iterator<ElementIterator,IndexIterator>(e,i);
-}
+    template <typename ElementIterator, typename IndexIterator>
+    __host__ __device__ permutation_iterator<ElementIterator, IndexIterator>
+                        make_permutation_iterator(ElementIterator e, IndexIterator i)
+    {
+        return permutation_iterator<ElementIterator, IndexIterator>(e, i);
+    }
 
-/*! \} // end fancyiterators
+    /*! \} // end fancyiterators
  */
 
-/*! \} // end iterators
+    /*! \} // end iterators
  */
 
-} // end thrust
-
+} // namespace thrust

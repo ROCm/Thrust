@@ -15,7 +15,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file runtime_introspection.h
  *  \brief Defines the interface to functions
  *         providing introspection into the architecture
@@ -34,62 +33,50 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
-
-/*! Returns the current device ordinal.
+                /*! Returns the current device ordinal.
  */
-inline __host__ __device__
-int current_device();
+                inline __host__ __device__ int current_device();
 
-
-/*! Returns a copy of the device_properties_t structure
+                /*! Returns a copy of the device_properties_t structure
  *  that is associated with a given device.
  */
-inline __host__ __device__
-device_properties_t device_properties(int device_id);
+                inline __host__ __device__ device_properties_t device_properties(int device_id);
 
-
-/*! Returns a copy of the device_properties_t structure
+                /*! Returns a copy of the device_properties_t structure
  *  that is associated with the current device.
  */
-inline __host__ __device__
-device_properties_t device_properties();
+                inline __host__ __device__ device_properties_t device_properties();
 
-
-/*! Returns a copy of the function_attributes_t structure
+                /*! Returns a copy of the function_attributes_t structure
  *  that is associated with a given __global__ function
  */
-template<typename KernelFunction>
-inline __host__ __device__
-function_attributes_t function_attributes(KernelFunction kernel);
+                template <typename KernelFunction>
+                inline __host__ __device__ function_attributes_t
+                                           function_attributes(KernelFunction kernel);
 
-
-/*! Returns the compute capability of a device in integer format.
+                /*! Returns the compute capability of a device in integer format.
  *  For example, returns 10 for sm_10 and 21 for sm_21
  *  \return The compute capability as an integer
  */
-inline __host__ __device__
-size_t compute_capability(const device_properties_t &properties);
+                inline __host__ __device__ size_t
+                                           compute_capability(const device_properties_t& properties);
 
-
-/*! Returns the compute capability of the current device in integer format.
+                /*! Returns the compute capability of the current device in integer format.
  *  For example, returns 10 for sm_10 and 21 for sm_21
  *  \return The compute capability as an integer
  */
-inline __host__ __device__
-size_t compute_capability();
+                inline __host__ __device__ size_t compute_capability();
 
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/runtime_introspection.inl>
-

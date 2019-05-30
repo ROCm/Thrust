@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file scan.h
  *  \brief Scan operations (parallel prefix-sum) [cuda]
  */
@@ -26,44 +25,40 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename AssociativeOperator>
+                __host__ __device__ OutputIterator
+                                    inclusive_scan(execution_policy<DerivedPolicy>& exec,
+                                                   InputIterator                    first,
+                                                   InputIterator                    last,
+                                                   OutputIterator                   result,
+                                                   AssociativeOperator              binary_op);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename AssociativeOperator>
-__host__ __device__
-OutputIterator inclusive_scan(execution_policy<DerivedPolicy> &exec,
-                              InputIterator first,
-                              InputIterator last,
-                              OutputIterator result,
-                              AssociativeOperator binary_op);
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename T,
+                          typename AssociativeOperator>
+                __host__ __device__ OutputIterator
+                                    exclusive_scan(execution_policy<DerivedPolicy>& exec,
+                                                   InputIterator                    first,
+                                                   InputIterator                    last,
+                                                   OutputIterator                   result,
+                                                   T                                init,
+                                                   AssociativeOperator              binary_op);
 
-
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename T,
-         typename AssociativeOperator>
-__host__ __device__
-OutputIterator exclusive_scan(execution_policy<DerivedPolicy> &exec,
-                              InputIterator first,
-                              InputIterator last,
-                              OutputIterator result,
-                              T init,
-                              AssociativeOperator binary_op);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/scan.inl>
-

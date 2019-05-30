@@ -15,7 +15,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file odd_even_sort.h
  *  \brief Block versions of Batcher's Odd-Even Merge Sort
  */
@@ -24,129 +23,121 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
-namespace block
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
+                namespace block
+                {
 
-
-/*! Block-wise implementation of Batcher's Odd-Even Merge Sort
+                    /*! Block-wise implementation of Batcher's Odd-Even Merge Sort
  *  This implementation is based on Nadathur Satish's.
  */
-template<typename KeyType,
-         typename ValueType,
-         typename StrictWeakOrdering>
-  __device__ void odd_even_sort(KeyType *keys,
-                                ValueType *data,
-                                const unsigned int n,
-                                StrictWeakOrdering comp)
-{
-  for(unsigned int p = hipBlockDim_x>>1; p > 0; p >>= 1)
-  {
-    unsigned int q = hipBlockDim_x>>1, r = 0, d = p;
+                    template <typename KeyType, typename ValueType, typename StrictWeakOrdering>
+                    __device__ void odd_even_sort(KeyType*           keys,
+                                                  ValueType*         data,
+                                                  const unsigned int n,
+                                                  StrictWeakOrdering comp)
+                    {
+                        for(unsigned int p = hipBlockDim_x >> 1; p > 0; p >>= 1)
+                        {
+                            unsigned int q = hipBlockDim_x >> 1, r = 0, d = p;
 
-    while(q >= p)
-    {
-      unsigned int j = hipThreadIdx_x + d;
+                            while(q >= p)
+                            {
+                                unsigned int j = hipThreadIdx_x + d;
 
-      // if j lies beyond the end of the array, we consider it "sorted" wrt i
-      // regardless of whether i lies beyond the end of the array 
-      if(hipThreadIdx_x < (hipBlockDim_x-d) && (hipThreadIdx_x & p) == r && j < n)
-      {
-        KeyType xikey = keys[hipThreadIdx_x];
-        KeyType xjkey = keys[j];
+                                // if j lies beyond the end of the array, we consider it "sorted" wrt i
+                                // regardless of whether i lies beyond the end of the array
+                                if(hipThreadIdx_x < (hipBlockDim_x - d) && (hipThreadIdx_x & p) == r
+                                   && j < n)
+                                {
+                                    KeyType xikey = keys[hipThreadIdx_x];
+                                    KeyType xjkey = keys[j];
 
-        ValueType xivalue = data[hipThreadIdx_x];
-        ValueType xjvalue = data[j];
+                                    ValueType xivalue = data[hipThreadIdx_x];
+                                    ValueType xjvalue = data[j];
 
-        // does xj sort before xi?
-        if(comp(xjkey, xikey))
-        {
-          keys[hipThreadIdx_x] = xjkey;
-          keys[j] = xikey;
+                                    // does xj sort before xi?
+                                    if(comp(xjkey, xikey))
+                                    {
+                                        keys[hipThreadIdx_x] = xjkey;
+                                        keys[j]              = xikey;
 
-          data[hipThreadIdx_x] = xjvalue;
-          data[j] = xivalue;
-        } // end if
-      } // end if
+                                        data[hipThreadIdx_x] = xjvalue;
+                                        data[j]              = xivalue;
+                                    } // end if
+                                } // end if
 
-      d = q - p;
-      q >>= 1;
-      r = p;
+                                d = q - p;
+                                q >>= 1;
+                                r = p;
 
-      __syncthreads();
-    } // end while
-  } // end for p
-} // end odd_even_sort()
+                                __syncthreads();
+                            } // end while
+                        } // end for p
+                    } // end odd_even_sort()
 
-template<typename KeyType,
-         typename ValueType,
-         typename StrictWeakOrdering>
-  __device__ void stable_odd_even_sort(KeyType *keys,
-                                       ValueType *data,
-                                       const unsigned int n,
-                                       StrictWeakOrdering comp)
-{
-  for(unsigned int i = 0;
-      i < hipBlockDim_x>>1;
-      ++i)
-  {
-    bool thread_is_odd = hipThreadIdx_x & 0x1;
+                    template <typename KeyType, typename ValueType, typename StrictWeakOrdering>
+                    __device__ void stable_odd_even_sort(KeyType*           keys,
+                                                         ValueType*         data,
+                                                         const unsigned int n,
+                                                         StrictWeakOrdering comp)
+                    {
+                        for(unsigned int i = 0; i<hipBlockDim_x>> 1; ++i)
+                        {
+                            bool thread_is_odd = hipThreadIdx_x & 0x1;
 
-    // do odds first
-    if(thread_is_odd && hipThreadIdx_x + 1 < n)
-    {
-      KeyType xikey = keys[hipThreadIdx_x];
-      KeyType xjkey = keys[hipThreadIdx_x + 1];
+                            // do odds first
+                            if(thread_is_odd && hipThreadIdx_x + 1 < n)
+                            {
+                                KeyType xikey = keys[hipThreadIdx_x];
+                                KeyType xjkey = keys[hipThreadIdx_x + 1];
 
-      ValueType xivalue = data[hipThreadIdx_x];
-      ValueType xjvalue = data[hipThreadIdx_x + 1];
+                                ValueType xivalue = data[hipThreadIdx_x];
+                                ValueType xjvalue = data[hipThreadIdx_x + 1];
 
-      // does xj sort before xi?
-      if(comp(xjkey, xikey))
-      {
-        keys[hipThreadIdx_x] = xjkey;
-        keys[hipThreadIdx_x + 1] = xikey;
+                                // does xj sort before xi?
+                                if(comp(xjkey, xikey))
+                                {
+                                    keys[hipThreadIdx_x]     = xjkey;
+                                    keys[hipThreadIdx_x + 1] = xikey;
 
-        data[hipThreadIdx_x] = xjvalue;
-        data[hipThreadIdx_x + 1] = xivalue;
-      } // end if
-    } // end if
+                                    data[hipThreadIdx_x]     = xjvalue;
+                                    data[hipThreadIdx_x + 1] = xivalue;
+                                } // end if
+                            } // end if
 
-    __syncthreads();
+                            __syncthreads();
 
-    // do evens second
-    if(!thread_is_odd && hipThreadIdx_x + 1 < n)
-    {
-      KeyType xikey = keys[hipThreadIdx_x];
-      KeyType xjkey = keys[hipThreadIdx_x + 1];
+                            // do evens second
+                            if(!thread_is_odd && hipThreadIdx_x + 1 < n)
+                            {
+                                KeyType xikey = keys[hipThreadIdx_x];
+                                KeyType xjkey = keys[hipThreadIdx_x + 1];
 
-      ValueType xivalue = data[hipThreadIdx_x];
-      ValueType xjvalue = data[hipThreadIdx_x + 1];
+                                ValueType xivalue = data[hipThreadIdx_x];
+                                ValueType xjvalue = data[hipThreadIdx_x + 1];
 
-      // does xj sort before xi?
-      if(comp(xjkey, xikey))
-      {
-        keys[hipThreadIdx_x] = xjkey;
-        keys[hipThreadIdx_x + 1] = xikey;
+                                // does xj sort before xi?
+                                if(comp(xjkey, xikey))
+                                {
+                                    keys[hipThreadIdx_x]     = xjkey;
+                                    keys[hipThreadIdx_x + 1] = xikey;
 
-        data[hipThreadIdx_x] = xjvalue;
-        data[hipThreadIdx_x + 1] = xivalue;
-      } // end if
-    } // end if
+                                    data[hipThreadIdx_x]     = xjvalue;
+                                    data[hipThreadIdx_x + 1] = xivalue;
+                                } // end if
+                            } // end if
 
-    __syncthreads();
-  } // end for i
-} // end stable_odd_even_sort()
+                            __syncthreads();
+                        } // end for i
+                    } // end stable_odd_even_sort()
 
-
-} // end namespace block
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+                } // end namespace block
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
-

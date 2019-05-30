@@ -14,39 +14,37 @@
  *  limitations under the License.
  */
 
-
 /*! \file normal_distribution.h
  *  \brief A normal (Gaussian) distribution of real-valued numbers.
  */
 
 #pragma once
 
+#include <iostream>
 #include <thrust/detail/config.h>
 #include <thrust/pair.h>
-#include <thrust/random/detail/random_core_access.h>
 #include <thrust/random/detail/normal_distribution_base.h>
-#include <iostream>
+#include <thrust/random/detail/random_core_access.h>
 
 namespace thrust
 {
 
-namespace random
-{
+    namespace random
+    {
 
-
-/*! \addtogroup random_number_distributions
+        /*! \addtogroup random_number_distributions
  *  \{
  */
 
-/*! \class normal_distribution
- *  \brief A \p normal_distribution random number distribution produces floating point
- *         Normally distributed random numbers.
+        /*! \class normal_distribution
+ *  \brief A \p normal_distribution random number distribution produces floating
+ * point Normally distributed random numbers.
  *
  *  \tparam RealType The type of floating point number to produce.
  *
- *  The following code snippet demonstrates examples of using a \p normal_distribution with a 
- *  random number engine to produce random values drawn from the Normal distribution with a given
- *  mean and variance:
+ *  The following code snippet demonstrates examples of using a \p
+ * normal_distribution with a random number engine to produce random values
+ * drawn from the Normal distribution with a given mean and variance:
  *
  *  \code
  *  #include <thrust/random/linear_congruential_engine.h>
@@ -57,7 +55,8 @@ namespace random
  *    // create a minstd_rand object to act as our source of randomness
  *    thrust::minstd_rand rng;
  *
- *    // create a normal_distribution to produce floats from the Normal distribution
+ *    // create a normal_distribution to produce floats from the Normal
+ * distribution
  *    // with mean 2.0 and standard deviation 3.5
  *    thrust::random::normal_distribution<float> dist(2.0f, 3.5f);
  *
@@ -78,198 +77,189 @@ namespace random
  *  }
  *  \endcode
  */
-template<typename RealType = double>
-  class normal_distribution
-    : public detail::normal_distribution_base<RealType>::type
-{
-  private:
-    typedef typename detail::normal_distribution_base<RealType>::type super_t;
+        template <typename RealType = double>
+        class normal_distribution : public detail::normal_distribution_base<RealType>::type
+        {
+        private:
+            typedef typename detail::normal_distribution_base<RealType>::type super_t;
 
-  public:
-    // types
-    
-    /*! \typedef result_type
-     *  \brief The type of the floating point number produced by this \p normal_distribution.
-     */
-    typedef RealType result_type;
+        public:
+            // types
 
-    /*! \typedef param_type
-     *  \brief The type of the object encapsulating this \p normal_distribution's parameters.
-     */
-    typedef thrust::pair<RealType,RealType> param_type;
+            /*! \typedef result_type
+   *  \brief The type of the floating point number produced by this \p
+   * normal_distribution.
+   */
+            typedef RealType result_type;
 
-    // constructors and reset functions
-    
-    /*! This constructor creates a new \p normal_distribution from two values defining the
-     *  half-open interval of the distribution.
-     *  
-     *  \param mean The mean (expected value) of the distribution. Defaults to \c 0.0.
-     *  \param stddev The standard deviation of the distribution. Defaults to \c 1.0.
-     */
-    __host__ __device__
-    explicit normal_distribution(RealType mean = 0.0, RealType stddev = 1.0);
+            /*! \typedef param_type
+   *  \brief The type of the object encapsulating this \p normal_distribution's
+   * parameters.
+   */
+            typedef thrust::pair<RealType, RealType> param_type;
 
-    /*! This constructor creates a new \p normal_distribution from a \p param_type object
-     *  encapsulating the range of the distribution.
-     *  
-     *  \param parm A \p param_type object encapsulating the parameters (i.e., the mean and standard deviation) of the distribution.
-     */
-    __host__ __device__
-    explicit normal_distribution(const param_type &parm);
+            // constructors and reset functions
 
-    /*! Calling this member function guarantees that subsequent uses of this
-     *  \p normal_distribution do not depend on values produced by any random
-     *  number generator prior to invoking this function.
-     */
-    __host__ __device__
-    void reset(void);
+            /*! This constructor creates a new \p normal_distribution from two values
+   * defining the half-open interval of the distribution.
+   *
+   *  \param mean The mean (expected value) of the distribution. Defaults to \c
+   * 0.0. \param stddev The standard deviation of the distribution. Defaults to
+   * \c 1.0.
+   */
+            __host__ __device__ explicit normal_distribution(RealType mean   = 0.0,
+                                                             RealType stddev = 1.0);
 
-    // generating functions
+            /*! This constructor creates a new \p normal_distribution from a \p param_type
+   * object encapsulating the range of the distribution.
+   *
+   *  \param parm A \p param_type object encapsulating the parameters (i.e., the
+   * mean and standard deviation) of the distribution.
+   */
+            __host__ __device__ explicit normal_distribution(const param_type& parm);
 
-    /*! This method produces a new Normal random integer drawn from this \p normal_distribution's
-     *  range using a \p UniformRandomNumberGenerator as a source of randomness.
-     *
-     *  \param urng The \p UniformRandomNumberGenerator to use as a source of randomness.
-     */
-    template<typename UniformRandomNumberGenerator>
-    __host__ __device__
-    result_type operator()(UniformRandomNumberGenerator &urng);
+            /*! Calling this member function guarantees that subsequent uses of this
+   *  \p normal_distribution do not depend on values produced by any random
+   *  number generator prior to invoking this function.
+   */
+            __host__ __device__ void reset(void);
 
-    /*! This method produces a new Normal random integer as if by creating a new \p normal_distribution 
-     *  from the given \p param_type object, and calling its <tt>operator()</tt> method with the given
-     *  \p UniformRandomNumberGenerator as a source of randomness.
-     *
-     *  \param urng The \p UniformRandomNumberGenerator to use as a source of randomness.
-     *  \param parm A \p param_type object encapsulating the parameters of the \p normal_distribution
-     *              to draw from.
-     */
-    template<typename UniformRandomNumberGenerator>
-    __host__ __device__
-    result_type operator()(UniformRandomNumberGenerator &urng, const param_type &parm);
+            // generating functions
 
-    // property functions
+            /*! This method produces a new Normal random integer drawn from this \p
+   * normal_distribution's range using a \p UniformRandomNumberGenerator as a
+   * source of randomness.
+   *
+   *  \param urng The \p UniformRandomNumberGenerator to use as a source of
+   * randomness.
+   */
+            template <typename UniformRandomNumberGenerator>
+            __host__ __device__ result_type operator()(UniformRandomNumberGenerator& urng);
 
-    /*! This method returns the value of the parameter with which this \p normal_distribution
-     *  was constructed.
-     *
-     *  \return The mean (expected value) of this \p normal_distribution's output.
-     */
-    __host__ __device__
-    result_type mean(void) const;
+            /*! This method produces a new Normal random integer as if by creating a new
+   * \p normal_distribution from the given \p param_type object, and calling its
+   * <tt>operator()</tt> method with the given \p UniformRandomNumberGenerator
+   * as a source of randomness.
+   *
+   *  \param urng The \p UniformRandomNumberGenerator to use as a source of
+   * randomness. \param parm A \p param_type object encapsulating the parameters
+   * of the \p normal_distribution to draw from.
+   */
+            template <typename UniformRandomNumberGenerator>
+            __host__ __device__ result_type operator()(UniformRandomNumberGenerator& urng,
+                                                       const param_type&             parm);
 
-    /*! This method returns the value of the parameter with which this \p normal_distribution
-     *  was constructed.
-     *
-     *  \return The standard deviation of this \p uniform_real_distribution's output.
-     */
-    __host__ __device__
-    result_type stddev(void) const;
+            // property functions
 
-    /*! This method returns a \p param_type object encapsulating the parameters with which this
-     *  \p normal_distribution was constructed.
-     *
-     *  \return A \p param_type object encapsulating the parameters (i.e., the mean and standard deviation) of this \p normal_distribution.
-     */
-    __host__ __device__
-    param_type param(void) const;
+            /*! This method returns the value of the parameter with which this \p
+   * normal_distribution was constructed.
+   *
+   *  \return The mean (expected value) of this \p normal_distribution's output.
+   */
+            __host__ __device__ result_type mean(void) const;
 
-    /*! This method changes the parameters of this \p normal_distribution using the values encapsulated
-     *  in a given \p param_type object.
-     *
-     *  \param parm A \p param_type object encapsulating the new parameters (i.e., the mean and variance) of this \p normal_distribution.
-     */
-    __host__ __device__
-    void param(const param_type &parm);
+            /*! This method returns the value of the parameter with which this \p
+   * normal_distribution was constructed.
+   *
+   *  \return The standard deviation of this \p uniform_real_distribution's
+   * output.
+   */
+            __host__ __device__ result_type stddev(void) const;
 
-    /*! This method returns the smallest floating point number this \p normal_distribution can potentially produce.
-     *
-     *  \return The lower bound of this \p normal_distribution's half-open interval.
-     */
-    __host__ __device__
-    result_type min THRUST_PREVENT_MACRO_SUBSTITUTION (void) const;
+            /*! This method returns a \p param_type object encapsulating the parameters
+   * with which this \p normal_distribution was constructed.
+   *
+   *  \return A \p param_type object encapsulating the parameters (i.e., the
+   * mean and standard deviation) of this \p normal_distribution.
+   */
+            __host__ __device__ param_type param(void) const;
 
-    /*! This method returns the smallest number larger than largest floating point number this \p uniform_real_distribution can potentially produce.
-     *
-     *  \return The upper bound of this \p normal_distribution's half-open interval.
-     */
-    __host__ __device__
-    result_type max THRUST_PREVENT_MACRO_SUBSTITUTION (void) const;
+            /*! This method changes the parameters of this \p normal_distribution using
+   * the values encapsulated in a given \p param_type object.
+   *
+   *  \param parm A \p param_type object encapsulating the new parameters (i.e.,
+   * the mean and variance) of this \p normal_distribution.
+   */
+            __host__ __device__ void param(const param_type& parm);
 
-    /*! \cond
-     */
-  private:
-    param_type m_param;
+            /*! This method returns the smallest floating point number this \p
+   * normal_distribution can potentially produce.
+   *
+   *  \return The lower bound of this \p normal_distribution's half-open
+   * interval.
+   */
+            __host__ __device__ result_type min THRUST_PREVENT_MACRO_SUBSTITUTION(void) const;
 
-    friend struct thrust::random::detail::random_core_access;
+            /*! This method returns the smallest number larger than largest floating point
+   * number this \p uniform_real_distribution can potentially produce.
+   *
+   *  \return The upper bound of this \p normal_distribution's half-open
+   * interval.
+   */
+            __host__ __device__ result_type max THRUST_PREVENT_MACRO_SUBSTITUTION(void) const;
 
-    __host__ __device__
-    bool equal(const normal_distribution &rhs) const;
+            /*! \cond
+   */
+        private:
+            param_type m_param;
 
-    template<typename CharT, typename Traits>
-    std::basic_ostream<CharT,Traits>& stream_out(std::basic_ostream<CharT,Traits> &os) const;
+            friend struct thrust::random::detail::random_core_access;
 
-    template<typename CharT, typename Traits>
-    std::basic_istream<CharT,Traits>& stream_in(std::basic_istream<CharT,Traits> &is);
-    /*! \endcond
-     */
-}; // end normal_distribution
+            __host__ __device__ bool equal(const normal_distribution& rhs) const;
 
+            template <typename CharT, typename Traits>
+            std::basic_ostream<CharT, Traits>&
+                stream_out(std::basic_ostream<CharT, Traits>& os) const;
 
-/*! This function checks two \p normal_distributions for equality.
+            template <typename CharT, typename Traits>
+            std::basic_istream<CharT, Traits>& stream_in(std::basic_istream<CharT, Traits>& is);
+            /*! \endcond
+   */
+        }; // end normal_distribution
+
+        /*! This function checks two \p normal_distributions for equality.
  *  \param lhs The first \p normal_distribution to test.
  *  \param rhs The second \p normal_distribution to test.
  *  \return \c true if \p lhs is equal to \p rhs; \c false, otherwise.
  */
-template<typename RealType>
-__host__ __device__
-bool operator==(const normal_distribution<RealType> &lhs,
-                const normal_distribution<RealType> &rhs);
+        template <typename RealType>
+        __host__ __device__ bool operator==(const normal_distribution<RealType>& lhs,
+                                            const normal_distribution<RealType>& rhs);
 
-
-/*! This function checks two \p normal_distributions for inequality.
+        /*! This function checks two \p normal_distributions for inequality.
  *  \param lhs The first \p normal_distribution to test.
  *  \param rhs The second \p normal_distribution to test.
  *  \return \c true if \p lhs is not equal to \p rhs; \c false, otherwise.
  */
-template<typename RealType>
-__host__ __device__
-bool operator!=(const normal_distribution<RealType> &lhs,
-                const normal_distribution<RealType> &rhs);
+        template <typename RealType>
+        __host__ __device__ bool operator!=(const normal_distribution<RealType>& lhs,
+                                            const normal_distribution<RealType>& rhs);
 
-
-/*! This function streams a normal_distribution to a \p std::basic_ostream.
+        /*! This function streams a normal_distribution to a \p std::basic_ostream.
  *  \param os The \p basic_ostream to stream out to.
  *  \param d The \p normal_distribution to stream out.
  *  \return \p os
  */
-template<typename RealType,
-         typename CharT, typename Traits>
-std::basic_ostream<CharT,Traits>&
-operator<<(std::basic_ostream<CharT,Traits> &os,
-           const normal_distribution<RealType> &d);
+        template <typename RealType, typename CharT, typename Traits>
+        std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>&   os,
+                                                      const normal_distribution<RealType>& d);
 
-
-/*! This function streams a normal_distribution in from a std::basic_istream.
+        /*! This function streams a normal_distribution in from a std::basic_istream.
  *  \param is The \p basic_istream to stream from.
  *  \param d The \p normal_distribution to stream in.
  *  \return \p is
  */
-template<typename RealType,
-         typename CharT, typename Traits>
-std::basic_istream<CharT,Traits>&
-operator>>(std::basic_istream<CharT,Traits> &is,
-           normal_distribution<RealType> &d);
+        template <typename RealType, typename CharT, typename Traits>
+        std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
+                                                      normal_distribution<RealType>&     d);
 
-
-/*! \} // end random_number_distributions
+        /*! \} // end random_number_distributions
  */
 
+    } // namespace random
 
-} // end random
+    using random::normal_distribution;
 
-using random::normal_distribution;
-
-} // end thrust
+} // namespace thrust
 
 #include <thrust/random/detail/normal_distribution.inl>
-

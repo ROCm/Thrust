@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file adjacent_difference.h
  *  \brief CUDA implementation of adjacent_difference.
  */
@@ -26,29 +25,27 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator,
+                          typename OutputIterator,
+                          typename BinaryFunction>
+                __host__ __device__ OutputIterator
+                                    adjacent_difference(execution_policy<DerivedPolicy>& exec,
+                                                        InputIterator                    first,
+                                                        InputIterator                    last,
+                                                        OutputIterator                   result,
+                                                        BinaryFunction                   binary_op);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename BinaryFunction>
-__host__ __device__
-OutputIterator adjacent_difference(execution_policy<DerivedPolicy> &exec,
-                                   InputIterator first, InputIterator last,
-                                   OutputIterator result,
-                                   BinaryFunction binary_op);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/adjacent_difference.inl>
-

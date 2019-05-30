@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file copy_device_to_device.h
  *  \brief Device implementations for copying on the device.
  */
@@ -26,27 +25,23 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy, typename InputIterator, typename OutputIterator>
+                __host__ __device__ OutputIterator
+                                    copy_device_to_device(execution_policy<DerivedPolicy>& exec,
+                                                          InputIterator                    begin,
+                                                          InputIterator                    end,
+                                                          OutputIterator                   result);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator>
-__host__ __device__
-OutputIterator copy_device_to_device(execution_policy<DerivedPolicy> &exec,
-                                     InputIterator begin, 
-                                     InputIterator end, 
-                                     OutputIterator result);
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/copy_device_to_device.inl>
-

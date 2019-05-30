@@ -20,39 +20,33 @@
 
 #pragma once
 
-#include <thrust/detail/config.h>
 #include <cstring>
+#include <thrust/detail/config.h>
 #include <thrust/system/detail/sequential/general_copy.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace detail
-{
-namespace sequential
-{
+    namespace system
+    {
+        namespace detail
+        {
+            namespace sequential
+            {
 
-
-template<typename T>
-__host__ __device__
-  T *trivial_copy_n(const T *first,
-                    std::ptrdiff_t n,
-                    T *result)
-{
-//#ifndef __CUDA_ARCH__
+                template <typename T>
+                __host__ __device__ T* trivial_copy_n(const T* first, std::ptrdiff_t n, T* result)
+                {
+                    //#ifndef __CUDA_ARCH__
 
 #if __HIP_DEVICE_COMPILE__ == 0
 
-  
-  std::memmove(result, first, n * sizeof(T));
-  return result + n;
+                    std::memmove(result, first, n * sizeof(T));
+                    return result + n;
 #else
-  return thrust::system::detail::sequential::general_copy_n(first, n, result);
+                    return thrust::system::detail::sequential::general_copy_n(first, n, result);
 #endif
-} // end trivial_copy_n()
-} // end namespace sequential
-} // end namespace detail
-} // end namespace system
+                } // end trivial_copy_n()
+            } // end namespace sequential
+        } // end namespace detail
+    } // end namespace system
 } // end namespace thrust
-

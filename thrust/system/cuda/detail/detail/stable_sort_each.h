@@ -21,38 +21,36 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
+                namespace detail
+                {
 
+                    template <unsigned int work_per_thread,
+                              typename DerivedPolicy,
+                              typename Context,
+                              typename RandomAccessIterator1,
+                              typename Pointer,
+                              typename RandomAccessIterator2,
+                              typename Compare>
+                    __host__ __device__ void
+                             stable_sort_each_copy(execution_policy<DerivedPolicy>& exec,
+                                                   Context                          context,
+                                                   unsigned int                     block_size,
+                                                   RandomAccessIterator1            first,
+                                                   RandomAccessIterator1            last,
+                                                   Pointer                          vitual_smem,
+                                                   RandomAccessIterator2            result,
+                                                   Compare                          comp);
 
-template<unsigned int work_per_thread,
-         typename DerivedPolicy,
-         typename Context,
-         typename RandomAccessIterator1,
-         typename Pointer,
-         typename RandomAccessIterator2,
-         typename Compare>
-__host__ __device__
-void stable_sort_each_copy(execution_policy<DerivedPolicy> &exec,
-                           Context context,
-                           unsigned int block_size,
-                           RandomAccessIterator1 first, RandomAccessIterator1 last,
-                           Pointer vitual_smem,
-                           RandomAccessIterator2 result,
-                           Compare comp);
-
-
-} // end detail
-} // end detail
-} // end cuda
-} // end system
+                } // end detail
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
 
 #include <thrust/system/cuda/detail/detail/stable_sort_each.inl>
-

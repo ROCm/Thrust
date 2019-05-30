@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file mismatch.h
  *  \brief Search for differences between ranges
  */
@@ -28,25 +27,24 @@
 namespace thrust
 {
 
-
-/*! \addtogroup algorithms
+    /*! \addtogroup algorithms
  */
 
-/*! \addtogroup searching
+    /*! \addtogroup searching
  *  \ingroup algorithms
  *  \{
  */
 
-
-/*! \p mismatch finds the first position where the two ranges <tt>[first1, last1)</tt>
- *  and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two versions of 
- *  \p mismatch use different tests for whether elements differ.
+    /*! \p mismatch finds the first position where the two ranges <tt>[first1,
+ * last1)</tt> and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two
+ * versions of \p mismatch use different tests for whether elements differ.
  *
- *  This version of \p mismatch finds the first iterator \c i in <tt>[first1, last1)</tt>
- *  such that <tt>*i == *(first2 + (i - first1))</tt> is \c false. The return value is a
- *  \c pair whose first element is \c i and whose second element is <tt>*(first2 + (i - first1))</tt>.
- *  If no such iterator \c i exists, the return value is a \c pair whose first element
- *  is \c last1 and whose second element is <tt>*(first2 + (last1 - first1))</tt>.
+ *  This version of \p mismatch finds the first iterator \c i in <tt>[first1,
+ * last1)</tt> such that <tt>*i == *(first2 + (i - first1))</tt> is \c false.
+ * The return value is a \c pair whose first element is \c i and whose second
+ * element is <tt>*(first2 + (i - first1))</tt>. If no such iterator \c i
+ * exists, the return value is a \c pair whose first element is \c last1 and
+ * whose second element is <tt>*(first2 + (last1 - first1))</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
@@ -57,9 +55,11 @@ namespace thrust
  *  \return The first position where the sequences differ.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>
- *          and \p InputIterator1's \c value_type is equality comparable to \p InputIterator2's \c value_type.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \p InputIterator1's \c value_type is equality comparable to \p
+ * InputIterator2's \c value_type. \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
  *
  *  \code
  *  #include <thrust/mismatch.h>
@@ -69,7 +69,7 @@ namespace thrust
  *  thrust::device_vector<int> vec1(4);
  *  thrust::device_vector<int> vec2(4);
  *
- *  vec1[0] = 0;  vec2[0] = 0; 
+ *  vec1[0] = 0;  vec2[0] = 0;
  *  vec1[1] = 5;  vec2[1] = 5;
  *  vec1[2] = 3;  vec2[2] = 8;
  *  vec1[3] = 7;  vec2[3] = 7;
@@ -77,7 +77,8 @@ namespace thrust
  *  typedef thrust::device_vector<int>::iterator Iterator;
  *  thrust::pair<Iterator,Iterator> result;
  *
- *  result = thrust::mismatch(thrust::device, vec1.begin(), vec1.end(), vec2.begin());
+ *  result = thrust::mismatch(thrust::device, vec1.begin(), vec1.end(),
+ * vec2.begin());
  *
  *  // result.first  is vec1.begin() + 2
  *  // result.second is vec2.begin() + 2
@@ -86,32 +87,34 @@ namespace thrust
  *  \see find
  *  \see find_if
  */
-template<typename DerivedPolicy, typename InputIterator1, typename InputIterator2>
-__host__ __device__
-thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                                                      InputIterator1 first1,
-                                                      InputIterator1 last1,
-                                                      InputIterator2 first2);
+    template <typename DerivedPolicy, typename InputIterator1, typename InputIterator2>
+    __host__ __device__ thrust::pair<InputIterator1, InputIterator2>
+                        mismatch(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                 InputIterator1                                              first1,
+                                 InputIterator1                                              last1,
+                                 InputIterator2                                              first2);
 
-
-/*! \p mismatch finds the first position where the two ranges <tt>[first1, last1)</tt>
- * and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two versions of 
- * \p mismatch use different tests for whether elements differ.
+    /*! \p mismatch finds the first position where the two ranges <tt>[first1,
+ * last1)</tt> and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two
+ * versions of \p mismatch use different tests for whether elements differ.
  *
- * This version of \p mismatch finds the first iterator \c i in <tt>[first1, last1)</tt>
- * such that <tt>*i == *(first2 + (i - first1))</tt> is \c false. The return value is a
- * \c pair whose first element is \c i and whose second element is <tt>*(first2 + (i - first1))</tt>.
- * If no such iterator \c i exists, the return value is a \c pair whose first element
- * is \c last1 and whose second element is <tt>*(first2 + (last1 - first1))</tt>.
+ * This version of \p mismatch finds the first iterator \c i in <tt>[first1,
+ * last1)</tt> such that <tt>*i == *(first2 + (i - first1))</tt> is \c false.
+ * The return value is a \c pair whose first element is \c i and whose second
+ * element is <tt>*(first2 + (i - first1))</tt>. If no such iterator \c i
+ * exists, the return value is a \c pair whose first element is \c last1 and
+ * whose second element is <tt>*(first2 + (last1 - first1))</tt>.
  *
  *  \param first1 The beginning of the first sequence.
  *  \param last1  The end of the first sequence.
  *  \param first2 The beginning of the second sequence.
  *  \return The first position where the sequences differ.
  *
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>
- *          and \p InputIterator1's \c value_type is equality comparable to \p InputIterator2's \c value_type.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \p InputIterator1's \c value_type is equality comparable to \p
+ * InputIterator2's \c value_type. \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
  *
  *  \code
  *  #include <thrust/mismatch.h>
@@ -120,7 +123,7 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  thrust::device_vector<int> vec1(4);
  *  thrust::device_vector<int> vec2(4);
  *
- *  vec1[0] = 0;  vec2[0] = 0; 
+ *  vec1[0] = 0;  vec2[0] = 0;
  *  vec1[1] = 5;  vec2[1] = 5;
  *  vec1[2] = 3;  vec2[2] = 8;
  *  vec1[3] = 7;  vec2[3] = 7;
@@ -137,21 +140,20 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  \see find
  *  \see find_if
  */
-template <typename InputIterator1, typename InputIterator2>
-thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
-                                                      InputIterator1 last1,
-                                                      InputIterator2 first2);
+    template <typename InputIterator1, typename InputIterator2>
+    thrust::pair<InputIterator1, InputIterator2>
+        mismatch(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2);
 
-
-/*! \p mismatch finds the first position where the two ranges <tt>[first1, last1)</tt>
- *  and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two versions of 
- *  \p mismatch use different tests for whether elements differ.
+    /*! \p mismatch finds the first position where the two ranges <tt>[first1,
+ * last1)</tt> and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two
+ * versions of \p mismatch use different tests for whether elements differ.
  *
- *  This version of \p mismatch finds the first iterator \c i in <tt>[first1, last1)</tt>
- *  such that <tt>pred(\*i, \*(first2 + (i - first1))</tt> is \c false. The return value is a
- *  \c pair whose first element is \c i and whose second element is <tt>*(first2 + (i - first1))</tt>.
- *  If no such iterator \c i exists, the return value is a \c pair whose first element is
- *  \c last1 and whose second element is <tt>*(first2 + (last1 - first1))</tt>.
+ *  This version of \p mismatch finds the first iterator \c i in <tt>[first1,
+ * last1)</tt> such that <tt>pred(\*i, \*(first2 + (i - first1))</tt> is \c
+ * false. The return value is a \c pair whose first element is \c i and whose
+ * second element is <tt>*(first2 + (i - first1))</tt>. If no such iterator \c i
+ * exists, the return value is a \c pair whose first element is \c last1 and
+ * whose second element is <tt>*(first2 + (last1 - first1))</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
@@ -163,9 +165,12 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
  *  \return The first position where the sequences differ.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/BinaryPredicate.html">Input Iterator</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/BinaryPredicate.html">Input Iterator</a>.
  *
  *  \code
  *  #include <thrust/mismatch.h>
@@ -175,7 +180,7 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
  *  thrust::device_vector<int> vec1(4);
  *  thrust::device_vector<int> vec2(4);
  *
- *  vec1[0] = 0;  vec2[0] = 0; 
+ *  vec1[0] = 0;  vec2[0] = 0;
  *  vec1[1] = 5;  vec2[1] = 5;
  *  vec1[2] = 3;  vec2[2] = 8;
  *  vec1[3] = 7;  vec2[3] = 7;
@@ -183,7 +188,8 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
  *  typedef thrust::device_vector<int>::iterator Iterator;
  *  thrust::pair<Iterator,Iterator> result;
  *
- *  result = thrust::mismatch(thrust::device, vec1.begin(), vec1.end(), vec2.begin(), thrust::equal_to<int>());
+ *  result = thrust::mismatch(thrust::device, vec1.begin(), vec1.end(),
+ * vec2.begin(), thrust::equal_to<int>());
  *
  *  // result.first  is vec1.begin() + 2
  *  // result.second is vec2.begin() + 2
@@ -192,24 +198,27 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
  *  \see find
  *  \see find_if
  */
-template<typename DerivedPolicy, typename InputIterator1, typename InputIterator2, typename BinaryPredicate>
-__host__ __device__
-thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                                                      InputIterator1 first1,
-                                                      InputIterator1 last1,
-                                                      InputIterator2 first2,
-                                                      BinaryPredicate pred);
+    template <typename DerivedPolicy,
+              typename InputIterator1,
+              typename InputIterator2,
+              typename BinaryPredicate>
+    __host__ __device__ thrust::pair<InputIterator1, InputIterator2>
+                        mismatch(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                 InputIterator1                                              first1,
+                                 InputIterator1                                              last1,
+                                 InputIterator2                                              first2,
+                                 BinaryPredicate                                             pred);
 
-
-/*! \p mismatch finds the first position where the two ranges <tt>[first1, last1)</tt>
- * and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two versions of 
- * \p mismatch use different tests for whether elements differ.
+    /*! \p mismatch finds the first position where the two ranges <tt>[first1,
+ * last1)</tt> and <tt>[first2, first2 + (last1 - first1))</tt> differ. The two
+ * versions of \p mismatch use different tests for whether elements differ.
  *
- * This version of \p mismatch finds the first iterator \c i in <tt>[first1, last1)</tt>
- * such that <tt>pred(\*i, \*(first2 + (i - first1))</tt> is \c false. The return value is a
- * \c pair whose first element is \c i and whose second element is <tt>*(first2 + (i - first1))</tt>.
- * If no such iterator \c i exists, the return value is a \c pair whose first element is
- * \c last1 and whose second element is <tt>*(first2 + (last1 - first1))</tt>.
+ * This version of \p mismatch finds the first iterator \c i in <tt>[first1,
+ * last1)</tt> such that <tt>pred(\*i, \*(first2 + (i - first1))</tt> is \c
+ * false. The return value is a \c pair whose first element is \c i and whose
+ * second element is <tt>*(first2 + (i - first1))</tt>. If no such iterator \c i
+ * exists, the return value is a \c pair whose first element is \c last1 and
+ * whose second element is <tt>*(first2 + (last1 - first1))</tt>.
  *
  *  \param first1 The beginning of the first sequence.
  *  \param last1  The end of the first sequence.
@@ -217,9 +226,12 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  \param pred   The binary predicate to compare elements.
  *  \return The first position where the sequences differ.
  *
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/BinaryPredicate.html">Input Iterator</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/BinaryPredicate.html">Input Iterator</a>.
  *
  *  \code
  *  #include <thrust/mismatch.h>
@@ -228,7 +240,7 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  thrust::device_vector<int> vec1(4);
  *  thrust::device_vector<int> vec2(4);
  *
- *  vec1[0] = 0;  vec2[0] = 0; 
+ *  vec1[0] = 0;  vec2[0] = 0;
  *  vec1[1] = 5;  vec2[1] = 5;
  *  vec1[2] = 3;  vec2[2] = 8;
  *  vec1[3] = 7;  vec2[3] = 7;
@@ -236,7 +248,8 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  typedef thrust::device_vector<int>::iterator Iterator;
  *  thrust::pair<Iterator,Iterator> result;
  *
- *  result = thrust::mismatch(vec1.begin(), vec1.end(), vec2.begin(), thrust::equal_to<int>());
+ *  result = thrust::mismatch(vec1.begin(), vec1.end(), vec2.begin(),
+ * thrust::equal_to<int>());
  *
  *  // result.first  is vec1.begin() + 2
  *  // result.second is vec2.begin() + 2
@@ -245,16 +258,15 @@ thrust::pair<InputIterator1, InputIterator2> mismatch(const thrust::detail::exec
  *  \see find
  *  \see find_if
  */
-template <typename InputIterator1, typename InputIterator2, typename BinaryPredicate>
-thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1 first1,
-                                                      InputIterator1 last1,
-                                                      InputIterator2 first2,
-                                                      BinaryPredicate pred);
+    template <typename InputIterator1, typename InputIterator2, typename BinaryPredicate>
+    thrust::pair<InputIterator1, InputIterator2> mismatch(InputIterator1  first1,
+                                                          InputIterator1  last1,
+                                                          InputIterator2  first2,
+                                                          BinaryPredicate pred);
 
-/*! \} // end searching
+    /*! \} // end searching
  */
 
 } // end namespace thrust
 
 #include <thrust/detail/mismatch.inl>
-

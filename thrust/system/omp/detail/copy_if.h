@@ -21,31 +21,28 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename InputIterator1,
+                          typename InputIterator2,
+                          typename OutputIterator,
+                          typename Predicate>
+                OutputIterator copy_if(execution_policy<DerivedPolicy>& exec,
+                                       InputIterator1                   first,
+                                       InputIterator1                   last,
+                                       InputIterator2                   stencil,
+                                       OutputIterator                   result,
+                                       Predicate                        pred);
 
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator,
-         typename Predicate>
-  OutputIterator copy_if(execution_policy<DerivedPolicy> &exec,
-                         InputIterator1 first,
-                         InputIterator1 last,
-                         InputIterator2 stencil,
-                         OutputIterator result,
-                         Predicate pred);
-
-
-} // end detail
-} // end omp
-} // end system
+            } // end detail
+        } // end omp
+    } // end system
 } // end thrust
 
 #include <thrust/system/omp/detail/copy_if.inl>
-

@@ -19,4 +19,3 @@
 #include <thrust/detail/config.h>
 
 // cuda has no special transform
-

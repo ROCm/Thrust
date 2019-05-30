@@ -8,5 +8,3 @@ void TestVectorCppZeroSize(void)
     ASSERT_EQUAL((v.begin() == v.end()), true);
 }
 DECLARE_VECTOR_UNITTEST(TestVectorCppZeroSize);
-
-
