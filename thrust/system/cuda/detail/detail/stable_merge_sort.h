@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file stable_merge_sort_dev.h
  *  \brief Defines the interface for a stable merge implementation on CUDA
  */
@@ -26,40 +25,39 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
+                namespace detail
+                {
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename StrictWeakOrdering>
-__host__ __device__
-void stable_merge_sort(execution_policy<DerivedPolicy> &exec,
-                       RandomAccessIterator first,
-                       RandomAccessIterator last,
-                       StrictWeakOrdering comp);
-    
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2,
-         typename StrictWeakOrdering>
-__host__ __device__
-void stable_merge_sort_by_key(execution_policy<DerivedPolicy> &exec,
-                              RandomAccessIterator1 keys_begin,
-                              RandomAccessIterator1 keys_end,
-                              RandomAccessIterator2 values_begin,
-                              StrictWeakOrdering comp);
+                    template <typename DerivedPolicy,
+                              typename RandomAccessIterator,
+                              typename StrictWeakOrdering>
+                    __host__ __device__ void
+                             stable_merge_sort(execution_policy<DerivedPolicy>& exec,
+                                               RandomAccessIterator             first,
+                                               RandomAccessIterator             last,
+                                               StrictWeakOrdering               comp);
 
-} // end namespace detail
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+                    template <typename DerivedPolicy,
+                              typename RandomAccessIterator1,
+                              typename RandomAccessIterator2,
+                              typename StrictWeakOrdering>
+                    __host__ __device__ void
+                             stable_merge_sort_by_key(execution_policy<DerivedPolicy>& exec,
+                                                      RandomAccessIterator1            keys_begin,
+                                                      RandomAccessIterator1            keys_end,
+                                                      RandomAccessIterator2            values_begin,
+                                                      StrictWeakOrdering               comp);
+
+                } // end namespace detail
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/detail/stable_merge_sort.inl>
-

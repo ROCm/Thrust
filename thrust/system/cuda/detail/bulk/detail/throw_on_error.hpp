@@ -17,64 +17,60 @@
 
 #pragma once
 
+#include <cstdio>
 #include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/terminate.hpp>
-#include <thrust/system_error.h>
 #include <thrust/system/cuda/error.h>
-#include <cstdio>
-
+#include <thrust/system_error.h>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
+    namespace detail
+    {
 
-inline __host__ __device__
-void throw_on_error(hipError_t e, const char *message)
-{
-  if(e)
-  {
+        inline __host__ __device__ void throw_on_error(hipError_t e, const char* message)
+        {
+            if(e)
+            {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
 
-    //throw thrust::system_error(e, thrust::cuda_category(), message);
+                //throw thrust::system_error(e, thrust::cuda_category(), message);
 
-thrust::system_error(e, thrust::system::cuda_category(), message);
+                thrust::system_error(e, thrust::system::cuda_category(), message);
 
 #else
-#  if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
-    printf("Error after %s: %s\n", message, hipGetErrorString(e));
-#  elif __BULK_HAS_PRINTF__
-    printf("Error: %s\n", message);
-#  endif
-    bulk::detail::terminate();
+#if(__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
+                printf("Error after %s: %s\n", message, hipGetErrorString(e));
+#elif __BULK_HAS_PRINTF__
+                printf("Error: %s\n", message);
 #endif
-  } // end if
-} // end throw_on_error()
+                bulk::detail::terminate();
+#endif
+            } // end if
+        } // end throw_on_error()
 
 #ifdef __HIP_PLATFORM_NVCC__
-inline __host__ __device__
-void throw_on_error(cudaError_t e, const char *message)
-{
-  if(e)
-  {
+        inline __host__ __device__ void throw_on_error(cudaError_t e, const char* message)
+        {
+            if(e)
+            {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-    throw thrust::system_error(e, thrust::cuda_category(), message);
+                throw thrust::system_error(e, thrust::cuda_category(), message);
 #else
-#  if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
-    printf("Error after %s: %s\n", message, cudaGetErrorString(e));
-#  elif __BULK_HAS_PRINTF__
-    printf("Error: %s\n", message);
-#  endif
-    bulk::detail::terminate();
+#if(__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
+                printf("Error after %s: %s\n", message, cudaGetErrorString(e));
+#elif __BULK_HAS_PRINTF__
+                printf("Error: %s\n", message);
 #endif
-  } // end if
-} // end throw_on_error()
+                bulk::detail::terminate();
+#endif
+            } // end if
+        } // end throw_on_error()
 
 #endif
-} // end detail
+    } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-

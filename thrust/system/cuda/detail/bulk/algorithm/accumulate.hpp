@@ -17,207 +17,223 @@
 
 #pragma once
 
-#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
+#include <thrust/detail/type_traits/function_traits.h>
 #include <thrust/system/cuda/detail/bulk/algorithm/reduce.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/system/cuda/detail/bulk/execution_policy.hpp>
 #include <thrust/system/cuda/detail/bulk/uninitialized.hpp>
-#include <thrust/detail/type_traits/function_traits.h>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
 
-
-template<std::size_t bound,
-         std::size_t grainsize,
-         typename RandomAccessIterator,
-         typename T,
-         typename BinaryFunction>
-__forceinline__ __device__
-T accumulate(const bounded<bound,bulk::agent<grainsize> > &exec,
-             RandomAccessIterator first,
-             RandomAccessIterator last,
-             T init,
-             BinaryFunction binary_op)
-{
-  typedef typename bounded<bound,bulk::agent<grainsize> >::size_type size_type;
-
-  size_type n = last - first;
-
-  for(size_type i = 0; i < exec.bound(); ++i)
-  {
-    if(i < n)
+    template <std::size_t bound,
+              std::size_t grainsize,
+              typename RandomAccessIterator,
+              typename T,
+              typename BinaryFunction>
+    __forceinline__ __device__ T accumulate(const bounded<bound, bulk::agent<grainsize>>& exec,
+                                            RandomAccessIterator                          first,
+                                            RandomAccessIterator                          last,
+                                            T                                             init,
+                                            BinaryFunction                                binary_op)
     {
-      init = binary_op(init, first[i]);
-    } // end if
-  } // end for i
+        typedef typename bounded<bound, bulk::agent<grainsize>>::size_type size_type;
 
-  return init;
-} // end accumulate()
+        size_type n = last - first;
 
+        for(size_type i = 0; i < exec.bound(); ++i)
+        {
+            if(i < n)
+            {
+                init = binary_op(init, first[i]);
+            } // end if
+        } // end for i
 
-namespace detail
-{
-namespace accumulate_detail
-{
+        return init;
+    } // end accumulate()
 
-
-// XXX this implementation is simply an inplace inclusive scan
-//     we could potentially do better with an implementation which uses Sean's bitfield reverse trick
-template<typename ConcurrentGroup, typename RandomAccessIterator, typename Size, typename T, typename BinaryFunction>
-__device__ T destructive_accumulate_n(ConcurrentGroup &g, RandomAccessIterator first, Size n, T init, BinaryFunction binary_op)
-{
-  typedef typename ConcurrentGroup::size_type size_type;
-
-  size_type tid = g.this_exec.index();
-
-  T x = init;
-  if(tid < n)
-  {
-    x = first[tid];
-  }
-
-  g.wait();
-
-  for(size_type offset = 1; offset < g.size(); offset += offset)
-  {
-    if(tid >= offset && tid - offset < n)
+    namespace detail
     {
-      x = binary_op(first[tid - offset], x);
-    }
+        namespace accumulate_detail
+        {
 
-    g.wait();
+            // XXX this implementation is simply an inplace inclusive scan
+            //     we could potentially do better with an implementation which uses Sean's bitfield reverse trick
+            template <typename ConcurrentGroup,
+                      typename RandomAccessIterator,
+                      typename Size,
+                      typename T,
+                      typename BinaryFunction>
+            __device__ T destructive_accumulate_n(ConcurrentGroup&     g,
+                                                  RandomAccessIterator first,
+                                                  Size                 n,
+                                                  T                    init,
+                                                  BinaryFunction       binary_op)
+            {
+                typedef typename ConcurrentGroup::size_type size_type;
 
-    if(tid < n)
-    {
-      first[tid] = x;
-    }
+                size_type tid = g.this_exec.index();
 
-    g.wait();
-  }
+                T x = init;
+                if(tid < n)
+                {
+                    x = first[tid];
+                }
 
-  T result = binary_op(init, first[n - 1]);
+                g.wait();
 
-  g.wait();
+                for(size_type offset = 1; offset < g.size(); offset += offset)
+                {
+                    if(tid >= offset && tid - offset < n)
+                    {
+                        x = binary_op(first[tid - offset], x);
+                    }
 
-  return result;
-}
+                    g.wait();
 
+                    if(tid < n)
+                    {
+                        first[tid] = x;
+                    }
 
-template<std::size_t groupsize, std::size_t grainsize, typename RandomAccessIterator, typename T>
-struct buffer
-{
-  typedef typename thrust::iterator_value<RandomAccessIterator>::type value_type;
+                    g.wait();
+                }
 
-  union
-  {
-    uninitialized_array<value_type, groupsize * grainsize> inputs;
-    uninitialized_array<T, groupsize>                      sums;
-  }; // end union
-}; // end buffer
+                T result = binary_op(init, first[n - 1]);
 
+                g.wait();
 
-template<std::size_t groupsize, std::size_t grainsize, typename RandomAccessIterator, typename T, typename BinaryFunction>
-__device__
-T accumulate(bulk::concurrent_group<bulk::agent<grainsize>,groupsize> &g,
-             RandomAccessIterator first,
-             RandomAccessIterator last,
-             T init,
-             BinaryFunction binary_op)
-{
-  typedef typename bulk::concurrent_group<bulk::agent<grainsize>,groupsize>::size_type size_type;
+                return result;
+            }
 
-  const size_type elements_per_group = groupsize * grainsize;
+            template <std::size_t groupsize,
+                      std::size_t grainsize,
+                      typename RandomAccessIterator,
+                      typename T>
+            struct buffer
+            {
+                typedef typename thrust::iterator_value<RandomAccessIterator>::type value_type;
 
-  size_type tid = g.this_exec.index();
+                union
+                {
+                    uninitialized_array<value_type, groupsize * grainsize> inputs;
+                    uninitialized_array<T, groupsize>                      sums;
+                }; // end union
+            }; // end buffer
 
-  T sum = init;
+            template <std::size_t groupsize,
+                      std::size_t grainsize,
+                      typename RandomAccessIterator,
+                      typename T,
+                      typename BinaryFunction>
+            __device__ T accumulate(bulk::concurrent_group<bulk::agent<grainsize>, groupsize>& g,
+                                    RandomAccessIterator first,
+                                    RandomAccessIterator last,
+                                    T                    init,
+                                    BinaryFunction       binary_op)
+            {
+                typedef
+                    typename bulk::concurrent_group<bulk::agent<grainsize>, groupsize>::size_type
+                        size_type;
 
-  typename thrust::iterator_difference<RandomAccessIterator>::type n = last - first;
+                const size_type elements_per_group = groupsize * grainsize;
 
-  typedef detail::accumulate_detail::buffer<
-    groupsize,
-    grainsize,
-    RandomAccessIterator,
-    T
-  > buffer_type;
+                size_type tid = g.this_exec.index();
+
+                T sum = init;
+
+                typename thrust::iterator_difference<RandomAccessIterator>::type n = last - first;
+
+                typedef detail::accumulate_detail::
+                    buffer<groupsize, grainsize, RandomAccessIterator, T>
+                        buffer_type;
 
 #if __CUDA_ARCH__ >= 200
-  buffer_type *buffer = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
+                buffer_type* buffer
+                    = reinterpret_cast<buffer_type*>(bulk::malloc(g, sizeof(buffer_type)));
 #else
-  __shared__ uninitialized<buffer_type> buffer_impl;
-  buffer_type *buffer = &buffer_impl.get();
+                __shared__ uninitialized<buffer_type> buffer_impl;
+                buffer_type*                          buffer = &buffer_impl.get();
 #endif
-  
-  for(; first < last; first += elements_per_group)
-  {
-    // XXX each iteration is essentially a bounded accumulate
-    
-    size_type partition_size = thrust::min<size_type>(elements_per_group, last - first);
-    
-    // copy partition into smem
-    bulk::copy_n(g, first, partition_size, buffer->inputs.data());
-    
-    T this_sum;
-    size_type local_offset = grainsize * g.this_exec.index();
 
-    size_type local_size = thrust::max<size_type>(0,thrust::min<size_type>(grainsize, partition_size - grainsize * tid));
+                for(; first < last; first += elements_per_group)
+                {
+                    // XXX each iteration is essentially a bounded accumulate
 
-    if(local_size)
-    {
-      this_sum = buffer->inputs[local_offset];
-      this_sum = bulk::accumulate(bound<grainsize-1>(g.this_exec),
-                                  buffer->inputs.data() + local_offset + 1,
-                                  buffer->inputs.data() + local_offset + local_size,
-                                  this_sum,
-                                  binary_op);
-    } // end if
+                    size_type partition_size
+                        = thrust::min<size_type>(elements_per_group, last - first);
 
-    g.wait();
+                    // copy partition into smem
+                    bulk::copy_n(g, first, partition_size, buffer->inputs.data());
 
-    if(local_size)
-    {
-      buffer->sums[tid] = this_sum;
-    } // end if
+                    T         this_sum;
+                    size_type local_offset = grainsize * g.this_exec.index();
 
-    g.wait();
-    
-    // sum over the group
-    sum = accumulate_detail::destructive_accumulate_n(g, buffer->sums.data(), thrust::min<size_type>(groupsize,n), sum, binary_op);
-  } // end for
+                    size_type local_size = thrust::max<size_type>(
+                        0, thrust::min<size_type>(grainsize, partition_size - grainsize * tid));
+
+                    if(local_size)
+                    {
+                        this_sum = buffer->inputs[local_offset];
+                        this_sum
+                            = bulk::accumulate(bound<grainsize - 1>(g.this_exec),
+                                               buffer->inputs.data() + local_offset + 1,
+                                               buffer->inputs.data() + local_offset + local_size,
+                                               this_sum,
+                                               binary_op);
+                    } // end if
+
+                    g.wait();
+
+                    if(local_size)
+                    {
+                        buffer->sums[tid] = this_sum;
+                    } // end if
+
+                    g.wait();
+
+                    // sum over the group
+                    sum = accumulate_detail::destructive_accumulate_n(
+                        g,
+                        buffer->sums.data(),
+                        thrust::min<size_type>(groupsize, n),
+                        sum,
+                        binary_op);
+                } // end for
 
 #if __CUDA_ARCH__ >= 200
-  bulk::free(g, buffer);
+                bulk::free(g, buffer);
 #endif
 
-  return sum;
-} // end accumulate
-} // end accumulate_detail
-} // end detail
+                return sum;
+            } // end accumulate
+        } // end accumulate_detail
+    } // end detail
 
+    template <std::size_t groupsize,
+              std::size_t grainsize,
+              typename RandomAccessIterator,
+              typename T,
+              typename BinaryFunction>
+    __device__ T accumulate(bulk::concurrent_group<bulk::agent<grainsize>, groupsize>& g,
+                            RandomAccessIterator                                       first,
+                            RandomAccessIterator                                       last,
+                            T                                                          init,
+                            BinaryFunction                                             binary_op)
+    {
+        // use reduce when the operator is commutative
+        if(thrust::detail::is_commutative<BinaryFunction>::value)
+        {
+            init = bulk::reduce(g, first, last, init, binary_op);
+        } // end if
+        else
+        {
+            init = detail::accumulate_detail::accumulate(g, first, last, init, binary_op);
+        } // end else
 
-template<std::size_t groupsize, std::size_t grainsize, typename RandomAccessIterator, typename T, typename BinaryFunction>
-__device__
-T accumulate(bulk::concurrent_group<bulk::agent<grainsize>, groupsize> &g,
-             RandomAccessIterator first,
-             RandomAccessIterator last,
-             T init,
-             BinaryFunction binary_op)
-{
-  // use reduce when the operator is commutative
-  if(thrust::detail::is_commutative<BinaryFunction>::value)
-  {
-    init = bulk::reduce(g, first, last, init, binary_op);
-  } // end if
-  else
-  {
-    init = detail::accumulate_detail::accumulate(g, first, last, init, binary_op);
-  } // end else
-
-  return init;
-} // end accumulate()
-
+        return init;
+    } // end accumulate()
 
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-

@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file default_decomposition.h
  *  \brief Return a decomposition that is appropriate for the CUDA backend.
  */
@@ -26,23 +25,21 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename IndexType>
+                __host__
+                    __device__ thrust::system::detail::internal::uniform_decomposition<IndexType>
+                               default_decomposition(IndexType n);
 
-template<typename IndexType>
-__host__ __device__
-thrust::system::detail::internal::uniform_decomposition<IndexType> default_decomposition(IndexType n);
-
-
-} // end namespace detail
-} // end namespace cuda
-} // end namespace system
+            } // end namespace detail
+        } // end namespace cuda
+    } // end namespace system
 } // end namespace thrust
 
 #include <thrust/system/cuda/detail/default_decomposition.inl>
-

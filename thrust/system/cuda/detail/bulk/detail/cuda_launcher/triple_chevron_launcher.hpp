@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/alignment.hpp>
-#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/cuda_launcher/parameter_ptr.hpp>
+#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
 
 // It's not possible to launch a CUDA kernel unless __BULK_HAS_CUDART__
 // is 1, so we'd like to just hide all this code when that macro is 0.
@@ -31,109 +31,117 @@
 // So we allow the user to unconditionally call cuda_launcher.launch() even though it
 // will terminate the program at runtime if CUDART is not available.
 
-
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
-
+    namespace detail
+    {
 
 #ifdef __HIPCC__
 // if there are multiple versions of Bulk floating around, this may be #defined already
-#  ifndef __bulk_launch_bounds__
+#ifndef __bulk_launch_bounds__
 //#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm) __launch_bounds__(num_threads_per_block, num_blocks_per_sm)
-#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm)
-#  endif
+#define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm)
+#endif
 #else
-#  ifndef __bulk_launch_bounds__
-#    define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm)
-#  endif
+#ifndef __bulk_launch_bounds__
+#define __bulk_launch_bounds__(num_threads_per_block, num_blocks_per_sm)
+#endif
 #endif // __HIPCC__
 
+        // triple_chevron_launcher_base is the base class of triple_chevron_launcher
+        // it primarily serves to choose (statically) which __global__ function is used as the kernel
+        // sm_20+ devices have 4096 bytes of parameter space
+        // http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
+        template <unsigned int block_size,
+                  typename Function,
+                  bool by_value = (sizeof(Function) <= 4096)>
+        struct triple_chevron_launcher_base;
 
-// triple_chevron_launcher_base is the base class of triple_chevron_launcher
-// it primarily serves to choose (statically) which __global__ function is used as the kernel
-// sm_20+ devices have 4096 bytes of parameter space
-// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
-template<unsigned int block_size, typename Function, bool by_value = (sizeof(Function) <= 4096)> struct triple_chevron_launcher_base;
-
-
-template<unsigned int block_size, typename Function>
-__global__
-__bulk_launch_bounds__(block_size, 0)
-void launch_by_value(Function f)
-{
-  f();
-}
-
-
-template<unsigned int block_size, typename Function>
-struct triple_chevron_launcher_base<block_size,Function,true>
-{
-  typedef void (*global_function_pointer_t)(Function);
-
-  __host__ __device__
-  static global_function_pointer_t global_function_pointer()
-  {
-    return launch_by_value<block_size,Function>;
-  }
-};
-
-
-template<unsigned int block_size, typename Function>
-__global__
-__bulk_launch_bounds__(block_size, 0)
-void launch_by_pointer(const Function *f)
-{
-  // copy to registers
-  Function f_reg = *f;
-  f_reg();
-}
-
-
-template<unsigned int block_size, typename Function>
-struct triple_chevron_launcher_base<block_size,Function,false>
-{
-  typedef void (*global_function_pointer_t)(const Function*);
-
-  __host__ __device__
-  static global_function_pointer_t global_function_pointer()
-  {
-    return launch_by_pointer<block_size,Function>;
-  }
-};
-
-
-// sm_20+ devices have 4096 bytes of parameter space
-// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
-template<unsigned int block_size_, typename Function, bool by_value = sizeof(Function) <= 4096>
-class triple_chevron_launcher : protected triple_chevron_launcher_base<block_size_, Function>
-{
-  private:
-    typedef triple_chevron_launcher_base<block_size_,Function> super_t;
-
-  public:
-    typedef Function task_type;
-
-    inline  __host__ __device__
-    void launch(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
-    {
-      struct workaround
-      {
-        __host__ __device__
-        static void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
+        template <unsigned int block_size, typename Function>
+        __global__ __bulk_launch_bounds__(block_size, 0) void launch_by_value(Function f)
         {
+            f();
+        }
+
+        template <unsigned int block_size, typename Function>
+        struct triple_chevron_launcher_base<block_size, Function, true>
+        {
+            typedef void (*global_function_pointer_t)(Function);
+
+            __host__ __device__ static global_function_pointer_t global_function_pointer()
+            {
+                return launch_by_value<block_size, Function>;
+            }
+        };
+
+        template <unsigned int block_size, typename Function>
+        __global__ __bulk_launch_bounds__(block_size, 0) void launch_by_pointer(const Function* f)
+        {
+            // copy to registers
+            Function f_reg = *f;
+            f_reg();
+        }
+
+        template <unsigned int block_size, typename Function>
+        struct triple_chevron_launcher_base<block_size, Function, false>
+        {
+            typedef void (*global_function_pointer_t)(const Function*);
+
+            __host__ __device__ static global_function_pointer_t global_function_pointer()
+            {
+                return launch_by_pointer<block_size, Function>;
+            }
+        };
+
+        // sm_20+ devices have 4096 bytes of parameter space
+        // http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
+        template <unsigned int block_size_,
+                  typename Function,
+                  bool by_value = sizeof(Function) <= 4096>
+        class triple_chevron_launcher
+            : protected triple_chevron_launcher_base<block_size_, Function>
+        {
+        private:
+            typedef triple_chevron_launcher_base<block_size_, Function> super_t;
+
+        public:
+            typedef Function task_type;
+
+            inline __host__ __device__ void launch(unsigned int num_blocks,
+                                                   unsigned int block_size,
+                                                   size_t       num_dynamic_smem_bytes,
+                                                   hipStream_t  stream,
+                                                   task_type    task)
+            {
+                struct workaround
+                {
+                    __host__ __device__ static void supported_path(unsigned int num_blocks,
+                                                                   unsigned int block_size,
+                                                                   size_t num_dynamic_smem_bytes,
+                                                                   hipStream_t stream,
+                                                                   task_type   task)
+                    {
 
 #if __BULK_HAS_CUDART__ /*|| defined(__HIP_PLATFORM_HCC__)*/
-#if (!defined __HIP_DEVICE_COMPILE__) /* || defined(__HIP_PLATFORM_HCC__)*/
-if (by_value)
-hipLaunchKernelGGL((launch_by_value<block_size_,Function>), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);
-else
-hipLaunchKernelGGL((launch_by_pointer<block_size_,Function>), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,&task);
+#if(!defined __HIP_DEVICE_COMPILE__) /* || defined(__HIP_PLATFORM_HCC__)*/
+                        if(by_value)
+                            hipLaunchKernelGGL((launch_by_value<block_size_, Function>),
+                                               dim3(num_blocks),
+                                               dim3(block_size),
+                                               num_dynamic_smem_bytes,
+                                               stream,
+                                               task);
+                        else
+                            hipLaunchKernelGGL((launch_by_pointer<block_size_, Function>),
+                                               dim3(num_blocks),
+                                               dim3(block_size),
+                                               num_dynamic_smem_bytes,
+                                               stream,
+                                               &task);
 #endif
 #endif
-/*#if __BULK_HAS_CUDART__ || defined(__HIP_DEVICE_COMPILE__)
+                        /*#if __BULK_HAS_CUDART__ || defined(__HIP_DEVICE_COMPILE__)
 //#  ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0 || defined(__HIP_DEVICE_COMPILE__)
          // cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
@@ -141,96 +149,112 @@ hipLaunchKernelGGL((launch_by_pointer<block_size_,Function>), dim3(num_blocks), 
          // bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");
 
             hipLaunchKernelGGL((super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);*/
-/*#else
+                        /*#else
            hipLaunchKernelGGL(reinterpret_cast<void*>(super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,alignment_of<task_type>::value);
 # endif // __CUDA_ARCH__
 #endif // __BULK_HAS_CUDART__*/
-        }
+                    }
 
-        __host__ __device__
-        static void unsupported_path(unsigned int, unsigned int, size_t, hipStream_t, task_type)
-        {
-          bulk::detail::terminate_with_message("triple_chevron_launcher::launch(): CUDA kernel launch requires CUDART.");
-        }
-      };
-
-
-
-
+                    __host__ __device__ static void
+                             unsupported_path(unsigned int, unsigned int, size_t, hipStream_t, task_type)
+                    {
+                        bulk::detail::terminate_with_message("triple_chevron_launcher::launch(): "
+                                                             "CUDA kernel launch requires CUDART.");
+                    }
+                };
 
 #if __BULK_HAS_CUDART__ /* || defined(__HIP_PLATFORM_HCC__)*/ //TODO Workaround for create kernel
-//workaround wand;
-     //wand.supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
-workaround::supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+                //workaround wand;
+                //wand.supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+                workaround::supported_path(
+                    num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
 
 #else
-      workaround::unsupported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
-#endif  
-    } // end launch()
-};
+                workaround::unsupported_path(
+                    num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+#endif
+            } // end launch()
+        };
 
-
-// sm_20+ devices have 4096 bytes of parameter space
-// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
-// This specialization of triple_chevron_launcher marshals large Functions through
-// global memory via parameter_ptr
-template<unsigned int block_size_, typename Function>
-class triple_chevron_launcher<block_size_,Function,false> : protected triple_chevron_launcher_base<block_size_,Function>
-{
-  private:
-    typedef triple_chevron_launcher_base<block_size_,Function> super_t;
-
-  public:
-    typedef Function task_type;
-
-    inline __host__ __device__
-    void launch(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
-    {
-      struct workaround
-      {
-        __host__ __device__
-        static void supported_path(unsigned int num_blocks, unsigned int block_size, size_t num_dynamic_smem_bytes, hipStream_t stream, task_type task)
+        // sm_20+ devices have 4096 bytes of parameter space
+        // http://docs.nvidia.com/cuda/cuda-c-programming-guide/#function-parameters
+        // This specialization of triple_chevron_launcher marshals large Functions through
+        // global memory via parameter_ptr
+        template <unsigned int block_size_, typename Function>
+        class triple_chevron_launcher<block_size_, Function, false>
+            : protected triple_chevron_launcher_base<block_size_, Function>
         {
-          //bulk::detail::parameter_ptr<task_type> parm = bulk::detail::make_parameter<task_type>(task);
+        private:
+            typedef triple_chevron_launcher_base<block_size_, Function> super_t;
 
-#if __BULK_HAS_CUDART__/*|| defined(__HIP_PLATFORM_HCC__)*/
+        public:
+            typedef Function task_type;
+
+            inline __host__ __device__ void launch(unsigned int num_blocks,
+                                                   unsigned int block_size,
+                                                   size_t       num_dynamic_smem_bytes,
+                                                   hipStream_t  stream,
+                                                   task_type    task)
+            {
+                struct workaround
+                {
+                    __host__ __device__ static void supported_path(unsigned int num_blocks,
+                                                                   unsigned int block_size,
+                                                                   size_t num_dynamic_smem_bytes,
+                                                                   hipStream_t stream,
+                                                                   task_type   task)
+                    {
+                        //bulk::detail::parameter_ptr<task_type> parm = bulk::detail::make_parameter<task_type>(task);
+
+#if __BULK_HAS_CUDART__ /*|| defined(__HIP_PLATFORM_HCC__)*/
 //#  ifndef __CUDA_ARCH__
-#if __HIP_DEVICE_COMPILE__ == 0 /*|| defined(__HIP_PLATFORM_HCC__) */       
- // cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
-         // cudaSetupArgument(static_cast<const task_type*>(parm.get()), 0);
-         // bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");
-              hipLaunchKernelGGL((super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,task);
-#  else
-          /*void *param_buffer = cudaGetParameterBuffer(alignment_of<task_type>::value, sizeof(task_type));
+#if __HIP_DEVICE_COMPILE__ == 0 /*|| defined(__HIP_PLATFORM_HCC__) */
+                        // cudaConfigureCall(dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream);
+                        // cudaSetupArgument(static_cast<const task_type*>(parm.get()), 0);
+                        // bulk::detail::throw_on_error(cudaLaunch(super_t::global_function_pointer()), "after cudaLaunch in triple_chevron_launcher::launch()");
+                        hipLaunchKernelGGL((super_t::global_function_pointer()),
+                                           dim3(num_blocks),
+                                           dim3(block_size),
+                                           num_dynamic_smem_bytes,
+                                           stream,
+                                           task);
+#else
+                        /*void *param_buffer = cudaGetParameterBuffer(alignment_of<task_type>::value, sizeof(task_type));
           task_type *task_ptr = parm.get();
           std::memcpy(param_buffer, &task_ptr, sizeof(task_type*));
           bulk::detail::throw_on_error(cudaLaunchDevice(reinterpret_cast<void*>(super_t::global_function_pointer()), param_buffer, dim3(num_blocks), dim3(block_size), num_dynamic_smem_bytes, stream),
                                        "after cudaLaunchDevice in triple_chevron_launcher::launch()");*/
-  hipLaunchKernelGGL((launch_by_pointer<block_size_,Function>), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,&task);
+                        hipLaunchKernelGGL((launch_by_pointer<block_size_, Function>),
+                                           dim3(num_blocks),
+                                           dim3(block_size),
+                                           num_dynamic_smem_bytes,
+                                           stream,
+                                           &task);
 
-          /* hipLaunchKernelGGL(reinterpret_cast<void*>(super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,alignment_of<task_type>::value);*/
-#  endif // __CUDA_ARCH__
+                        /* hipLaunchKernelGGL(reinterpret_cast<void*>(super_t::global_function_pointer()), dim3(num_blocks), dim3(block_size),num_dynamic_smem_bytes, stream,alignment_of<task_type>::value);*/
+#endif // __CUDA_ARCH__
 #endif // __BULK_HAS_CUDART__
-        }
+                    }
 
-        __host__ __device__
-        static void unsupported_path(unsigned int, unsigned int, size_t, hipStream_t, task_type)
-        {
-          bulk::detail::terminate_with_message("triple_chevron_launcher::launch(): CUDA kernel launch requires CUDART.");
-        }
-      };
+                    __host__ __device__ static void
+                             unsupported_path(unsigned int, unsigned int, size_t, hipStream_t, task_type)
+                    {
+                        bulk::detail::terminate_with_message("triple_chevron_launcher::launch(): "
+                                                             "CUDA kernel launch requires CUDART.");
+                    }
+                };
 
 //workaround wand;
 #if __BULK_HAS_CUDART__ /*|| __HIP_DEVICE_COMPILE__*/
-      workaround::supported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+                workaround::supported_path(
+                    num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
 #else
-      workaround::unsupported_path(num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
+                workaround::unsupported_path(
+                    num_blocks, block_size, num_dynamic_smem_bytes, stream, task);
 #endif
-    } // end launch()
-};
+            } // end launch()
+        };
 
-
-} // end detail
+    } // end detail
 } // end bul
 BULK_NAMESPACE_SUFFIX
-

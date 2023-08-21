@@ -16,50 +16,48 @@
 
 #pragma once
 
-
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
+                namespace detail
+                {
 
+                    template <typename Closure, typename RandomAccessIterator>
+                    struct virtualized_smem_closure : Closure
+                    {
+                        typedef Closure super_t;
 
-template<typename Closure, typename RandomAccessIterator>
-  struct virtualized_smem_closure
-    : Closure
-{
-  typedef Closure super_t;
+                        size_t               num_elements_per_block;
+                        RandomAccessIterator virtual_smem;
 
-  size_t num_elements_per_block;
-  RandomAccessIterator virtual_smem;
+                        __host__ __device__ __thrust_forceinline__
+                                            virtualized_smem_closure(Closure              closure,
+                                                                     size_t               num_elements_per_block,
+                                                                     RandomAccessIterator virtual_smem)
+                            : super_t(closure)
+                            , num_elements_per_block(num_elements_per_block)
+                            , virtual_smem(virtual_smem)
+                        {
+                        }
 
-  __host__ __device__ __thrust_forceinline__
-  virtualized_smem_closure(Closure closure, size_t num_elements_per_block, RandomAccessIterator virtual_smem)
-    : super_t(closure),
-      num_elements_per_block(num_elements_per_block),
-      virtual_smem(virtual_smem)
-  {}
+                        __device__ __thrust_forceinline__ void operator()()
+                        {
+                            typename super_t::context_type ctx;
 
-  __device__ __thrust_forceinline__
-  void operator()()
-  {
-    typename super_t::context_type ctx;
+                            RandomAccessIterator smem
+                                = virtual_smem + num_elements_per_block * ctx.block_index();
 
-    RandomAccessIterator smem = virtual_smem + num_elements_per_block * ctx.block_index();
+                            super_t::operator()(smem);
+                        }
+                    };
 
-    super_t::operator()(smem);
-  }
-};
-
-
-} // end detail
-} // end detail
-} // end cuda
-} // end system
+                } // end detail
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

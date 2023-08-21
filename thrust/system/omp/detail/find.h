@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file find.h
  *  \brief OpenMP implementation of find_if. 
  */
@@ -27,25 +26,24 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace omp
+        {
+            namespace detail
+            {
 
-template <typename DerivedPolicy, typename InputIterator, typename Predicate>
-InputIterator find_if(execution_policy<DerivedPolicy> &exec,
-                      InputIterator first,
-                      InputIterator last,
-                      Predicate pred)
-{
-  // omp prefers generic::find_if to cpp::find_if
-  return thrust::system::detail::generic::find_if(exec, first, last, pred);
-}
+                template <typename DerivedPolicy, typename InputIterator, typename Predicate>
+                InputIterator find_if(execution_policy<DerivedPolicy>& exec,
+                                      InputIterator                    first,
+                                      InputIterator                    last,
+                                      Predicate                        pred)
+                {
+                    // omp prefers generic::find_if to cpp::find_if
+                    return thrust::system::detail::generic::find_if(exec, first, last, pred);
+                }
 
-} // end namespace detail
-} // end namespace omp
-} // end namespace system
+            } // end namespace detail
+        } // end namespace omp
+    } // end namespace system
 } // end namespace thrust
-

@@ -23,110 +23,98 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
-
-__host__ __device__
-inline hipStream_t legacy_stream()
-{
+                __host__ __device__ inline hipStream_t legacy_stream()
+                {
 #if defined(__NVCC__)
-   #if (CUDA_VERSION < 7000)
-       return 0;
-   #else
-       return cudaStreamLegacy;
-   #endif
+#if(CUDA_VERSION < 7000)
+                    return 0;
 #else
-    // For HIP/ROCM this is equivalent to null stream. (HIP/ROCm does not support per-thread default stream).
-    return 0; 
+                    return cudaStreamLegacy;
 #endif
-}
+#else
+                    // For HIP/ROCM this is equivalent to null stream. (HIP/ROCm does not support per-thread default stream).
+                    return 0;
+#endif
+                }
 
+                __host__ __device__ inline hipStream_t default_stream()
+                {
+                    // XXX we might actually want to use the per-thread default stream instead
+                    return legacy_stream();
+                }
 
-__host__ __device__
-inline hipStream_t default_stream()
-{
-  // XXX we might actually want to use the per-thread default stream instead
-  return legacy_stream();
-}
+                // given any old execution_policy, we return the default stream
+                template <typename DerivedPolicy>
+                __host__ __device__ inline hipStream_t
+                         stream(const execution_policy<DerivedPolicy>&)
+                {
+                    return default_stream();
+                }
 
+                // base class for execute_on_stream
+                template <typename DerivedPolicy>
+                class execute_on_stream_base
+                    : public thrust::system::cuda::detail::execution_policy<DerivedPolicy>
+                {
+                public:
+                    __host__ __device__ execute_on_stream_base()
+                        : m_stream(default_stream())
+                    {
+                    }
 
-// given any old execution_policy, we return the default stream
-template<typename DerivedPolicy>
-__host__ __device__
-inline hipStream_t stream(const execution_policy<DerivedPolicy> &)
-{
-  return default_stream();
-}
+                    __host__ __device__ execute_on_stream_base(hipStream_t stream)
+                        : m_stream(stream)
+                    {
+                    }
 
+                    __host__ __device__ DerivedPolicy on(const hipStream_t& s) const
+                    {
+                        // create a copy of *this to return
+                        // make sure it is the derived type
+                        DerivedPolicy result = thrust::detail::derived_cast(*this);
 
-// base class for execute_on_stream
-template<typename DerivedPolicy>
-class execute_on_stream_base
-  : public thrust::system::cuda::detail::execution_policy<DerivedPolicy>
-{
-  public:
-    __host__ __device__
-    execute_on_stream_base()
-      : m_stream(default_stream())
-    {}
+                        // change the result's stream to s
+                        result.set_stream(s);
 
-    __host__ __device__
-    execute_on_stream_base(hipStream_t stream)
-      : m_stream(stream)
-    {}
+                        return result;
+                    }
 
-    __host__ __device__
-    DerivedPolicy on(const hipStream_t &s) const
-    {
-      // create a copy of *this to return
-      // make sure it is the derived type
-      DerivedPolicy result = thrust::detail::derived_cast(*this);
+                private:
+                    // stream() is a friend function because we call it through ADL
+                    __host__ __device__ friend inline hipStream_t
+                             stream(const execute_on_stream_base& exec)
+                    {
+                        return exec.m_stream;
+                    }
 
-      // change the result's stream to s
-      result.set_stream(s);
+                    __host__ __device__ inline void set_stream(const hipStream_t& s)
+                    {
+                        m_stream = s;
+                    }
 
-      return result;
-    }
+                    hipStream_t m_stream;
+                };
 
-  private:
-    // stream() is a friend function because we call it through ADL
-    __host__ __device__
-    friend inline hipStream_t stream(const execute_on_stream_base &exec)
-    {
-      return exec.m_stream;
-    }
+                // execution policy which submits kernel launches on a given stream
+                class execute_on_stream : public execute_on_stream_base<execute_on_stream>
+                {
+                    typedef execute_on_stream_base<execute_on_stream> super_t;
 
-    __host__ __device__
-    inline void set_stream(const hipStream_t &s)
-    {
-      m_stream = s;
-    }
+                public:
+                    __host__ __device__ inline execute_on_stream(hipStream_t stream)
+                        : super_t(stream)
+                    {
+                    }
+                };
 
-    hipStream_t m_stream;
-};
-
-
-// execution policy which submits kernel launches on a given stream
-class execute_on_stream
-  : public execute_on_stream_base<execute_on_stream>
-{
-  typedef execute_on_stream_base<execute_on_stream> super_t;
-
-  public:
-    __host__ __device__
-    inline execute_on_stream(hipStream_t stream) 
-      : super_t(stream)
-    {}
-};
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

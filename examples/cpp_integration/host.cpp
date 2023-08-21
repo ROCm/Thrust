@@ -1,10 +1,10 @@
-#include <thrust/host_vector.h>
-#include <thrust/random.h>
-#include <thrust/generate.h>
-#include <thrust/sort.h>
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
+#include <thrust/generate.h>
+#include <thrust/host_vector.h>
+#include <thrust/random.h>
+#include <thrust/sort.h>
 
 // defines the function prototype
 #include "device.h"
@@ -12,7 +12,7 @@
 int main(void)
 {
     // generate 20 random numbers on the host
-    thrust::host_vector<int> h_vec(20);
+    thrust::host_vector<int>      h_vec(20);
     thrust::default_random_engine rng;
     thrust::generate(h_vec.begin(), h_vec.end(), rng);
 
@@ -24,4 +24,3 @@ int main(void)
 
     return 0;
 }
-

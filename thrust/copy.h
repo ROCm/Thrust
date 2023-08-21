@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file copy.h
  *  \brief Copies elements from one range to another
  */
@@ -27,23 +26,22 @@
 namespace thrust
 {
 
-/*! \addtogroup algorithms
+    /*! \addtogroup algorithms
  */
 
-/*! \addtogroup copying
+    /*! \addtogroup copying
  *  \ingroup algorithms
  *  \{
  */
 
-
-/*! \p copy copies elements from the range [\p first, \p last) to the range
+    /*! \p copy copies elements from the range [\p first, \p last) to the range
  *  [\p result, \p result + (\p last - \p first)). That is, it performs
- *  the assignments *\p result = *\p first, *(\p result + \c 1) = *(\p first + \c 1),
- *  and so on. Generally, for every integer \c n from \c 0 to \p last - \p first, \p copy
- *  performs the assignment *(\p result + \c n) = *(\p first + \c n). Unlike
- *  \c std::copy, \p copy offers no guarantee on order of operation.  As a result,
- *  calling \p copy with overlapping source and destination ranges has undefined
- *  behavior.
+ *  the assignments *\p result = *\p first, *(\p result + \c 1) = *(\p first +
+ * \c 1), and so on. Generally, for every integer \c n from \c 0 to \p last - \p
+ * first, \p copy performs the assignment *(\p result + \c n) = *(\p first + \c
+ * n). Unlike \c std::copy, \p copy offers no guarantee on order of operation.
+ * As a result, calling \p copy with overlapping source and destination ranges
+ * has undefined behavior.
  *
  *  The return value is \p result + (\p last - \p first).
  *
@@ -57,13 +55,18 @@ namespace thrust
  *  \see http://www.sgi.com/tech/stl/copy.html
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator must be a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and \c InputIterator's \c value_type must be convertible to \c OutputIterator's \c value_type.
- *  \tparam OutputIterator must be a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam InputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \c InputIterator's \c value_type must be convertible to \c OutputIterator's
+ * \c value_type. \tparam OutputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *
- *  \pre \p result may be equal to \p first, but \p result shall not be in the range <tt>[first, last)</tt> otherwise.
+ *  \pre \p result may be equal to \p first, but \p result shall not be in the
+ * range <tt>[first, last)</tt> otherwise.
  *
  *  The following code snippet demonstrates how to use \p copy
- *  to copy from one range to another using the \p thrust::device parallelization policy:
+ *  to copy from one range to another using the \p thrust::device
+ * parallelization policy:
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -80,21 +83,20 @@ namespace thrust
  *  // vec1 is now a copy of vec0
  *  \endcode
  */
-template<typename DerivedPolicy, typename InputIterator, typename OutputIterator>
-__host__ __device__
-  OutputIterator copy(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                      InputIterator first,
-                      InputIterator last,
-                      OutputIterator result);
+    template <typename DerivedPolicy, typename InputIterator, typename OutputIterator>
+    __host__ __device__ OutputIterator
+                        copy(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                             InputIterator                                               first,
+                             InputIterator                                               last,
+                             OutputIterator                                              result);
 
-
-/*! \p copy_n copies elements from the range <tt>[first, first + n)</tt> to the range
- *  <tt>[result, result + n)</tt>. That is, it performs the assignments <tt>*result = *first, *(result + 1) = *(first + 1)</tt>,
- *  and so on. Generally, for every integer \c i from \c 0 to \c n, \p copy
- *  performs the assignment *(\p result + \c i) = *(\p first + \c i). Unlike
- *  \c std::copy_n, \p copy_n offers no guarantee on order of operation. As a result,
- *  calling \p copy_n with overlapping source and destination ranges has undefined
- *  behavior.
+    /*! \p copy_n copies elements from the range <tt>[first, first + n)</tt> to the
+ * range <tt>[result, result + n)</tt>. That is, it performs the assignments
+ * <tt>*result = *first, *(result + 1) = *(first + 1)</tt>, and so on.
+ * Generally, for every integer \c i from \c 0 to \c n, \p copy performs the
+ * assignment *(\p result + \c i) = *(\p first + \c i). Unlike \c std::copy_n,
+ * \p copy_n offers no guarantee on order of operation. As a result, calling \p
+ * copy_n with overlapping source and destination ranges has undefined behavior.
  *
  *  The return value is \p result + \p n.
  *
@@ -107,14 +109,19 @@ __host__ __device__
  *  \return The end of the destination range.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator must be a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and \c InputIterator's \c value_type must be convertible to \c OutputIterator's \c value_type.
- *  \tparam Size is an integral type.
- *  \tparam OutputIterator must be a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam InputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \c InputIterator's \c value_type must be convertible to \c OutputIterator's
+ * \c value_type. \tparam Size is an integral type. \tparam OutputIterator must
+ * be a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *
- *  \pre \p result may be equal to \p first, but \p result shall not be in the range <tt>[first, first + n)</tt> otherwise.
+ *  \pre \p result may be equal to \p first, but \p result shall not be in the
+ * range <tt>[first, first + n)</tt> otherwise.
  *
  *  The following code snippet demonstrates how to use \p copy
- *  to copy from one range to another using the \p thrust::device parallelization policy:
+ *  to copy from one range to another using the \p thrust::device
+ * parallelization policy:
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -133,23 +140,24 @@ __host__ __device__
  *  \see http://www.sgi.com/tech/stl/copy_n.html
  *  \see thrust::copy
  */
-template<typename DerivedPolicy, typename InputIterator, typename Size, typename OutputIterator>
-__host__ __device__
-  OutputIterator copy_n(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                        InputIterator first,
-                        Size n,
-                        OutputIterator result);
+    template <typename DerivedPolicy,
+              typename InputIterator,
+              typename Size,
+              typename OutputIterator>
+    __host__ __device__ OutputIterator
+                        copy_n(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                               InputIterator                                               first,
+                               Size                                                        n,
+                               OutputIterator                                              result);
 
-
-	
-/*! \p copy copies elements from the range [\p first, \p last) to the range
+    /*! \p copy copies elements from the range [\p first, \p last) to the range
  *  [\p result, \p result + (\p last - \p first)). That is, it performs
- *  the assignments *\p result = *\p first, *(\p result + \c 1) = *(\p first + \c 1),
- *  and so on. Generally, for every integer \c n from \c 0 to \p last - \p first, \p copy
- *  performs the assignment *(\p result + \c n) = *(\p first + \c n). Unlike
- *  \c std::copy, \p copy offers no guarantee on order of operation.  As a result,
- *  calling \p copy with overlapping source and destination ranges has undefined
- *  behavior.
+ *  the assignments *\p result = *\p first, *(\p result + \c 1) = *(\p first +
+ * \c 1), and so on. Generally, for every integer \c n from \c 0 to \p last - \p
+ * first, \p copy performs the assignment *(\p result + \c n) = *(\p first + \c
+ * n). Unlike \c std::copy, \p copy offers no guarantee on order of operation.
+ * As a result, calling \p copy with overlapping source and destination ranges
+ * has undefined behavior.
  *
  *  The return value is \p result + (\p last - \p first).
  *
@@ -159,10 +167,14 @@ __host__ __device__
  *  \return The end of the destination sequence.
  *  \see http://www.sgi.com/tech/stl/copy.html
  *
- *  \tparam InputIterator must be a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and \c InputIterator's \c value_type must be convertible to \c OutputIterator's \c value_type.
- *  \tparam OutputIterator must be a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam InputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \c InputIterator's \c value_type must be convertible to \c OutputIterator's
+ * \c value_type. \tparam OutputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *
- *  \pre \p result may be equal to \p first, but \p result shall not be in the range <tt>[first, last)</tt> otherwise.
+ *  \pre \p result may be equal to \p first, but \p result shall not be in the
+ * range <tt>[first, last)</tt> otherwise.
  *
  *  The following code snippet demonstrates how to use \p copy
  *  to copy from one range to another.
@@ -182,18 +194,16 @@ __host__ __device__
  *  // vec1 is now a copy of vec0
  *  \endcode
  */
-template<typename InputIterator, typename OutputIterator>
-  OutputIterator copy(InputIterator first,
-                      InputIterator last,
-                      OutputIterator result);
+    template <typename InputIterator, typename OutputIterator>
+    OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result);
 
-/*! \p copy_n copies elements from the range <tt>[first, first + n)</tt> to the range
- *  <tt>[result, result + n)</tt>. That is, it performs the assignments <tt>*result = *first, *(result + 1) = *(first + 1)</tt>,
- *  and so on. Generally, for every integer \c i from \c 0 to \c n, \p copy
- *  performs the assignment *(\p result + \c i) = *(\p first + \c i). Unlike
- *  \c std::copy_n, \p copy_n offers no guarantee on order of operation. As a result,
- *  calling \p copy_n with overlapping source and destination ranges has undefined
- *  behavior.
+    /*! \p copy_n copies elements from the range <tt>[first, first + n)</tt> to the
+ * range <tt>[result, result + n)</tt>. That is, it performs the assignments
+ * <tt>*result = *first, *(result + 1) = *(first + 1)</tt>, and so on.
+ * Generally, for every integer \c i from \c 0 to \c n, \p copy performs the
+ * assignment *(\p result + \c i) = *(\p first + \c i). Unlike \c std::copy_n,
+ * \p copy_n offers no guarantee on order of operation. As a result, calling \p
+ * copy_n with overlapping source and destination ranges has undefined behavior.
  *
  *  The return value is \p result + \p n.
  *
@@ -202,11 +212,15 @@ template<typename InputIterator, typename OutputIterator>
  *  \param result The beginning destination range.
  *  \return The end of the destination range.
  *
- *  \tparam InputIterator must be a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and \c InputIterator's \c value_type must be convertible to \c OutputIterator's \c value_type.
- *  \tparam Size is an integral type.
- *  \tparam OutputIterator must be a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam InputIterator must be a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a> and
+ * \c InputIterator's \c value_type must be convertible to \c OutputIterator's
+ * \c value_type. \tparam Size is an integral type. \tparam OutputIterator must
+ * be a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
  *
- *  \pre \p result may be equal to \p first, but \p result shall not be in the range <tt>[first, first + n)</tt> otherwise.
+ *  \pre \p result may be equal to \p first, but \p result shall not be in the
+ * range <tt>[first, first + n)</tt> otherwise.
  *
  *  The following code snippet demonstrates how to use \p copy
  *  to copy from one range to another.
@@ -227,28 +241,27 @@ template<typename InputIterator, typename OutputIterator>
  *  \see http://www.sgi.com/tech/stl/copy_n.html
  *  \see thrust::copy
  */
-template<typename InputIterator, typename Size, typename OutputIterator>
-  OutputIterator copy_n(InputIterator first,
-                        Size n,
-                        OutputIterator result);
+    template <typename InputIterator, typename Size, typename OutputIterator>
+    OutputIterator copy_n(InputIterator first, Size n, OutputIterator result);
 
-/*! \} // end copying
+    /*! \} // end copying
  */
 
-/*! \addtogroup stream_compaction
+    /*! \addtogroup stream_compaction
  *  \{
  */
 
-
-/*! This version of \p copy_if copies elements from the range <tt>[first,last)</tt>
- *  to a range beginning at \p result, except that any element which causes \p pred
- *  to be \c false is not copied. \p copy_if is stable, meaning that the relative
- *  order of elements that are copied is unchanged.
+    /*! This version of \p copy_if copies elements from the range
+ * <tt>[first,last)</tt> to a range beginning at \p result, except that any
+ * element which causes \p pred to be \c false is not copied. \p copy_if is
+ * stable, meaning that the relative order of elements that are copied is
+ * unchanged.
  *
- *  More precisely, for every integer \c n such that <tt>0 <= n < last-first</tt>,
- *  \p copy_if performs the assignment <tt>*result = *(first+n)</tt> and \p result
- *  is advanced one position if <tt>pred(*(first+n))</tt>. Otherwise, no assignment
- *  occurs and \p result is not advanced.
+ *  More precisely, for every integer \c n such that <tt>0 <= n <
+ * last-first</tt>, \p copy_if performs the assignment <tt>*result =
+ * *(first+n)</tt> and \p result is advanced one position if
+ * <tt>pred(*(first+n))</tt>. Otherwise, no assignment occurs and \p result is
+ * not advanced.
  *
  *  The algorithm's execution is parallelized as determined by \p system.
  *
@@ -256,20 +269,25 @@ template<typename InputIterator, typename Size, typename OutputIterator>
  *  \param first The beginning of the sequence from which to copy.
  *  \param last The end of the sequence from which to copy.
  *  \param result The beginning of the sequence into which to copy.
- *  \param pred The predicate to test on every value of the range <tt>[first, last)</tt>.
- *  \return <tt>result + n</tt>, where \c n is equal to the number of times \p pred
- *          evaluated to \c true in the range <tt>[first, last)</tt>.
+ *  \param pred The predicate to test on every value of the range <tt>[first,
+ * last)</tt>. \return <tt>result + n</tt>, where \c n is equal to the number of
+ * times \p pred evaluated to \c true in the range <tt>[first, last)</tt>.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>,
- *                        and \p InputIterator's \c value_type is convertible to \p Predicate's \c argument_type.
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
+ *  \tparam InputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>, and
+ * \p InputIterator's \c value_type is convertible to \p Predicate's \c
+ * argument_type. \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
  *
- *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
+ *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last -
+ * first))</tt> shall not overlap.
  *
- *  The following code snippet demonstrates how to use \p copy_if to perform stream compaction
- *  to copy even numbers to an output range using the \p thrust::host parallelization policy:
+ *  The following code snippet demonstrates how to use \p copy_if to perform
+ * stream compaction to copy even numbers to an output range using the \p
+ * thrust::host parallelization policy:
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -296,42 +314,48 @@ template<typename InputIterator, typename Size, typename OutputIterator>
  *
  *  \see \c remove_copy_if
  */
-template<typename DerivedPolicy, typename InputIterator, typename OutputIterator, typename Predicate>
-__host__ __device__
-  OutputIterator copy_if(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                         InputIterator first,
-                         InputIterator last,
-                         OutputIterator result,
-                         Predicate pred);
+    template <typename DerivedPolicy,
+              typename InputIterator,
+              typename OutputIterator,
+              typename Predicate>
+    __host__ __device__ OutputIterator
+                        copy_if(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                InputIterator                                               first,
+                                InputIterator                                               last,
+                                OutputIterator                                              result,
+                                Predicate                                                   pred);
 
-
-
-/*! This version of \p copy_if copies elements from the range <tt>[first,last)</tt>
- *  to a range beginning at \p result, except that any element which causes \p pred
- *  to \c false is not copied. \p copy_if is stable, meaning that the relative
- *  order of elements that are copied is unchanged.
+    /*! This version of \p copy_if copies elements from the range
+ * <tt>[first,last)</tt> to a range beginning at \p result, except that any
+ * element which causes \p pred to \c false is not copied. \p copy_if is stable,
+ * meaning that the relative order of elements that are copied is unchanged.
  *
- *  More precisely, for every integer \c n such that <tt>0 <= n < last-first</tt>,
- *  \p copy_if performs the assignment <tt>*result = *(first+n)</tt> and \p result
- *  is advanced one position if <tt>pred(*(first+n))</tt>. Otherwise, no assignment
- *  occurs and \p result is not advanced.
+ *  More precisely, for every integer \c n such that <tt>0 <= n <
+ * last-first</tt>, \p copy_if performs the assignment <tt>*result =
+ * *(first+n)</tt> and \p result is advanced one position if
+ * <tt>pred(*(first+n))</tt>. Otherwise, no assignment occurs and \p result is
+ * not advanced.
  *
  *  \param first The beginning of the sequence from which to copy.
  *  \param last The end of the sequence from which to copy.
  *  \param result The beginning of the sequence into which to copy.
- *  \param pred The predicate to test on every value of the range <tt>[first, last)</tt>.
- *  \return <tt>result + n</tt>, where \c n is equal to the number of times \p pred
- *          evaluated to \c true in the range <tt>[first, last)</tt>.
+ *  \param pred The predicate to test on every value of the range <tt>[first,
+ * last)</tt>. \return <tt>result + n</tt>, where \c n is equal to the number of
+ * times \p pred evaluated to \c true in the range <tt>[first, last)</tt>.
  *
- *  \tparam InputIterator is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>,
- *                        and \p InputIterator's \c value_type is convertible to \p Predicate's \c argument_type.
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
+ *  \tparam InputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>, and
+ * \p InputIterator's \c value_type is convertible to \p Predicate's \c
+ * argument_type. \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator.html">Output Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
  *
- *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
+ *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last -
+ * first))</tt> shall not overlap.
  *
- *  The following code snippet demonstrates how to use \p copy_if to perform stream compaction
- *  to copy even numbers to an output range.
+ *  The following code snippet demonstrates how to use \p copy_if to perform
+ * stream compaction to copy even numbers to an output range.
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -357,24 +381,21 @@ __host__ __device__
  *
  *  \see \c remove_copy_if
  */
-template<typename InputIterator,
-         typename OutputIterator,
-         typename Predicate>
-  OutputIterator copy_if(InputIterator first,
-                         InputIterator last,
-                         OutputIterator result,
-                         Predicate pred);
+    template <typename InputIterator, typename OutputIterator, typename Predicate>
+    OutputIterator
+        copy_if(InputIterator first, InputIterator last, OutputIterator result, Predicate pred);
 
-
-/*! This version of \p copy_if copies elements from the range <tt>[first,last)</tt>
- *  to a range beginning at \p result, except that any element whose corresponding stencil
- *  element causes \p pred to be \c false is not copied. \p copy_if is stable, meaning
- *  that the relative order of elements that are copied is unchanged.
+    /*! This version of \p copy_if copies elements from the range
+ * <tt>[first,last)</tt> to a range beginning at \p result, except that any
+ * element whose corresponding stencil element causes \p pred to be \c false is
+ * not copied. \p copy_if is stable, meaning that the relative order of elements
+ * that are copied is unchanged.
  *
- *  More precisely, for every integer \c n such that <tt>0 <= n < last-first</tt>,
- *  \p copy_if performs the assignment <tt>*result = *(first+n)</tt> and \p result
- *  is advanced one position if <tt>pred(*(stencil+n))</tt>. Otherwise, no assignment
- *  occurs and \p result is not advanced.
+ *  More precisely, for every integer \c n such that <tt>0 <= n <
+ * last-first</tt>, \p copy_if performs the assignment <tt>*result =
+ * *(first+n)</tt> and \p result is advanced one position if
+ * <tt>pred(*(stencil+n))</tt>. Otherwise, no assignment occurs and \p result is
+ * not advanced.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
  *
@@ -383,22 +404,30 @@ template<typename InputIterator,
  *  \param last The end of the sequence from which to copy.
  *  \param stencil The beginning of the stencil sequence.
  *  \param result The beginning of the sequence into which to copy.
- *  \param pred The predicate to test on every value of the range <tt>[stencil, stencil + (last-first))</tt>.
- *  \return <tt>result + n</tt>, where \c n is equal to the number of times \p pred
- *          evaluated to \c true in the range <tt>[stencil, stencil + (last-first))</tt>.
+ *  \param pred The predicate to test on every value of the range <tt>[stencil,
+ * stencil + (last-first))</tt>. \return <tt>result + n</tt>, where \c n is
+ * equal to the number of times \p pred evaluated to \c true in the range
+ * <tt>[stencil, stencil + (last-first))</tt>.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>,
- *                         and \p InputIterator2's \c value_type is convertible to \p Predicate's \c argument_type.
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator">Output Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>, and
+ * \p InputIterator2's \c value_type is convertible to \p Predicate's \c
+ * argument_type. \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator">Output Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
  *
- *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
- *  \pre The ranges <tt>[stencil, stencil + (last - first))</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
+ *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last -
+ * first))</tt> shall not overlap. \pre The ranges <tt>[stencil, stencil + (last
+ * - first))</tt> and <tt>[result, result + (last - first))</tt> shall not
+ * overlap.
  *
- *  The following code snippet demonstrates how to use \p copy_if to perform stream compaction
- *  to copy numbers to an output range when corresponding stencil elements are even using the \p thrust::host execution policy:
+ *  The following code snippet demonstrates how to use \p copy_if to perform
+ * stream compaction to copy numbers to an output range when corresponding
+ * stencil elements are even using the \p thrust::host execution policy:
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -427,45 +456,58 @@ template<typename InputIterator,
  *
  *  \see \c remove_copy_if
  */
-template<typename DerivedPolicy, typename InputIterator1, typename InputIterator2, typename OutputIterator, typename Predicate>
-__host__ __device__
-  OutputIterator copy_if(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                         InputIterator1 first,
-                         InputIterator1 last,
-                         InputIterator2 stencil,
-                         OutputIterator result,
-                         Predicate pred);
+    template <typename DerivedPolicy,
+              typename InputIterator1,
+              typename InputIterator2,
+              typename OutputIterator,
+              typename Predicate>
+    __host__ __device__ OutputIterator
+                        copy_if(const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+                                InputIterator1                                              first,
+                                InputIterator1                                              last,
+                                InputIterator2                                              stencil,
+                                OutputIterator                                              result,
+                                Predicate                                                   pred);
 
-
-/*! This version of \p copy_if copies elements from the range <tt>[first,last)</tt>
- *  to a range beginning at \p result, except that any element whose corresponding stencil
- *  element causes \p pred to be \c false is not copied. \p copy_if is stable, meaning
- *  that the relative order of elements that are copied is unchanged.
+    /*! This version of \p copy_if copies elements from the range
+ * <tt>[first,last)</tt> to a range beginning at \p result, except that any
+ * element whose corresponding stencil element causes \p pred to be \c false is
+ * not copied. \p copy_if is stable, meaning that the relative order of elements
+ * that are copied is unchanged.
  *
- *  More precisely, for every integer \c n such that <tt>0 <= n < last-first</tt>,
- *  \p copy_if performs the assignment <tt>*result = *(first+n)</tt> and \p result
- *  is advanced one position if <tt>pred(*(stencil+n))</tt>. Otherwise, no assignment
- *  occurs and \p result is not advanced.
+ *  More precisely, for every integer \c n such that <tt>0 <= n <
+ * last-first</tt>, \p copy_if performs the assignment <tt>*result =
+ * *(first+n)</tt> and \p result is advanced one position if
+ * <tt>pred(*(stencil+n))</tt>. Otherwise, no assignment occurs and \p result is
+ * not advanced.
  *
  *  \param first The beginning of the sequence from which to copy.
  *  \param last The end of the sequence from which to copy.
  *  \param stencil The beginning of the stencil sequence.
  *  \param result The beginning of the sequence into which to copy.
- *  \param pred The predicate to test on every value of the range <tt>[stencil, stencil + (last-first))</tt>.
- *  \return <tt>result + n</tt>, where \c n is equal to the number of times \p pred
- *          evaluated to \c true in the range <tt>[stencil, stencil + (last-first))</tt>.
+ *  \param pred The predicate to test on every value of the range <tt>[stencil,
+ * stencil + (last-first))</tt>. \return <tt>result + n</tt>, where \c n is
+ * equal to the number of times \p pred evaluated to \c true in the range
+ * <tt>[stencil, stencil + (last-first))</tt>.
  *
- *  \tparam InputIterator1 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
- *  \tparam InputIterator2 is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>,
- *                         and \p InputIterator2's \c value_type is convertible to \p Predicate's \c argument_type.
- *  \tparam OutputIterator is a model of <a href="http://www.sgi.com/tech/stl/OutputIterator">Output Iterator</a>.
- *  \tparam Predicate is a model of <a href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
+ *  \tparam InputIterator1 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator2 is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>, and
+ * \p InputIterator2's \c value_type is convertible to \p Predicate's \c
+ * argument_type. \tparam OutputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/OutputIterator">Output Iterator</a>.
+ *  \tparam Predicate is a model of <a
+ * href="http://www.sgi.com/tech/stl/Predicate.html">Predicate</a>.
  *
- *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
- *  \pre The ranges <tt>[stencil, stencil + (last - first))</tt> and <tt>[result, result + (last - first))</tt> shall not overlap.
+ *  \pre The ranges <tt>[first, last)</tt> and <tt>[result, result + (last -
+ * first))</tt> shall not overlap. \pre The ranges <tt>[stencil, stencil + (last
+ * - first))</tt> and <tt>[result, result + (last - first))</tt> shall not
+ * overlap.
  *
- *  The following code snippet demonstrates how to use \p copy_if to perform stream compaction
- *  to copy numbers to an output range when corresponding stencil elements are even:
+ *  The following code snippet demonstrates how to use \p copy_if to perform
+ * stream compaction to copy numbers to an output range when corresponding
+ * stencil elements are even:
  *
  *  \code
  *  #include <thrust/copy.h>
@@ -493,21 +535,20 @@ __host__ __device__
  *
  *  \see \c remove_copy_if
  */
-template<typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator,
-         typename Predicate>
-  OutputIterator copy_if(InputIterator1 first,
-                         InputIterator1 last,
-                         InputIterator2 stencil,
-                         OutputIterator result,
-                         Predicate pred);
+    template <typename InputIterator1,
+              typename InputIterator2,
+              typename OutputIterator,
+              typename Predicate>
+    OutputIterator copy_if(InputIterator1 first,
+                           InputIterator1 last,
+                           InputIterator2 stencil,
+                           OutputIterator result,
+                           Predicate      pred);
 
-/*! \} // end stream_compaction
+    /*! \} // end stream_compaction
  */
-	
+
 } // end namespace thrust
 
 #include <thrust/detail/copy.h>
 #include <thrust/detail/copy_if.h>
-

@@ -17,56 +17,48 @@
 
 #pragma once
 
-#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <cstdio>
 #include <exception>
+#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
+    namespace detail
+    {
 
-
-__host__ __device__
-inline void terminate()
-{
+        __host__ __device__ inline void terminate()
+        {
 //#ifdef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__
-  asm("s_trap 0x2;");
+            asm("s_trap 0x2;");
 #else
-  std::terminate();
+            std::terminate();
 #endif
-} // end terminate()
+        } // end terminate()
 
-
-__host__ __device__
-inline void terminate_with_message(const char* message)
-{
+        __host__ __device__ inline void terminate_with_message(const char* message)
+        {
 #if __BULK_HAS_PRINTF__
-  std::printf("%s\n", message);
+            std::printf("%s\n", message);
 #endif
 
-  bulk::detail::terminate();
-}
+            bulk::detail::terminate();
+        }
 
-
-__host__ __device__
-inline void terminate_on_error(hipError_t e, const char* message)
-{
-  if(e)
-  {
-#if (__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
-    printf("Error after: %s: %s\n", message, hipGetErrorString(e));
+        __host__ __device__ inline void terminate_on_error(hipError_t e, const char* message)
+        {
+            if(e)
+            {
+#if(__BULK_HAS_PRINTF__ && __BULK_HAS_CUDART__)
+                printf("Error after: %s: %s\n", message, hipGetErrorString(e));
 #elif __BULK_HAS_PRINTF__
-    printf("Error: %s\n", message);
+                printf("Error: %s\n", message);
 #endif
-    bulk::detail::terminate();
-  }
-}
+                bulk::detail::terminate();
+            }
+        }
 
-
-} // end detail
+    } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-

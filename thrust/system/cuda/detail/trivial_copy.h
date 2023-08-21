@@ -19,40 +19,35 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator1,
+                          typename Size,
+                          typename RandomAccessIterator2>
+                __host__ __device__ void trivial_copy_n(execution_policy<DerivedPolicy>& exec,
+                                                        RandomAccessIterator1            first,
+                                                        Size                             n,
+                                                        RandomAccessIterator2            result);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename Size,
-         typename RandomAccessIterator2>
-__host__ __device__
-void trivial_copy_n(execution_policy<DerivedPolicy> &exec,
-                    RandomAccessIterator1 first,
-                    Size n,
-                    RandomAccessIterator2 result);
+                template <typename System1,
+                          typename System2,
+                          typename RandomAccessIterator1,
+                          typename Size,
+                          typename RandomAccessIterator2>
+                void trivial_copy_n(cross_system<System1, System2>& exec,
+                                    RandomAccessIterator1           first,
+                                    Size                            n,
+                                    RandomAccessIterator2           result);
 
-
-template<typename System1,
-         typename System2,
-         typename RandomAccessIterator1,
-         typename Size,
-         typename RandomAccessIterator2>
-void trivial_copy_n(cross_system<System1,System2> &exec,
-                    RandomAccessIterator1 first,
-                    Size n,
-                    RandomAccessIterator2 result);
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
 
 #include <thrust/system/cuda/detail/trivial_copy.inl>
-

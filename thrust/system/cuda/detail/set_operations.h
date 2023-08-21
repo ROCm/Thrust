@@ -21,81 +21,75 @@
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator1,
+                          typename RandomAccessIterator2,
+                          typename RandomAccessIterator3,
+                          typename Compare>
+                __host__ __device__ RandomAccessIterator3
+                                    set_difference(execution_policy<DerivedPolicy>& exec,
+                                                   RandomAccessIterator1            first1,
+                                                   RandomAccessIterator1            last1,
+                                                   RandomAccessIterator2            first2,
+                                                   RandomAccessIterator2            last2,
+                                                   RandomAccessIterator3            result,
+                                                   Compare                          comp);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2, 
-	 typename RandomAccessIterator3,
-         typename Compare>
-__host__ __device__
-RandomAccessIterator3 set_difference(execution_policy<DerivedPolicy> &exec,
-                                     RandomAccessIterator1 first1,
-                                     RandomAccessIterator1 last1,
-                                     RandomAccessIterator2 first2,
-                                     RandomAccessIterator2 last2,
-                                     RandomAccessIterator3 result,
-                                     Compare comp);
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator1,
+                          typename RandomAccessIterator2,
+                          typename RandomAccessIterator3,
+                          typename Compare>
+                __host__ __device__ RandomAccessIterator3
+                                    set_intersection(execution_policy<DerivedPolicy>& exec,
+                                                     RandomAccessIterator1            first1,
+                                                     RandomAccessIterator1            last1,
+                                                     RandomAccessIterator2            first2,
+                                                     RandomAccessIterator2            last2,
+                                                     RandomAccessIterator3            result,
+                                                     Compare                          comp);
 
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator1,
+                          typename RandomAccessIterator2,
+                          typename RandomAccessIterator3,
+                          typename Compare>
+                __host__ __device__ RandomAccessIterator3
+                                    set_symmetric_difference(execution_policy<DerivedPolicy>& exec,
+                                                             RandomAccessIterator1            first1,
+                                                             RandomAccessIterator1            last1,
+                                                             RandomAccessIterator2            first2,
+                                                             RandomAccessIterator2            last2,
+                                                             RandomAccessIterator3            result,
+                                                             Compare                          comp);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2, 
-	 typename RandomAccessIterator3,
-         typename Compare>
-__host__ __device__
-RandomAccessIterator3 set_intersection(execution_policy<DerivedPolicy> &exec,
-                                       RandomAccessIterator1 first1,
-                                       RandomAccessIterator1 last1,
-                                       RandomAccessIterator2 first2,
-                                       RandomAccessIterator2 last2,
-                                       RandomAccessIterator3 result,
-                                       Compare comp);
+                template <typename DerivedPolicy,
+                          typename RandomAccessIterator1,
+                          typename RandomAccessIterator2,
+                          typename RandomAccessIterator3,
+                          typename Compare>
+                __host__ __device__ RandomAccessIterator3
+                                    set_union(execution_policy<DerivedPolicy>& exec,
+                                              RandomAccessIterator1            first1,
+                                              RandomAccessIterator1            last1,
+                                              RandomAccessIterator2            first2,
+                                              RandomAccessIterator2            last2,
+                                              RandomAccessIterator3            result,
+                                              Compare                          comp);
 
-
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2, 
-	 typename RandomAccessIterator3,
-         typename Compare>
-__host__ __device__
-RandomAccessIterator3 set_symmetric_difference(execution_policy<DerivedPolicy> &exec,
-                                               RandomAccessIterator1 first1,
-                                               RandomAccessIterator1 last1,
-                                               RandomAccessIterator2 first2,
-                                               RandomAccessIterator2 last2,
-                                               RandomAccessIterator3 result,
-                                               Compare comp);
-
-
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2, 
-	 typename RandomAccessIterator3,
-         typename Compare>
-__host__ __device__
-RandomAccessIterator3 set_union(execution_policy<DerivedPolicy> &exec,
-                                RandomAccessIterator1 first1,
-                                RandomAccessIterator1 last1,
-                                RandomAccessIterator2 first2,
-                                RandomAccessIterator2 last2,
-                                RandomAccessIterator3 result,
-                                Compare comp);
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
 
 #include <thrust/system/cuda/detail/set_difference.inl>
 #include <thrust/system/cuda/detail/set_intersection.inl>
 #include <thrust/system/cuda/detail/set_symmetric_difference.inl>
 #include <thrust/system/cuda/detail/set_union.inl>
-

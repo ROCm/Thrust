@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file distance.h
  *  \brief Computes the size of a range
  */
@@ -27,12 +26,11 @@
 namespace thrust
 {
 
-
-/*! \addtogroup iterators
+    /*! \addtogroup iterators
  *  \{
  */
 
-/*! \p distance finds the distance between \p first and \p last, i.e. the
+    /*! \p distance finds the distance between \p first and \p last, i.e. the
  *  number of times that \p first must be incremented until it is equal to
  *  \p last.
  *
@@ -40,10 +38,12 @@ namespace thrust
  *  \param last The end of an input range of interest.
  *  \return The distance between the beginning and end of the input range.
  *
- *  \tparam InputIterator is a model of <a href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
+ *  \tparam InputIterator is a model of <a
+ * href="http://www.sgi.com/tech/stl/InputIterator.html">Input Iterator</a>.
  *
- *  \pre If \c InputIterator meets the requirements of random access iterator, \p last shall be reachable from \p first or
- *       \p first shall be reachable from \p last; otherwise, \p last shall be reachable from \p first.
+ *  \pre If \c InputIterator meets the requirements of random access iterator,
+ * \p last shall be reachable from \p first or \p first shall be reachable from
+ * \p last; otherwise, \p last shall be reachable from \p first.
  *
  *  The following code snippet demonstrates how to use \p distance to compute
  *  the distance to one iterator from another.
@@ -63,15 +63,13 @@ namespace thrust
  *
  *  \see http://www.sgi.com/tech/stl/distance.html
  */
-template<typename InputIterator>
-inline __host__ __device__
-  typename thrust::iterator_traits<InputIterator>::difference_type
-    distance(InputIterator first, InputIterator last);
+    template <typename InputIterator>
+    inline __host__ __device__ typename thrust::iterator_traits<InputIterator>::difference_type
+                    distance(InputIterator first, InputIterator last);
 
-/*! \} // end iterators
+    /*! \} // end iterators
  */
 
-} // end thrust
+} // namespace thrust
 
 #include <thrust/detail/distance.inl>
-

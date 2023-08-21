@@ -15,46 +15,42 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
-template<typename T>
-  class extern_shared_ptr
-{
+                template <typename T>
+                class extern_shared_ptr
+                {
 // don't attempt to compile with any compiler other than nvcc
 // due to use of __shared__ below
 //#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
 #ifdef __HIPCC__
-  public:
-    __device__
-    inline operator T * (void)
-    {
-      HIP_DYNAMIC_SHARED( int4, smem)
-      return reinterpret_cast<T*>(smem);
-    }
+                public:
+                    __device__ inline operator T*(void)
+                    {
+                        HIP_DYNAMIC_SHARED(int4, smem)
+                        return reinterpret_cast<T*>(smem);
+                    }
 
-    __device__
-    inline operator const T * (void) const
-    {
-      HIP_DYNAMIC_SHARED( int4, smem)
-      return reinterpret_cast<const T*>(smem);
-    }
+                    __device__ inline operator const T*(void)const
+                    {
+                        HIP_DYNAMIC_SHARED(int4, smem)
+                        return reinterpret_cast<const T*>(smem);
+                    }
 #endif // THRUST_DEVICE_COMPILER_NVCC
-}; // end extern_shared_ptr
+                }; // end extern_shared_ptr
 
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

@@ -16,168 +16,163 @@
 
 #pragma once
 
+#include <hip/hip_runtime.h>
+#include <iostream>
+#include <stdexcept>
+#include <thrust/detail/swap.h>
 #include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/guarded_cuda_runtime_api.hpp>
-#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
 #include <thrust/system/cuda/detail/bulk/detail/terminate.hpp>
-#include <thrust/detail/swap.h>
-#include <hip/hip_runtime.h>
+#include <thrust/system/cuda/detail/bulk/detail/throw_on_error.hpp>
 #include <utility>
-#include <stdexcept>
-#include <iostream>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
-
-
-struct future_core_access;
-
-
-} // end detail
-
-
-template<typename T> class future;
-
-
-template<>
-class future<void>
-{
-  public:
-    __host__ __device__
-    ~future()
+    namespace detail
     {
-      if(valid())
-      {
+
+        struct future_core_access;
+
+    } // end detail
+
+    template <typename T>
+    class future;
+
+    template <>
+    class future<void>
+    {
+    public:
+        __host__ __device__ ~future()
+        {
+            if(valid())
+            {
 #if __BULK_HAS_CUDART__
-        // swallow errors
-        hipError_t e = hipEventDestroy(m_event);
+                // swallow errors
+                hipError_t e = hipEventDestroy(m_event);
 
 #if __BULK_HAS_PRINTF__
-        if(e)
-        {
-          printf("CUDA error after hipEventDestroy in future dtor: %s", hipGetErrorString(e));
-        } // end if
+                if(e)
+                {
+                    printf("CUDA error after hipEventDestroy in future dtor: %s",
+                           hipGetErrorString(e));
+                } // end if
 #endif // __BULK_HAS_PRINTF__
 
-        if(m_owns_stream)
-        {
-          e = hipStreamDestroy(m_stream);
+                if(m_owns_stream)
+                {
+                    e = hipStreamDestroy(m_stream);
 
 #if __BULK_HAS_PRINTF__
-          if(e)
-          {
-            printf("CUDA error after hipStreamDestroy in future dtor: %s", hipGetErrorString(e));
-          } // end if
+                    if(e)
+                    {
+                        printf("CUDA error after hipStreamDestroy in future dtor: %s",
+                               hipGetErrorString(e));
+                    } // end if
 #endif // __BULK_HAS_PRINTF__
-        } // end if
+                } // end if
 #endif
-      } // end if
-    } // end ~future()
+            } // end if
+        } // end ~future()
 
-    __host__ __device__
-    void wait() const
-    {
-      // XXX should probably check for valid() here
+        __host__ __device__ void wait() const
+        {
+            // XXX should probably check for valid() here
 
 #if __BULK_HAS_CUDART__
 
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-      // XXX need to capture the error as an exception and then throw it in .get()
-      bulk::detail::throw_on_error(hipEventSynchronize(m_event), "hipEventSynchronize in future::wait");
+            // XXX need to capture the error as an exception and then throw it in .get()
+            bulk::detail::throw_on_error(hipEventSynchronize(m_event),
+                                         "hipEventSynchronize in future::wait");
 #else
-      // XXX need to capture the error as an exception and then throw it in .get()
-      bulk::detail::throw_on_error(hipDeviceSynchronize(), "hipDeviceSynchronize in future::wait");
+            // XXX need to capture the error as an exception and then throw it in .get()
+            bulk::detail::throw_on_error(hipDeviceSynchronize(),
+                                         "hipDeviceSynchronize in future::wait");
 #endif // __CUDA_ARCH__
 
 #else
-      // XXX should terminate with a message
-      bulk::detail::terminate();
+            // XXX should terminate with a message
+            bulk::detail::terminate();
 #endif // __BULK_HAS_CUDART__
-    } // end wait()
+        } // end wait()
 
-    __host__ __device__
-    bool valid() const
-    {
-      return m_event != 0;
-    } // end valid()
+        __host__ __device__ bool valid() const
+        {
+            return m_event != 0;
+        } // end valid()
 
-    __host__ __device__
-    future()
-      : m_stream(0), m_event(0), m_owns_stream(false)
-    {}
+        __host__ __device__ future()
+            : m_stream(0)
+            , m_event(0)
+            , m_owns_stream(false)
+        {
+        }
 
-    // simulate a move
-    // XXX need to add rval_ref or something
-    __host__ __device__
-    future(const future &other)
-      : m_stream(0), m_event(0), m_owns_stream(false)
-    {
-      thrust::swap(m_stream,      const_cast<future&>(other).m_stream);
-      thrust::swap(m_event,       const_cast<future&>(other).m_event);
-      thrust::swap(m_owns_stream, const_cast<future&>(other).m_owns_stream);
-    } // end future()
+        // simulate a move
+        // XXX need to add rval_ref or something
+        __host__ __device__ future(const future& other)
+            : m_stream(0)
+            , m_event(0)
+            , m_owns_stream(false)
+        {
+            thrust::swap(m_stream, const_cast<future&>(other).m_stream);
+            thrust::swap(m_event, const_cast<future&>(other).m_event);
+            thrust::swap(m_owns_stream, const_cast<future&>(other).m_owns_stream);
+        } // end future()
 
-    // simulate a move
-    // XXX need to add rval_ref or something
-    __host__ __device__
-    future &operator=(const future &other)
-    {
-      thrust::swap(m_stream,      const_cast<future&>(other).m_stream);
-      thrust::swap(m_event,       const_cast<future&>(other).m_event);
-      thrust::swap(m_owns_stream, const_cast<future&>(other).m_owns_stream);
-      return *this;
-    } // end operator=()
+        // simulate a move
+        // XXX need to add rval_ref or something
+        __host__ __device__ future& operator=(const future& other)
+        {
+            thrust::swap(m_stream, const_cast<future&>(other).m_stream);
+            thrust::swap(m_event, const_cast<future&>(other).m_event);
+            thrust::swap(m_owns_stream, const_cast<future&>(other).m_owns_stream);
+            return *this;
+        } // end operator=()
 
-  private:
-    friend struct detail::future_core_access;
+    private:
+        friend struct detail::future_core_access;
 
-    __host__ __device__
-    future(hipStream_t s, bool owns_stream)
-      : m_stream(s),m_owns_stream(owns_stream)
-    {
+        __host__ __device__ future(hipStream_t s, bool owns_stream)
+            : m_stream(s)
+            , m_owns_stream(owns_stream)
+        {
 #if __BULK_HAS_CUDART__
-      bulk::detail::throw_on_error(hipEventCreateWithFlags(&m_event, create_flags), "hipEventCreateWithFlags in future ctor");
-      bulk::detail::throw_on_error(hipEventRecord(m_event, m_stream), "hipEventRecord in future ctor");
+            bulk::detail::throw_on_error(hipEventCreateWithFlags(&m_event, create_flags),
+                                         "hipEventCreateWithFlags in future ctor");
+            bulk::detail::throw_on_error(hipEventRecord(m_event, m_stream),
+                                         "hipEventRecord in future ctor");
 #endif
-    } // end future()
+        } // end future()
 
-    // XXX this combination makes the constructor expensive
-    //static const int create_flags = hipEventDisableTiming | cudaEventBlockingSync;
-    static const int create_flags = hipEventDisableTiming;
+        // XXX this combination makes the constructor expensive
+        //static const int create_flags = hipEventDisableTiming | cudaEventBlockingSync;
+        static const int create_flags = hipEventDisableTiming;
 
-    hipStream_t m_stream;
-    hipEvent_t m_event;
-    bool m_owns_stream;
-}; // end future<void>
+        hipStream_t m_stream;
+        hipEvent_t  m_event;
+        bool        m_owns_stream;
+    }; // end future<void>
 
+    namespace detail
+    {
 
-namespace detail
-{
+        struct future_core_access
+        {
+            __host__ __device__ inline static future<void> create(hipStream_t s, bool owns_stream)
+            {
+                return future<void>(s, owns_stream);
+            } // end create_in_stream()
 
+            __host__ __device__ inline static hipEvent_t event(const future<void>& f)
+            {
+                return f.m_event;
+            } // end event()
+        }; // end future_core_access
 
-struct future_core_access
-{
-  __host__ __device__
-  inline static future<void> create(hipStream_t s, bool owns_stream)
-  {
-    return future<void>(s, owns_stream);
-  } // end create_in_stream()
-
-  __host__ __device__
-  inline static hipEvent_t event(const future<void> &f)
-  {
-    return f.m_event;
-  } // end event()
-}; // end future_core_access
-
-
-} // end detail
-
+    } // end detail
 
 } // end namespace bulk
 BULK_NAMESPACE_SUFFIX
-

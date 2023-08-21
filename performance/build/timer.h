@@ -22,53 +22,53 @@
 
 // use CUDA's high-resolution timers when possible
 #include <hip/hip_runtime_api.h>
+#include <string>
 #include <thrust/system/cuda/error.h>
 #include <thrust/system_error.h>
-#include <string>
 
 void cuda_safe_call(hipError_t error, const std::string& message = "")
 {
-  if(error)
-    throw thrust::system_error(error, thrust::cuda_category(), message);
+    if(error)
+        throw thrust::system_error(error, thrust::cuda_category(), message);
 }
 
 struct timer
 {
-  hipEvent_t start;
-  hipEvent_t end;
+    hipEvent_t start;
+    hipEvent_t end;
 
-  timer(void)
-  {
-    cuda_safe_call(hipEventCreate(&start));
-    cuda_safe_call(hipEventCreate(&end));
-    restart();
-  }
+    timer(void)
+    {
+        cuda_safe_call(hipEventCreate(&start));
+        cuda_safe_call(hipEventCreate(&end));
+        restart();
+    }
 
-  ~timer(void)
-  {
-    cuda_safe_call(hipEventDestroy(start));
-    cuda_safe_call(hipEventDestroy(end));
-  }
+    ~timer(void)
+    {
+        cuda_safe_call(hipEventDestroy(start));
+        cuda_safe_call(hipEventDestroy(end));
+    }
 
-  void restart(void)
-  {
-    cuda_safe_call(hipEventRecord(start, 0));
-  }
+    void restart(void)
+    {
+        cuda_safe_call(hipEventRecord(start, 0));
+    }
 
-  double elapsed(void)
-  {
-    cuda_safe_call(hipEventRecord(end, 0));
-    cuda_safe_call(hipEventSynchronize(end));
+    double elapsed(void)
+    {
+        cuda_safe_call(hipEventRecord(end, 0));
+        cuda_safe_call(hipEventSynchronize(end));
 
-    float ms_elapsed;
-    cuda_safe_call(hipEventElapsedTime(&ms_elapsed, start, end));
-    return ms_elapsed / 1e3;
-  }
+        float ms_elapsed;
+        cuda_safe_call(hipEventElapsedTime(&ms_elapsed, start, end));
+        return ms_elapsed / 1e3;
+    }
 
-  double epsilon(void)
-  {
-    return 0.5e-6;
-  }
+    double epsilon(void)
+    {
+        return 0.5e-6;
+    }
 };
 
 #elif defined(__linux__)
@@ -77,34 +77,33 @@ struct timer
 
 struct timer
 {
-  timeval start;
-  timeval end;
+    timeval start;
+    timeval end;
 
-  timer(void)
-  {
-    restart();
-  }
+    timer(void)
+    {
+        restart();
+    }
 
-  ~timer(void)
-  {
-  }
+    ~timer(void) {}
 
-  void restart(void)
-  {
-    gettimeofday(&start, NULL);
-  }
+    void restart(void)
+    {
+        gettimeofday(&start, NULL);
+    }
 
-  double elapsed(void)
-  {
-    gettimeofday(&end, NULL);
+    double elapsed(void)
+    {
+        gettimeofday(&end, NULL);
 
-    return static_cast<double>(end.tv_sec - start.tv_sec) + 1e-6 * static_cast<double>((int)end.tv_usec - (int)start.tv_usec);
-  }
+        return static_cast<double>(end.tv_sec - start.tv_sec)
+               + 1e-6 * static_cast<double>((int)end.tv_usec - (int)start.tv_usec);
+    }
 
-  double epsilon(void)
-  {
-    return 0.5e-6;
-  }
+    double epsilon(void)
+    {
+        return 0.5e-6;
+    }
 };
 
 #else
@@ -114,35 +113,32 @@ struct timer
 
 struct timer
 {
-  clock_t start;
-  clock_t end;
+    clock_t start;
+    clock_t end;
 
-  timer(void)
-  {
-    restart();
-  }
+    timer(void)
+    {
+        restart();
+    }
 
-  ~timer(void)
-  {
-  }
+    ~timer(void) {}
 
-  void restart(void)
-  {
-    start = clock();
-  }
+    void restart(void)
+    {
+        start = clock();
+    }
 
-  double elapsed(void)
-  {
-    end = clock();
+    double elapsed(void)
+    {
+        end = clock();
 
-    return static_cast<double>(end - start) / static_cast<double>(CLOCKS_PER_SEC);
-  }
+        return static_cast<double>(end - start) / static_cast<double>(CLOCKS_PER_SEC);
+    }
 
-  double epsilon(void)
-  {
-    return 1.0 / static_cast<double>(CLOCKS_PER_SEC);
-  }
+    double epsilon(void)
+    {
+        return 1.0 / static_cast<double>(CLOCKS_PER_SEC);
+    }
 };
 
 #endif
-

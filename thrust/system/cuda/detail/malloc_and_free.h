@@ -17,74 +17,67 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/system/cuda/detail/execution_policy.h>
+#include <thrust/detail/malloc_and_free.h>
 #include <thrust/detail/raw_pointer_cast.h>
+#include <thrust/detail/seq.h>
+#include <thrust/system/cuda/detail/execution_policy.h>
 #include <thrust/system/cuda/detail/guarded_cuda_runtime_api.h>
-#include <thrust/system/system_error.h>
+#include <thrust/system/cuda/detail/throw_on_error.h>
 #include <thrust/system/cuda/error.h>
 #include <thrust/system/detail/bad_alloc.h>
-#include <thrust/system/cuda/detail/throw_on_error.h>
-#include <thrust/detail/malloc_and_free.h>
-#include <thrust/detail/seq.h>
-
+#include <thrust/system/system_error.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
-
-// note that malloc returns a raw pointer to avoid
-// depending on the heavyweight thrust/system/cuda/memory.h header
-template<typename DerivedPolicy>
-__host__ __device__
-void *malloc(execution_policy<DerivedPolicy> &, std::size_t n)
-{
-  void *result = 0;
+                // note that malloc returns a raw pointer to avoid
+                // depending on the heavyweight thrust/system/cuda/memory.h header
+                template <typename DerivedPolicy>
+                __host__ __device__ void* malloc(execution_policy<DerivedPolicy>&, std::size_t n)
+                {
+                    void* result = 0;
 
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-  // XXX use hipMalloc in __device__ code when it becomes available
+                    // XXX use hipMalloc in __device__ code when it becomes available
 
+                    hipError_t error = hipMalloc(reinterpret_cast<void**>(&result), n);
 
-  hipError_t error = hipMalloc(reinterpret_cast<void**>(&result), n);
-
-  if(error)
-  {
-    //throw thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
-  thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
-  } // end if
+                    if(error)
+                    {
+                        //throw thrust::system::detail::bad_alloc(thrust::cuda_category().message(error).c_str());
+                        thrust::system::detail::bad_alloc(
+                            thrust::cuda_category().message(error).c_str());
+                    } // end if
 
 #else
-  result = thrust::raw_pointer_cast(thrust::malloc(thrust::seq, n));
+                    result = thrust::raw_pointer_cast(thrust::malloc(thrust::seq, n));
 #endif
 
-  return result;
-} // end malloc()
+                    return result;
+                } // end malloc()
 
-
-template<typename DerivedPolicy, typename Pointer>
-__host__ __device__
-void free(execution_policy<DerivedPolicy> &, Pointer ptr)
-{
+                template <typename DerivedPolicy, typename Pointer>
+                __host__ __device__ void free(execution_policy<DerivedPolicy>&, Pointer ptr)
+                {
 //#ifndef __CUDA_ARCH__
 #if __HIP_DEVICE_COMPILE__ == 0
-  // XXX use hipFree in __device__ code when it becomes available
+                    // XXX use hipFree in __device__ code when it becomes available
 
-  throw_on_error(hipFree(thrust::raw_pointer_cast(ptr)), "hipFree in free");
+                    throw_on_error(hipFree(thrust::raw_pointer_cast(ptr)), "hipFree in free");
 
 #else
-  thrust::free(thrust::seq, ptr);
+                    thrust::free(thrust::seq, ptr);
 #endif
-} // end free()
+                } // end free()
 
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

@@ -17,39 +17,34 @@
 
 #pragma once
 
+#include <cstdio>
 #include <thrust/detail/config.h>
 #include <thrust/system/cuda/detail/bulk.h>
-#include <cstdio>
-
 
 namespace thrust
 {
-namespace system
-{
-namespace cuda
-{
-namespace detail
-{
+    namespace system
+    {
+        namespace cuda
+        {
+            namespace detail
+            {
 
-
-inline __host__ __device__
-void throw_on_error(hipError_t error, const char *message)
-{
-  thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
-}
+                inline __host__ __device__ void throw_on_error(hipError_t  error,
+                                                               const char* message)
+                {
+                    thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
+                }
 
 #ifdef __HIP_PLATFORM_NVCC__
-inline __host__ __device__
-void throw_on_error(cudaError_t error, const char *message)
-{
-  thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
-}
+                inline __host__ __device__ void throw_on_error(cudaError_t error,
+                                                               const char* message)
+                {
+                    thrust::system::cuda::detail::bulk_::detail::throw_on_error(error, message);
+                }
 #endif
 
-
-
-} // end detail
-} // end cuda
-} // end system
+            } // end detail
+        } // end cuda
+    } // end system
 } // end thrust
-

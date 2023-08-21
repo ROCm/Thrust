@@ -20,26 +20,26 @@
 
 #pragma once
 
-#include <thrust/detail/config.h>
-#include <thrust/system/omp/execution_policy.h>
-#include <thrust/memory.h>
-#include <thrust/detail/type_traits.h>
-#include <thrust/detail/allocator/malloc_allocator.h>
 #include <ostream>
+#include <thrust/detail/allocator/malloc_allocator.h>
+#include <thrust/detail/config.h>
+#include <thrust/detail/type_traits.h>
+#include <thrust/memory.h>
+#include <thrust/system/omp/execution_policy.h>
 
 namespace thrust
 {
-namespace system
-{
-namespace omp
-{
+    namespace system
+    {
+        namespace omp
+        {
 
-template<typename> class pointer;
+            template <typename>
+            class pointer;
 
-} // end omp
-} // end system
+        } // end omp
+    } // end system
 } // end thrust
-
 
 /*! \cond
  */
@@ -51,37 +51,36 @@ template<typename> class pointer;
 namespace thrust
 {
 
-template<typename Element>
-  struct iterator_traits<thrust::system::omp::pointer<Element> >
-{
-  private:
-    typedef thrust::system::omp::pointer<Element> ptr;
+    template <typename Element>
+    struct iterator_traits<thrust::system::omp::pointer<Element>>
+    {
+    private:
+        typedef thrust::system::omp::pointer<Element> ptr;
 
-  public:
-    typedef typename ptr::iterator_category       iterator_category;
-    typedef typename ptr::value_type              value_type;
-    typedef typename ptr::difference_type         difference_type;
-    typedef ptr                                   pointer;
-    typedef typename ptr::reference               reference;
-}; // end iterator_traits
+    public:
+        typedef typename ptr::iterator_category iterator_category;
+        typedef typename ptr::value_type        value_type;
+        typedef typename ptr::difference_type   difference_type;
+        typedef ptr                             pointer;
+        typedef typename ptr::reference         reference;
+    }; // end iterator_traits
 
 } // end thrust
 
 /*! \endcond
  */
 
-
 namespace thrust
 {
-namespace system
-{
+    namespace system
+    {
 
-/*! \addtogroup system_backends Systems
+        /*! \addtogroup system_backends Systems
  *  \ingroup system
  *  \{
  */
 
-/*! \namespace thrust::system::omp
+        /*! \namespace thrust::system::omp
  *  \brief \p thrust::system::omp is the namespace containing functionality for allocating, manipulating,
  *         and deallocating memory available to Thrust's OpenMP backend system.
  *         The identifiers are provided in a separate namespace underneath <tt>thrust::system</tt>
@@ -89,33 +88,33 @@ namespace system
  *         namespace for easy access.
  *
  */
-namespace omp
-{
+        namespace omp
+        {
 
-// forward declaration of reference for pointer
-template<typename Element> class reference;
+            // forward declaration of reference for pointer
+            template <typename Element>
+            class reference;
 
-/*! \cond
+            /*! \cond
  */
 
-// XXX nvcc + msvc have trouble instantiating reference below
-//     this is a workaround
-namespace detail
-{
+            // XXX nvcc + msvc have trouble instantiating reference below
+            //     this is a workaround
+            namespace detail
+            {
 
-template<typename Element>
-  struct reference_msvc_workaround
-{
-  typedef thrust::system::omp::reference<Element> type;
-}; // end reference_msvc_workaround
+                template <typename Element>
+                struct reference_msvc_workaround
+                {
+                    typedef thrust::system::omp::reference<Element> type;
+                }; // end reference_msvc_workaround
 
-} // end detail
+            } // end detail
 
-/*! \endcond
+            /*! \endcond
  */
 
-
-/*! \p pointer stores a pointer to an object allocated in memory available to the omp system.
+            /*! \p pointer stores a pointer to an object allocated in memory available to the omp system.
  *  This type provides type safety when dispatching standard algorithms on ranges resident
  *  in omp memory.
  *
@@ -136,131 +135,122 @@ template<typename Element>
  *  \see omp::free
  *  \see raw_pointer_cast
  */
-template<typename T>
-  class pointer
-    : public thrust::pointer<
-               T,
-               thrust::system::omp::tag,
-               thrust::system::omp::reference<T>,
-               thrust::system::omp::pointer<T>
-             >
-{
-  /*! \cond
+            template <typename T>
+            class pointer : public thrust::pointer<T,
+                                                   thrust::system::omp::tag,
+                                                   thrust::system::omp::reference<T>,
+                                                   thrust::system::omp::pointer<T>>
+            {
+                /*! \cond
    */
 
-  private:
-    typedef thrust::pointer<
-      T,
-      thrust::system::omp::tag,
-      //thrust::system::omp::reference<T>,
-      typename detail::reference_msvc_workaround<T>::type,
-      thrust::system::omp::pointer<T>
-    > super_t;
+            private:
+                typedef thrust::pointer<T,
+                                        thrust::system::omp::tag,
+                                        //thrust::system::omp::reference<T>,
+                                        typename detail::reference_msvc_workaround<T>::type,
+                                        thrust::system::omp::pointer<T>>
+                    super_t;
 
-  /*! \endcond
+                /*! \endcond
    */
 
-  public:
-    // note that omp::pointer's member functions need __host__ __device__
-    // to interoperate with nvcc + iterators' dereference member function
+            public:
+                // note that omp::pointer's member functions need __host__ __device__
+                // to interoperate with nvcc + iterators' dereference member function
 
-    /*! \p pointer's no-argument constructor initializes its encapsulated pointer to \c 0.
+                /*! \p pointer's no-argument constructor initializes its encapsulated pointer to \c 0.
      */
-    __host__ __device__
-    pointer() : super_t() {}
+                __host__ __device__ pointer()
+                    : super_t()
+                {
+                }
 
-    /*! This constructor allows construction of a <tt>pointer<const T></tt> from a <tt>T*</tt>.
+                /*! This constructor allows construction of a <tt>pointer<const T></tt> from a <tt>T*</tt>.
      *
      *  \param ptr A raw pointer to copy from, presumed to point to a location in memory
      *         accessible by the \p omp system.
      *  \tparam OtherT \p OtherT shall be convertible to \p T.
      */
-    template<typename OtherT>
-    __host__ __device__
-    explicit pointer(OtherT *ptr) : super_t(ptr) {}
+                template <typename OtherT>
+                __host__ __device__ explicit pointer(OtherT* ptr)
+                    : super_t(ptr)
+                {
+                }
 
-    /*! This constructor allows construction from another pointer-like object with related type.
+                /*! This constructor allows construction from another pointer-like object with related type.
      *
      *  \param other The \p OtherPointer to copy.
      *  \tparam OtherPointer The system tag associated with \p OtherPointer shall be convertible
      *          to \p thrust::system::omp::tag and its element type shall be convertible to \p T.
      */
-    template<typename OtherPointer>
-    __host__ __device__
-    pointer(const OtherPointer &other,
-            typename thrust::detail::enable_if_pointer_is_convertible<
-              OtherPointer,
-              pointer
-            >::type * = 0) : super_t(other) {}
+                template <typename OtherPointer>
+                __host__ __device__ pointer(
+                    const OtherPointer& other,
+                    typename thrust::detail::enable_if_pointer_is_convertible<OtherPointer,
+                                                                              pointer>::type* = 0)
+                    : super_t(other)
+                {
+                }
 
-    /*! Assignment operator allows assigning from another pointer-like object with related type.
+                /*! Assignment operator allows assigning from another pointer-like object with related type.
      *
      *  \param other The other pointer-like object to assign from.
      *  \tparam OtherPointer The system tag associated with \p OtherPointer shall be convertible
      *          to \p thrust::system::omp::tag and its element type shall be convertible to \p T.
      */
-    template<typename OtherPointer>
-    __host__ __device__
-    typename thrust::detail::enable_if_pointer_is_convertible<
-      OtherPointer,
-      pointer,
-      pointer &
-    >::type
-    operator=(const OtherPointer &other)
-    {
-      return super_t::operator=(other);
-    }
-}; // end pointer
+                template <typename OtherPointer>
+                __host__ __device__ typename thrust::detail::
+                    enable_if_pointer_is_convertible<OtherPointer, pointer, pointer&>::type
+                    operator=(const OtherPointer& other)
+                {
+                    return super_t::operator=(other);
+                }
+            }; // end pointer
 
-
-/*! \p reference is a wrapped reference to an object stored in memory available to the \p omp system.
+            /*! \p reference is a wrapped reference to an object stored in memory available to the \p omp system.
  *  \p reference is the type of the result of dereferencing a \p omp::pointer.
  *
  *  \tparam T Specifies the type of the referenced object.
  */
-template<typename T>
-  class reference
-    : public thrust::reference<
-               T,
-               thrust::system::omp::pointer<T>,
-               thrust::system::omp::reference<T>
-             >
-{
-  /*! \cond
+            template <typename T>
+            class reference : public thrust::reference<T,
+                                                       thrust::system::omp::pointer<T>,
+                                                       thrust::system::omp::reference<T>>
+            {
+                /*! \cond
    */
 
-  private:
-    typedef thrust::reference<
-      T,
-      thrust::system::omp::pointer<T>,
-      thrust::system::omp::reference<T>
-    > super_t;
+            private:
+                typedef thrust::
+                    reference<T, thrust::system::omp::pointer<T>, thrust::system::omp::reference<T>>
+                        super_t;
 
-  /*! \endcond
+                /*! \endcond
    */
 
-  public:
-    /*! \cond
+            public:
+                /*! \cond
      */
 
-    typedef typename super_t::value_type value_type;
-    typedef typename super_t::pointer    pointer;
+                typedef typename super_t::value_type value_type;
+                typedef typename super_t::pointer    pointer;
 
-    /*! \endcond
+                /*! \endcond
      */
 
-    /*! This constructor initializes this \p reference to refer to an object
+                /*! This constructor initializes this \p reference to refer to an object
      *  pointed to by the given \p pointer. After this \p reference is constructed,
      *  it shall refer to the object pointed to by \p ptr.
      *
      *  \param ptr A \p pointer to copy from.
      */
-    __host__ __device__
-    explicit reference(const pointer &ptr)
-      : super_t(ptr)
-    {}
+                __host__ __device__ explicit reference(const pointer& ptr)
+                    : super_t(ptr)
+                {
+                }
 
-    /*! This constructor accepts a const reference to another \p reference of related type.
+                /*! This constructor accepts a const reference to another \p reference of related type.
      *  After this \p reference is constructed, it shall refer to the same object as \p other.
      *
      *  \param other A \p reference to copy from.
@@ -269,42 +259,40 @@ template<typename T>
      *  \note This constructor is templated primarily to allow initialization of <tt>reference<const T></tt>
      *        from <tt>reference<T></tt>.
      */
-    template<typename OtherT>
-    __host__ __device__
-    reference(const reference<OtherT> &other,
-              typename thrust::detail::enable_if_convertible<
-                typename reference<OtherT>::pointer,
-                pointer
-              >::type * = 0)
-      : super_t(other)
-    {}
+                template <typename OtherT>
+                __host__ __device__ reference(const reference<OtherT>& other,
+                                              typename thrust::detail::enable_if_convertible<
+                                                  typename reference<OtherT>::pointer,
+                                                  pointer>::type* = 0)
+                    : super_t(other)
+                {
+                }
 
-    /*! Copy assignment operator copy assigns from another \p reference of related type.
+                /*! Copy assignment operator copy assigns from another \p reference of related type.
      *
      *  \param other The other \p reference to assign from.
      *  \return <tt>*this</tt>
      *  \tparam OtherT The element type of the other \p reference.
      */
-    template<typename OtherT>
-    reference &operator=(const reference<OtherT> &other);
+                template <typename OtherT>
+                reference& operator=(const reference<OtherT>& other);
 
-    /*! Assignment operator assigns from a \p value_type.
+                /*! Assignment operator assigns from a \p value_type.
      *
      *  \param x The \p value_type to assign from.
      *  \return <tt>*this</tt>
      */
-    reference &operator=(const value_type &x);
-}; // end reference
+                reference& operator=(const value_type& x);
+            }; // end reference
 
-/*! Exchanges the values of two objects referred to by \p reference.
+            /*! Exchanges the values of two objects referred to by \p reference.
  *  \p x The first \p reference of interest.
  *  \p y The second \p reference ot interest.
  */
-template<typename T>
-__host__ __device__
-void swap(reference<T> x, reference<T> y);
+            template <typename T>
+            __host__ __device__ void swap(reference<T> x, reference<T> y);
 
-/*! Allocates an area of memory available to Thrust's <tt>omp</tt> system.
+            /*! Allocates an area of memory available to Thrust's <tt>omp</tt> system.
  *  \param n Number of bytes to allocate.
  *  \return A <tt>omp::pointer<void></tt> pointing to the beginning of the newly
  *          allocated memory. A null <tt>omp::pointer<void></tt> is returned if
@@ -314,9 +302,9 @@ void swap(reference<T> x, reference<T> y);
  *  \see omp::free
  *  \see std::malloc
  */
-inline pointer<void> malloc(std::size_t n);
+            inline pointer<void> malloc(std::size_t n);
 
-/*! Allocates a typed area of memory available to Thrust's <tt>omp</tt> system.
+            /*! Allocates a typed area of memory available to Thrust's <tt>omp</tt> system.
  *  \param n Number of elements to allocate.
  *  \return A <tt>omp::pointer<T></tt> pointing to the beginning of the newly
  *          allocated memory. A null <tt>omp::pointer<T></tt> is returned if
@@ -326,89 +314,81 @@ inline pointer<void> malloc(std::size_t n);
  *  \see omp::free
  *  \see std::malloc
  */
-template<typename T>
-inline pointer<T> malloc(std::size_t n);
+            template <typename T>
+            inline pointer<T> malloc(std::size_t n);
 
-/*! Deallocates an area of memory previously allocated by <tt>omp::malloc</tt>.
+            /*! Deallocates an area of memory previously allocated by <tt>omp::malloc</tt>.
  *  \param ptr A <tt>omp::pointer<void></tt> pointing to the beginning of an area
  *         of memory previously allocated with <tt>omp::malloc</tt>.
  *  \see omp::malloc
  *  \see std::free
  */
-inline void free(pointer<void> ptr);
+            inline void free(pointer<void> ptr);
 
-// XXX upon c++11
-// template<typename T> using allocator = thrust::detail::malloc_allocator<T,tag,pointer<T> >;
+            // XXX upon c++11
+            // template<typename T> using allocator = thrust::detail::malloc_allocator<T,tag,pointer<T> >;
 
-/*! \p omp::allocator is the default allocator used by the \p omp system's containers such as
+            /*! \p omp::allocator is the default allocator used by the \p omp system's containers such as
  *  <tt>omp::vector</tt> if no user-specified allocator is provided. \p omp::allocator allocates
  *  (deallocates) storage with \p omp::malloc (\p omp::free).
  */
-template<typename T>
-  struct allocator
-    : thrust::detail::malloc_allocator<
-        T,
-        tag,
-        pointer<T>
-      >
-{
-  /*! The \p rebind metafunction provides the type of an \p allocator
+            template <typename T>
+            struct allocator : thrust::detail::malloc_allocator<T, tag, pointer<T>>
+            {
+                /*! The \p rebind metafunction provides the type of an \p allocator
    *  instantiated with another type.
    *
    *  \tparam U The other type to use for instantiation.
    */
-  template<typename U>
-    struct rebind
-  {
-    /*! The typedef \p other gives the type of the rebound \p allocator.
+                template <typename U>
+                struct rebind
+                {
+                    /*! The typedef \p other gives the type of the rebound \p allocator.
      */
-    typedef allocator<U> other;
-  };
+                    typedef allocator<U> other;
+                };
 
-  /*! No-argument constructor has no effect.
+                /*! No-argument constructor has no effect.
    */
-  __host__ __device__
-  inline allocator() {}
+                __host__ __device__ inline allocator() {}
 
-  /*! Copy constructor has no effect.
+                /*! Copy constructor has no effect.
    */
-  __host__ __device__
-  inline allocator(const allocator &) {}
+                __host__ __device__ inline allocator(const allocator&) {}
 
-  /*! Constructor from other \p allocator has no effect.
+                /*! Constructor from other \p allocator has no effect.
    */
-  template<typename U>
-  __host__ __device__
-  inline allocator(const allocator<U> &) {}
+                template <typename U>
+                __host__ __device__ inline allocator(const allocator<U>&)
+                {
+                }
 
-  /*! Destructor has no effect.
+                /*! Destructor has no effect.
    */
-  __host__ __device__
-  inline ~allocator() {}
-}; // end allocator
+                __host__ __device__ inline ~allocator() {}
+            }; // end allocator
 
-} // end omp
+        } // end omp
 
-/*! \}
+        /*! \}
  */
 
-} // end system
+    } // end system
 
-/*! \namespace thrust::omp
+    /*! \namespace thrust::omp
  *  \brief \p thrust::omp is a top-level alias for thrust::system::omp.
  */
-namespace omp
-{
+    namespace omp
+    {
 
-using thrust::system::omp::pointer;
-using thrust::system::omp::reference;
-using thrust::system::omp::malloc;
-using thrust::system::omp::free;
-using thrust::system::omp::allocator;
+        using thrust::system::omp::allocator;
+        using thrust::system::omp::free;
+        using thrust::system::omp::malloc;
+        using thrust::system::omp::pointer;
+        using thrust::system::omp::reference;
 
-} // end omp
+    } // end omp
 
 } // end thrust
 
 #include <thrust/system/omp/detail/memory.inl>
-

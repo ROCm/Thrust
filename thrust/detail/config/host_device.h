@@ -41,4 +41,3 @@
 #endif // __device__
 
 #endif
-

@@ -16,23 +16,20 @@
 
 #pragma once
 
-#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 #include <thrust/iterator/detail/is_trivial_iterator.h>
+#include <thrust/system/cuda/detail/bulk/detail/config.hpp>
 
 BULK_NAMESPACE_PREFIX
 namespace bulk
 {
-namespace detail
-{
+    namespace detail
+    {
 
+        template <typename T>
+        struct is_contiguous_iterator : thrust::detail::is_trivial_iterator<T>
+        {
+        };
 
-template<typename T>
-  struct is_contiguous_iterator
-    : thrust::detail::is_trivial_iterator<T>
-{};
-
-
-} // end detail
+    } // end detail
 } // end bulk
 BULK_NAMESPACE_SUFFIX
-
