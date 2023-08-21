@@ -63,11 +63,7 @@ inline __device__ T *on_chip_cast(T *ptr)
 namespace detail
 {
 
-#ifdef __HIP_PLATFORM_NVCC__
 HIP_DYNAMIC_SHARED( int, s_data_segment_begin)
-#else
-extern  int s_data_segment_begin[];
-#endif
 
 class os
 {
@@ -474,19 +470,12 @@ class singleton_on_chip_allocator
 }; // end singleton_on_chip_allocator
 
 // put the object in an anonymous namespace so that non-CUDA compilers don't complain about multiple definitions
-#ifdef __HIP_PLATFORM_NVCC__
 namespace
 {
 
 __shared__  uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
 
 } // end anon namespace
-#else
-namespace
-{
-uninitialized<singleton_on_chip_allocator> s_on_chip_allocator;
-} // end anon namespace
-#endif
 
 inline __device__ void init_on_chip_malloc(size_t max_data_segment_size)
 {
